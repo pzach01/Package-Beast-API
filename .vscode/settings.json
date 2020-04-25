@@ -1,0 +1,8 @@
+{
+    "python.pythonPath": "venv/bin/python",
+    "python.linting.pylintEnabled": false,
+    "python.linting.enabled": false,
+    "python.linting.pylintArgs": [
+        "--disable=F0401"
+    ]
+}

@@ -1,79 +1,88 @@
 from rest_framework import serializers
-from arrangements.models import Arrangement, BinLayout, BoxList
+from arrangements.models import Arrangement, ContainerLayout, ItemList
 from django.utils.timezone import now
 from arrangements.Box_Stuff_Python3_Only import box_stuff2 as optimize
 
 from users.models import User
 from users.serializers import UserSerializer
 
-class BoxListSerializer(serializers.ModelSerializer):
+class ItemListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = BoxList
+        model = ItemList
         fields = ['height', 'width', 'length', 'volume', 'xCenter', 'yCenter', 'zCenter']
 
-class BinLayoutSerializer(serializers.ModelSerializer):
-    boxList = BoxListSerializer(many=True, read_only=True)
+class ContainerLayoutSerializer(serializers.ModelSerializer):
+    itemList = ItemListSerializer(many=True, read_only=True)
 
     class Meta:
-        model = BinLayout
-        fields = ['height', 'width', 'length', 'volume', 'cost', 'boxList']
+        model = ContainerLayout
+        fields = ['height', 'width', 'length', 'volume', 'cost', 'itemList']
         
 class ArrangementSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     
-    binLayout = BinLayoutSerializer(many=True, read_only=True)
+    containerLayout = ContainerLayoutSerializer(many=True, read_only=True)
     class Meta:
         model = Arrangement
-        fields = ['id', 'owner', 'created', 'bins', 'boxes', 'binLayout']
+        fields = ['id', 'owner', 'created', 'containers', 'items', 'containerLayout']
 
     def create(self, validated_data):
 
         arrangement = Arrangement.objects.create(**validated_data)
 
-        bins = validated_data.get('bins')
-        boxes = validated_data.get('boxes')
-        bins = bins.split(',')
-        boxes = boxes.split(',')
-        caluclated_bins=optimize.master_calculate_optimal_solution(bins,boxes)
-     
-        binDictionarys=[]
-        for caluclated_bin in caluclated_bins:
-            binDictionarys.append(caluclated_bin.to_dictionary())
+        containers = validated_data.get('containers')
+        items = validated_data.get('items')
+        containers = containers.split(',')
+        items = items.split(',')
+        calculated_containers=optimize.master_calculate_optimal_solution(containers,items)
+        print("ccc", calculated_containers)
 
-        for binDictionary in binDictionarys:
-            binDictionary.pop('id', None)
-            boxLists = binDictionary.pop('boxList', None)
-            binDictionary.pop('weightCapacity', None)
-            binLayout = BinLayout.objects.create(arrangement=arrangement, **binDictionary)
+        containerDictionarys=[]
+        print("eee")
+        for calculated_container in calculated_containers:
+            print("aaa")
+            containerDictionarys.append(calculated_container.to_dictionary())
 
-            for boxList in boxLists:
-                boxList.pop('weight', None)
-                BoxList.objects.create(binLayout=binLayout, **boxList)
+        print("ddd")
+        for containerDictionary in containerDictionarys:
+            print("yyy")
+            containerDictionary.pop('id', None)
+            itemLists = containerDictionary.pop('itemList', None)
+            containerDictionary.pop('weightCapacity', None)
+            print("zzz", containerDictionary)
+            print("arrangement", arrangement.containers)
+            print("cd", containerDictionary)
+            containerLayout = ContainerLayout.objects.create(arrangement=arrangement, **containerDictionary)
+            print("qqq")
+            for itemList in itemLists:
+                print("sup")
+                itemList.pop('weight', None)
+                ItemList.objects.create(containerLayout=containerLayout, **itemList)
+        print("fff", arrangement)
         return arrangement
 
     def update(self, instance, validated_data):
-        instance.bins = validated_data.get('bins', instance.bins)
-        instance.boxes = validated_data.get('boxes', instance.boxes)
-        BinLayout.objects.filter(arrangement=instance).delete()
-        bins = instance.bins.split(',')
-        boxes = instance.boxes.split(',')
+        instance.containers = validated_data.get('containers', instance.containers)
+        instance.items = validated_data.get('items', instance.items)
+        ContainerLayout.objects.filter(arrangement=instance).delete()
+        containers = instance.containers.split(',')
+        items = instance.items.split(',')
 
+        calculated_containers=optimize.master_calculate_optimal_solution(containers,items)
 
-        calculated_bins=optimize.master_calculate_optimal_solution(bins,boxes)
+        containerDictionarys=[]
+        for calculated_containers in calculated_containers:
+            containerDictionarys.append(calculated_containers.to_dictionary())
 
-        binDictionarys=[]
-        for calculated_bins in calculated_bins:
-            binDictionarys.append(calculated_bins.to_dictionary())
+        for containerDictionary in containerDictionarys:
+            containerDictionary.pop('id', None)
+            itemLists = containerDictionary.pop('itemList', None)
+            containerDictionary.pop('weightCapacity', None)
+            containerLayout = ContainerLayout.objects.create(arrangement=instance, **containerDictionary)
 
-        for binDictionary in binDictionarys:
-            binDictionary.pop('id', None)
-            boxLists = binDictionary.pop('boxList', None)
-            binDictionary.pop('weightCapacity', None)
-            binLayout = BinLayout.objects.create(arrangement=instance, **binDictionary)
-
-            for boxList in boxLists:
-                boxList.pop('weight', None)
-                BoxList.objects.create(binLayout=binLayout, **boxList)
+            for itemList in itemLists:
+                itemList.pop('weight', None)
+                ItemList.objects.create(containerLayout=containerLayout, **itemList)
 
         instance.save()
         return instance

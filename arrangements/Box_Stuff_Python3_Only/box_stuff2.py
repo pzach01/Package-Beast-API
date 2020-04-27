@@ -8,8 +8,8 @@ import copy
 import math
 import itertools
 
-def calculate_partion_list_size(binListSize, boxListSize):
-    return math.factorial(binListSize+boxListSize-1)/(math.factorial(binListSize)*math.factorial(boxListSize-1))
+def calculate_partion_list_size(binListSize, itemListSize):
+    return math.factorial(binListSize+itemListSize-1)/(math.factorial(binListSize)*math.factorial(itemListSize-1))
 
 def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeightCapacitys, boxWeights):
     import time
@@ -72,7 +72,7 @@ def calculate_cost(costList, arrangment):
     return cost
 
 # an arrangment of boxes and bins doesnt come with xyz coordinates in pyshipping, but arrangment seems to be implied by pyshipping (relatively untested)
-def get_xyz_of_optimal_solution(minArrangment,bins1, boxs1):
+def get_xyz_of_optimal_solution(minArrangment,bins1, boxs1,endTimeRendering):
     binList=[]
     packageList=[]    
     for index in range(0, len(minArrangment)):
@@ -90,6 +90,17 @@ def get_xyz_of_optimal_solution(minArrangment,bins1, boxs1):
             #select the first box
             boxArrangment=boxArrangment[0]
             
+            
+            
+            try:
+                coordinateDict=box_stuff1.slot_bin_with_coordinates(boxArrangment, bin)
+                print(coordinateDict)
+            ### couldnt figure out how to add with this particurlar bin arrangment 
+            except ValueError:
+                raise ValueError            
+            
+            # old code that falsely claimed to enumerate all the ways we can arrange the boxes (ignores rotations!)
+            '''
             # get all the orders in which boxes can be placed into a single bin
             allArrangments=(itertools.permutations(boxArrangment,len(boxArrangment)))
             try:
@@ -107,7 +118,8 @@ def get_xyz_of_optimal_solution(minArrangment,bins1, boxs1):
             ### couldnt figure out how to add with this particurlar bin arrangment 
             except StopIteration:
                 raise ValueError
-                
+            '''
+            
             ### bins obviously dont have coordinates, also dictionary with bin as key could result in data overwrites if there are 2 of the same bin size
             ### as a result I use 2 lists
             binList.append(bin)
@@ -171,7 +183,13 @@ def fit_all(bins1, boxs1, timeout=0, costList=None, binWeightCapacitys=None, box
 
 # bin weights must be in same order, same for box weights
 def master_calculate_optimal_solution(bins1, boxs1,timeout=0,costList=None,binWeightCapacitys=None, boxWeights=None):
-    # use volume in default case
+    # metaparameter, expose to API at some point
+    renderingPercentageOfComputation=.5
+    
+    computationTimeout=timeout*(1-renderingPercentageOfComputation)
+    renderingTimeout=timeout*(renderingPercentageOfComputation)
+    
+    assert(computationTimeout+renderingTimeout==timeout)
     import math
     import time
     
@@ -182,8 +200,9 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,costList=None,binWe
         raise TimeoutError("this is too big for the current algorithm, reduce number of bins or boxes")
     
     # if we reach this time trigger a timeout error
-    endTime=math.inf if timeout==0 else time.time()+timeout
-        
+    endTimeComputation=math.inf if timeout==0 else time.time()+computationTimeout
+    endTimeRendering=endTimeComputation+renderingTimeout
+    
     boxs1=[Package(box) for box in boxs1]
     bins1=[Package(bin) for bin in bins1] 
     
@@ -201,7 +220,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,costList=None,binWe
 
     
     ## find the index arrangment of the cheapest combination (actual computation)
-    minArrangment, minCost,timedOut=bruteforce(generator,bins1, boxs1,endTime,costList,binWeightCapacitys,boxWeights)
+    minArrangment, minCost,timedOut=bruteforce(generator,bins1, boxs1,endTimeComputation,costList,binWeightCapacitys,boxWeights)
     if(minCost==float('inf')):
         raise NotImplementedError("no arrangment possible")
 
@@ -211,7 +230,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,costList=None,binWe
     
     ### these should be equal in length
 
-    binList, packageList=get_xyz_of_optimal_solution(minArrangment, bins1, boxs1)
+    binList, packageList=get_xyz_of_optimal_solution(minArrangment, bins1, boxs1,endTimeRendering)
     
     #return binList,packageList
     
@@ -243,7 +262,7 @@ class Bin():
         aDictionary['weightCapacity']=self.weightCapacity
         # this is basically just a fancy for loop
         aDictionary['timedOut']=self.timedOut
-        aDictionary['boxList']=[box.to_dictionary() for box in self.boxes]
+        aDictionary['itemList']=[box.to_dictionary() for box in self.boxes]
         return aDictionary
     def __init__(self,id,height, width, length,cost, weightCapacity,timedOut):
         self.id=id

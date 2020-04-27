@@ -47,8 +47,8 @@ INSTALLED_APPS = [
     # 'rest_framework_swagger', #2-7-20 New PZ
     'drf_yasg', #2-7-20 New PZ
     'corsheaders',
-    'boxes',
-    'bins',
+    'items',
+    'containers',
     'arrangements',
     'users'
 ]

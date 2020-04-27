@@ -59,8 +59,8 @@ urlpatterns = [
     #allows login and logout from endpoint, eg. /arrangments
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('', include('arrangements.urls')),
-    path('', include('bins.urls')),
-    path('', include('boxes.urls')),
+    path('', include('containers.urls')),
+    path('', include('items.urls')),
     path('', include('users.urls')),
     
     path('accounts/', include('rest_auth.urls')),

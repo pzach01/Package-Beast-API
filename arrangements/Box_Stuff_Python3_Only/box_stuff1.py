@@ -40,6 +40,7 @@ import copy
 from . import package
 from .package import Package
 import time
+from . import new_is_valid_corner_point_code
 
 
 
@@ -141,7 +142,8 @@ def slot_bin_with_coordinates(packageArrangment, bin):
     ### bounds obviously cant be in existing shapes, as a protocol checks that all new shapes are strictly outside existing shapes, which is impossible to add
     ### new shapes to the bin if this is so (logical contradiction)
     #existingShapes.append(bounds)
-
+    # we cant ever add to an interior point (as we have already added to it) so we keep it on a banned point list
+    interiorPoints=[]
     for package in packageArrangment:
 
         ### try to slot, if you can't add throw exception        
@@ -151,14 +153,16 @@ def slot_bin_with_coordinates(packageArrangment, bin):
         ### flatten the structured list of 'existingShapes' into just a list of points
         flattenedPoints=[]
         for list in existingShapes:
-            for item in list:
-                flattenedPoints.append(item)
+            for point in list:
+                if ((point not in flattenedPoints) and (point not in interiorPoints)):
+                    flattenedPoints.append(point)
         ### bounds isn't in existing shapes but should still be considered a place we can add point to
         for point in bounds:
             flattenedPoints.append(point)
         ### sort the points by the values you need to
         pointsWeCanAddTo=sort_points_we_can_add_to(flattenedPoints)
         ### 
+
         addedShape=False
         ### current failures: not adding to earlier succesful point
         ### not catching failure outside box
@@ -166,12 +170,14 @@ def slot_bin_with_coordinates(packageArrangment, bin):
             midPoint=generate_midpoint(cornerPoint, package.heigth, package.width, package.length)            
             newShape=generate_extreme_points(midPoint, package.heigth, package.width, package.length)
             ### the shape exists within the bounds of the bin 
-            if is_valid_corner_point(bounds, existingShapes,newShape):
+            if new_is_valid_corner_point_code.new_is_valid_corner_point(bounds,existingShapes,newShape):            
+            #if is_valid_corner_point(bounds, existingShapes,newShape):
                 ### add new shape to 'existingShapes'
                 existingShapes.append(newShape)
                 ### add the new coordinate and package to 'retDict'
                 retDict[(midPoint)]=package
                 addedShape=True
+                interiorPoints.append(cornerPoint)
                 break
                        
         if(not addedShape):
@@ -213,7 +219,30 @@ def is_valid_corner_point(bounds, existingShapes, newShape):
         return True
     else:
         return False
-### returns if a shape is strictly within bounds
+'''
+## returns if a shape is strictly outside dimensions of 'oldShape', ie. dont share space
+def stictly_outside(oldShape, newShape):
+    min, max=get_min_max_tuple(oldShape)
+    ### < instead of <= because extreme points can have the same coordinate (2 extreme points at one coordinate)
+    for extremePoint in newShape:
+        if((min[0] <extremePoint[0]<max[0])):
+            if((min[1] <extremePoint[1]<max[1])):
+                if((min[2] <extremePoint[2]<max[2])):
+                    return False
+    return True
+'''
+def stictly_outside(oldShape, newShape):
+    min, max=get_min_max_tuple(oldShape)
+    ### < instead of <= because extreme points can have the same coordinate (2 extreme points at one coordinate)
+    for extremePoint in newShape:
+        if extremePoint in oldShape:
+            pass
+        else:
+            if((min[0] <=extremePoint[0]<=max[0])):
+                if((min[1] <=extremePoint[1]<=max[1])):
+                    if((min[2] <=extremePoint[2]<=max[2])):
+                        return False
+    return True
 def strictly_within(bounds, newShape):
     ## all extreme points are within bounds
     min, max=get_min_max_tuple(bounds)
@@ -227,18 +256,6 @@ def strictly_within(bounds, newShape):
     
     
     return True
-
-## returns if a shape is strictly outside dimensions of 'oldShape', ie. dont share space
-def stictly_outside(oldShape, newShape):
-    min, max=get_min_max_tuple(oldShape)
-    ### < instead of <= because extreme points can have the same coordinate (2 extreme points at one coordinate)
-    for extremePoint in newShape:
-        if((min[0] <extremePoint[0]<max[0])):
-            if((min[1] <extremePoint[1]<max[1])):
-                if((min[2] <extremePoint[2]<max[2])):
-                    return False
-    return True
-
 
 def get_min_max_tuple(extremePoints):
     minX,minY,minZ=extremePoints[0][0],extremePoints[0][1],extremePoints[0][2]

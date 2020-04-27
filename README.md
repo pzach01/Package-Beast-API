@@ -5,7 +5,7 @@
 ```
 python3 -m venv venv
 ```
-### Activate you virtual environment: 
+### Activate your virtual environment: 
 
 ```source venv/bin/activate```
 

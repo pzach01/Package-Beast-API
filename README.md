@@ -5,26 +5,38 @@
 ```
 python3 -m venv venv
 ```
-### Activate you virtual environment: 
+### Activate your virtual environment: 
 
-```source venv/bin/activate```
+```
+source venv/bin/activate
+```
 
 ### Install requirements: 
 
-```pip install -r requirements.txt```
+```
+pip install -r requirements.txt
+```
+
+### Create superuser:
+
+```
+python manage.py createsuperuser
+```
 
 ### Make migrations: 
 
-```python manage.py makemigrations```
-
-### Create Superuser:
-
-```python manage.py createsuperuser```
+```
+python manage.py makemigrations
+```
 
 ### Migrate: 
 
-```python manage.py migrate```
+```
+python manage.py migrate
+```
 
 ### Run server: 
 
-```python manage.py runserver```
+```
+python manage.py runserver
+```

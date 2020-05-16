@@ -5,7 +5,7 @@ class ContainerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Container
         ref_name = 'myContainers'
-        fields = ['id', 'height', 'width', 'length', 'volume']
+        fields = ['id', 'sku', 'description', 'height', 'width', 'length', 'volume']
         read_only_fields = ['volume']
 
     def create(self, validated_data):

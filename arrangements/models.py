@@ -7,8 +7,8 @@ from django.contrib import admin
 class Arrangement(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('users.User', related_name='arrangements', on_delete=models.CASCADE)
-    containers = models.CharField(max_length=100, blank=True, default='')
-    items = models.CharField(max_length=100, blank=True, default='')
+    containers = models.CharField(max_length=255, blank=True, default='')
+    items = models.CharField(max_length=255, blank=True, default='')
     class Meta:
         ordering = ['created']
 

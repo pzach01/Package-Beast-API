@@ -5,7 +5,7 @@ class ItemListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         ref_name = 'myItems'
-        fields = ['id', 'height', 'width', 'length', 'volume']
+        fields = ['id', 'sku', 'description', 'height', 'width', 'length', 'volume']
         read_only_fields = ['volume']
 
     def create(self, validated_data):

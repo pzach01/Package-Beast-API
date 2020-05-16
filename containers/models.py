@@ -6,9 +6,11 @@ from django.utils.timezone import now
 class Container(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('users.User', related_name='bins', on_delete=models.CASCADE)
+    sku = models.CharField(max_length=255, blank=True, default='')
+    description = models.CharField(max_length=255, blank=True, default='')
     height = models.FloatField(default=0.0)
     width = models.FloatField(default=0.0)
     length = models.FloatField(default=0.0)
     volume = models.FloatField(default=0.0)
+    units = models.CharField(max_length=2, blank=False, default='in')
     cost = models.FloatField(default=0.0)
-    timedOut = models.BooleanField(default=False)

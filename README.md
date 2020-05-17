@@ -17,12 +17,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Create superuser:
-
-```
-python manage.py createsuperuser
-```
-
 ### Make migrations: 
 
 ```
@@ -33,6 +27,12 @@ python manage.py makemigrations
 
 ```
 python manage.py migrate
+```
+
+### Create superuser:
+
+```
+python manage.py createsuperuser
 ```
 
 ### Run server: 

@@ -33,7 +33,7 @@ from drf_yasg import openapi
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="SUP Turd",
+      title="Package Beast API",
       default_version='v1',
       description="A simple API for packaging optimization and payments",
     #   terms_of_service="Terms of use",

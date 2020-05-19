@@ -12,7 +12,7 @@ class ItemListSerializer(serializers.ModelSerializer):
         item = Item.objects.create(**validated_data)
         item.volume = validated_data['height']*validated_data['width']*validated_data['length']
         item.save()
-        return box
+        return item
 
     def update(self, instance, validated_data):
         instance.sku = validated_data.get('sku', instance.height)

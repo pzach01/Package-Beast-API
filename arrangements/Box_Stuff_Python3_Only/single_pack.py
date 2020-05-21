@@ -16,7 +16,7 @@ def single_pack(container, itemList,iterationLimit=1000):
     
     # Option 2 All permutations of the items
     # This takes forever to generate the permutations
-    item_permutations=list(itertools.permutations(itemList,len(itemList)))
+    item_permutations=(itertools.permutations(itemList,len(itemList)))
     #item_sets=set(itertools.permutations(itemList))
     #print(type(item_permutations))
     #print(type(item_sets))

@@ -34,7 +34,7 @@ def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeigh
                     ### uses one box with nothing leftover
                     if(len(boxes)!=0):
                         binpackResult=box_stuff1.binpack(boxes,bin)
-                        if (len(binpackResult[0])>1 or len(binpackResult[1])>0):
+                        if (binpackResult==None):
                             
                             valid=False
                             break
@@ -85,15 +85,15 @@ def get_xyz_of_optimal_solution(minArrangment,bins1, boxs1,endTimeRendering):
             #print(boxesUsed)
             #print(bin)
             ### boxes used instead of leftover boxes are selected
-            boxArrangment=box_stuff1.binpack(boxesUsed, bin, 2000000)[0]
-            assert(len(boxArrangment)<=1)
+            boxArrangment=box_stuff1.binpack(boxesUsed, bin, 2000000)
+            #rendering failed the second time
+            assert(boxArrangment is not None)
             #select the first box
-            boxArrangment=boxArrangment[0]
             
             
             
             try:
-                coordinateDict=box_stuff1.slot_bin_with_coordinates(boxArrangment, bin)
+                coordinateDict=box_stuff1.slot_bin_with_coordinates_py3dbp(boxArrangment, bin)
                 print(coordinateDict)
             ### couldnt figure out how to add with this particurlar bin arrangment 
             except ValueError:

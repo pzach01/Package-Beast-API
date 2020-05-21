@@ -127,6 +127,23 @@ Created by Maximillian Dornseif on 2010-08-16.
 Copyright (c) 2010 HUDORA. All rights reserved.
 """
 
+def slot_bin_with_coordinates_py3dbp(packageArrangment, bin):
+    retDict={}
+    for item in packageArrangment.items:
+
+
+        xPos=float(item.position[0])
+        yPos=float(item.position[1])
+        zPos=float(item.position[2])
+
+        # print("width:", float(item.width), "height:", float(item.height), "depth:", float(item.depth))
+        # print("dim_0:", item.get_dimension()[0], "dim_1:", item.get_dimension()[1], "dim_2:", item.get_dimension()[2])
+        xDim=int(item.get_dimension()[0])
+        yDim=int(item.get_dimension()[1])
+        zDim=int(item.get_dimension()[2])
+        coordinate=(xPos+(xDim/2), yPos+(yDim/2), zPos+(zDim/2))
+        retDict[coordinate]=Package(str(xDim)+"x"+str(yDim)+"x"+str(zDim), item.weight)
+    return retDict
 
 
 ### returns aDictionary with keys corresponding to unique coordinate, value corresponding to non unique bin
@@ -318,9 +335,18 @@ def binpack(packages, bin=None, iterlimit=1000000):
    
     from . import binpack_simple as bp 
     
-    
-    return bp.binpack(packages, bin, iterlimit)
+    from . import single_pack as sp
+    # convert to single pack format
 
+    from . import py3dbp_main as m
+    container=m.Bin('the_bin', bin.width, bin.heigth, bin.length, bin.weight)
+    items = [m.Item('an_item', package.width, package.heigth, package.length, package.weight) for package in packages]
+    packer=sp.single_pack(container, items)
+
+
+
+    #return bp.binpack(packages, bin, iterlimit)
+    return packer
 
 
     ### check that permutations are producing the correct number of items for the (unique bin unique balls problem)

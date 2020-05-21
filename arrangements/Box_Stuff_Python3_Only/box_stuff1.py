@@ -341,7 +341,7 @@ def binpack(packages, bin=None, iterlimit=1000000):
     from . import py3dbp_main as m
     container=m.Bin('the_bin', bin.width, bin.heigth, bin.length, bin.weight)
     items = [m.Item('an_item', package.width, package.heigth, package.length, package.weight) for package in packages]
-    packer=sp.single_pack(container, items)
+    packer=sp.single_pack(container, items,iterlimit)
 
 
 

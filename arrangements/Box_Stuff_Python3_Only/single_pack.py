@@ -1,5 +1,5 @@
 from . import py3dbp_main
-from .py3dbp_main import Packer, Bin, Item
+from .py3dbp_main import Packer, ContainerPY3DBP, ItemPY3DBP
 import itertools
 
 

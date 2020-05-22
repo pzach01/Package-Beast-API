@@ -37,8 +37,7 @@
 from __future__ import division
 import itertools
 import copy
-from . import package
-from .package import Package
+
 import time
 from . import new_is_valid_corner_point_code
 
@@ -142,137 +141,12 @@ def slot_bin_with_coordinates_py3dbp(packageArrangment, bin):
         yDim=int(item.get_dimension()[1])
         zDim=int(item.get_dimension()[2])
         coordinate=(xPos+(xDim/2), yPos+(yDim/2), zPos+(zDim/2))
-        retDict[coordinate]=Package(str(xDim)+"x"+str(yDim)+"x"+str(zDim), item.weight)
+        from . import py3dbp_main
+        from .py3dbp_main import ItemPY3DBP
+        retDict[coordinate]=ItemPY3DBP('', xDim, yDim, zDim,item.weight)
+        #retDict[coordinate]=Package(str(xDim)+"x"+str(yDim)+"x"+str(zDim), item.weight)
     return retDict
 
-
-### returns aDictionary with keys corresponding to unique coordinate, value corresponding to non unique bin
-def slot_bin_with_coordinates(packageArrangment, bin):
-    ### implicit in bin is idea that it is ranked consistently height=longest side, width=second longest side, length=shortest side
-    
-    #### thus a package arrangment corresponds to a specific arrangment (height, width, length aren't just longest sides ordered but reflect proper stack)
-    retDict={}
-    orgin=(0,0,0)
-    midPointOfBin=generate_midpoint(orgin, bin.heigth, bin.width, bin.length)
-    bounds=generate_extreme_points(midPointOfBin, bin.heigth, bin.width, bin.length)
-    existingShapes=[]
-    ### bounds obviously cant be in existing shapes, as a protocol checks that all new shapes are strictly outside existing shapes, which is impossible to add
-    ### new shapes to the bin if this is so (logical contradiction)
-    #existingShapes.append(bounds)
-    # we cant ever add to an interior point (as we have already added to it) so we keep it on a banned point list
-    interiorPoints=[]
-    for package in packageArrangment:
-
-        ### try to slot, if you can't add throw exception        
-        ### the control structure past 'generate_extreme_points' is screwed up
-        ### We should break out of trying to addThePackage once we can add it (thus updating retDict and other sideeffects), and also break when
-        ## we discover we can't add from a corner point (only takes one extreme point out of bounds to disqualify the cornerPoint for a given shape)
-        ### flatten the structured list of 'existingShapes' into just a list of points
-        flattenedPoints=[]
-        for list in existingShapes:
-            for point in list:
-                if ((point not in flattenedPoints) and (point not in interiorPoints)):
-                    flattenedPoints.append(point)
-        ### bounds isn't in existing shapes but should still be considered a place we can add point to
-        for point in bounds:
-            flattenedPoints.append(point)
-        ### sort the points by the values you need to
-        pointsWeCanAddTo=sort_points_we_can_add_to(flattenedPoints)
-        ### 
-
-        addedShape=False
-        ### current failures: not adding to earlier succesful point
-        ### not catching failure outside box
-        for cornerPoint in pointsWeCanAddTo:
-            midPoint=generate_midpoint(cornerPoint, package.heigth, package.width, package.length)            
-            newShape=generate_extreme_points(midPoint, package.heigth, package.width, package.length)
-            ### the shape exists within the bounds of the bin 
-            if new_is_valid_corner_point_code.new_is_valid_corner_point(bounds,existingShapes,newShape):            
-            #if is_valid_corner_point(bounds, existingShapes,newShape):
-                ### add new shape to 'existingShapes'
-                existingShapes.append(newShape)
-                ### add the new coordinate and package to 'retDict'
-                retDict[(midPoint)]=package
-                addedShape=True
-                interiorPoints.append(cornerPoint)
-                break
-                       
-        if(not addedShape):
-            raise ValueError("didnt add a shape")
-
-
-
-        ### create some sort of fail condition if you cant add a shape to the box (throw Exception)
-        
-        
-    
-    return retDict
-
-def is_valid_corner_point(bounds, existingShapes, newShape):
-    if strictly_within(bounds, newShape):
-        
-        for oldShape in existingShapes:
-            ### keep checking the list if this newShape is strictly outside oldShape
-            sameShape=True
-            for element in oldShape:
-                if element in newShape:
-                    pass
-                else:
-                    sameShape=False
-            if(sameShape):
-                return False
-            if stictly_outside(oldShape, newShape):
-                pass
-            else:
-                ### we cant add the newShape at corner point as it has bounds inside an old shape
-                return False
-            if stictly_outside(newShape, oldShape):
-                pass
-            else:
-                return False
-            
-        ### add the point
-        ### this wont actually work (out of scope but idea is correct below, add this shape to squares, midpoint to retDict)
-        return True
-    else:
-        return False
-'''
-## returns if a shape is strictly outside dimensions of 'oldShape', ie. dont share space
-def stictly_outside(oldShape, newShape):
-    min, max=get_min_max_tuple(oldShape)
-    ### < instead of <= because extreme points can have the same coordinate (2 extreme points at one coordinate)
-    for extremePoint in newShape:
-        if((min[0] <extremePoint[0]<max[0])):
-            if((min[1] <extremePoint[1]<max[1])):
-                if((min[2] <extremePoint[2]<max[2])):
-                    return False
-    return True
-'''
-def stictly_outside(oldShape, newShape):
-    min, max=get_min_max_tuple(oldShape)
-    ### < instead of <= because extreme points can have the same coordinate (2 extreme points at one coordinate)
-    for extremePoint in newShape:
-        if extremePoint in oldShape:
-            pass
-        else:
-            if((min[0] <=extremePoint[0]<=max[0])):
-                if((min[1] <=extremePoint[1]<=max[1])):
-                    if((min[2] <=extremePoint[2]<=max[2])):
-                        return False
-    return True
-def strictly_within(bounds, newShape):
-    ## all extreme points are within bounds
-    min, max=get_min_max_tuple(bounds)
-    for extremePoint in newShape:
-        if(not (extremePoint[0]>=min[0] and extremePoint[0]<=max[0])):
-            return False
-        if(not (extremePoint[1]>=min[1] and extremePoint[1]<=max[1])):
-            return False
-        if(not (extremePoint[2]>=min[2] and extremePoint[2]<=max[2])):
-            return False
-    
-    
-    return True
 
 def get_min_max_tuple(extremePoints):
     minX,minY,minZ=extremePoints[0][0],extremePoints[0][1],extremePoints[0][2]
@@ -292,28 +166,7 @@ def get_min_max_tuple(extremePoints):
             maxZ=extremePoint[2]
         
     return (minX,minY,minZ), (maxX,maxY,maxZ)
-            
-
-### assumes we are slotting to the top right of the corner point (ie. midpoint has a height, width, and length greater then the corner point)
-def generate_midpoint(cornerPoint, height, width, length):
-    return (cornerPoint[0]+(height/2), cornerPoint[1]+(width/2), cornerPoint[2]+(length/2))
-
-### returns the 8 extreme points that define the bound of the 
-def generate_extreme_points(midPoint, height, width, length):
-
-    lowerHeight, upperHeight=midPoint[0]-(height/2), midPoint[0]+(height/2)
-    lowerWidth, upperWidth= midPoint[1]-(width/2), midPoint[1]+(width/2)
-    lowerLength, upperLength=midPoint[2]-(length/2), midPoint[2]+(length/2)
-    
-    p1=(lowerHeight,lowerWidth, lowerLength)
-    p2=(lowerHeight,lowerWidth, upperLength)
-    p3=(lowerHeight, upperWidth, lowerLength)
-    p4=(lowerHeight, upperWidth, upperLength)
-    p5=(upperHeight,lowerWidth, lowerLength)
-    p6=(upperHeight,lowerWidth, upperLength)
-    p7=(upperHeight, upperWidth, lowerLength)
-    p8=(upperHeight, upperWidth, upperLength)    
-    return [p1,p2,p3,p4,p5,p6,p7,p8]
+  
 
 def sort_points_we_can_add_to(pointsWeCanAddTo):
     ### sort by min value of first index in tuple, min value of second index in tuple, min value of third index in tuple, in that order
@@ -339,9 +192,8 @@ def binpack(packages, bin=None, iterlimit=1000000):
     # convert to single pack format
 
     from . import py3dbp_main as m
-    container=m.Bin('the_bin', bin.width, bin.heigth, bin.length, bin.weight)
-    items = [m.Item('an_item', package.width, package.heigth, package.length, package.weight) for package in packages]
-    packer=sp.single_pack(container, items,iterlimit)
+
+    packer=sp.single_pack(bin, packages,iterlimit)
 
 
 

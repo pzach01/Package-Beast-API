@@ -5,8 +5,9 @@ from .py3dbp_auxiliary_methods import intersect
 
 START_POSITION = [0, 0, 0]
 
-class Item:
+class ItemPY3DBP:
     def __init__(self, name, width, height, depth, weight):
+
         self.name = name
         self.width = width
         self.height = height
@@ -45,7 +46,7 @@ class Item:
         return dimension
 
 
-class Bin:
+class ContainerPY3DBP:
     def __init__(self, name, width, height, depth, max_weight):
         self.name = name
         self.width = width

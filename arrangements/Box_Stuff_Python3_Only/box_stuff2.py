@@ -1,8 +1,10 @@
 from __future__ import division
 import os
-from . import package
-from .package import Package
 from . import box_stuff1
+
+from . import py3dbp_main
+from .py3dbp_main import ItemPY3DBP, ContainerPY3DBP
+
 import random
 import copy
 import math
@@ -181,6 +183,13 @@ def fit_all(bins1, boxs1, timeout=0, costList=None, binWeightCapacitys=None, box
             pass
     return apiFormat
 
+# wrapper for the ItemPY3DBP class
+def string_wrapper_for_item_class(itemString):
+    l,w,h=float(itemString.split('x')[0]),float(itemString.split('x')[1]),float(itemString.split('x')[2])
+    return ItemPY3DBP('',l,w,h,0)
+def string_wrapper_for_container_class(itemString):
+    l,w,h=float(itemString.split('x')[0]),float(itemString.split('x')[1]),float(itemString.split('x')[2])
+    return ContainerPY3DBP('',l,w,h,0)
 # bin weights must be in same order, same for box weights
 def master_calculate_optimal_solution(bins1, boxs1,timeout=0,costList=None,binWeightCapacitys=None, boxWeights=None):
     # metaparameter, expose to API at some point
@@ -203,8 +212,9 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,costList=None,binWe
     endTimeComputation=math.inf if timeout==0 else time.time()+computationTimeout
     endTimeRendering=endTimeComputation+renderingTimeout
     
-    boxs1=[Package(box) for box in boxs1]
-    bins1=[Package(bin) for bin in bins1] 
+    # string intiliaztion
+    boxs1=[string_wrapper_for_item_class(box) for box in boxs1]
+    bins1=[string_wrapper_for_container_class(bin) for bin in bins1] 
     
     assert((binWeightCapacitys==None and boxWeights==None) or (binWeightCapacitys!=None and binWeightCapacitys!=None))
 
@@ -241,7 +251,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,costList=None,binWe
     return apiFormat
 
 
-class Bin():
+class BinAPI():
     def to_string(self):
         binAttributes="("+str(self.id)+","+str(self.height)+","+str(self.width)+","+str(self.length)+","+str(self.volume)+","+str(self.cost)+","+str(self.weightCapacity)+","+str(self.timedOut)
         boxAttributes=""
@@ -290,10 +300,13 @@ class Bin():
         slotted=[]
         for key in coordinateDictionary.keys():
             package=coordinateDictionary[key]
-            height, width, length=package.heigth, package.width, package.length
+            height, width, depth=package.height, package.width, package.depth
+            print(height)
+            print(width)
+            print(depth)
             for boxIndex in range(0, len(self.boxes)):
                 # boxes have the same coordinates
-                if((self.boxes[boxIndex].height==height and self.boxes[boxIndex].width==width)and self.boxes[boxIndex].length==length):
+                if((self.boxes[boxIndex].height==height and self.boxes[boxIndex].width==width)and self.boxes[boxIndex].length==depth):
                     self.boxes[boxIndex].set_center(key)
                     slotted.append(self.boxes.pop(boxIndex))
                     break
@@ -301,7 +314,7 @@ class Bin():
         self.boxes=slotted
 
 
-class Box():
+class BoxAPI():
     def __init__(self,height, width, length,volume,weight):
         self.height=float(height)
         self.width=float(width)
@@ -348,7 +361,7 @@ def convert_to_api_form(minArrangment, binList, packageList, parameterBins, para
     for count in range(0, len(parameterBins)):
         ### implicit in bin is idea that it is ranked consistently height=longest side, width=second longest side, length=shortest side
         #def __init__(self,id,height, width, length,cost, weightCapacity)
-        binObjects.append(Bin(count, parameterBins[count].heigth, parameterBins[count].width, parameterBins[count].length,costList[count],binWeightCapacitys[count],timedOut))    
+        binObjects.append(BinAPI(count, parameterBins[count].height, parameterBins[count].width, parameterBins[count].depth,costList[count],binWeightCapacitys[count],timedOut))    
     
 
     
@@ -361,7 +374,7 @@ def convert_to_api_form(minArrangment, binList, packageList, parameterBins, para
     # initialize the boxes
     for count in range(0,len(parameterBoxes)):
        #def __init__(self,height, width, length,volume,weight):
-        boxObjects.append(Box(parameterBoxes[count].heigth, parameterBoxes[count].width, parameterBoxes[count].length, parameterBoxes[count].volume,boxWeights[count]))
+        boxObjects.append(BoxAPI(parameterBoxes[count].height, parameterBoxes[count].width, parameterBoxes[count].depth, parameterBoxes[count].volume,boxWeights[count]))
     
     # binList
     # packageList

@@ -58,7 +58,9 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
-db.sqlite3
+
+#!!!!! Add this back to the gitignore file once you get your db up and running !!!!
+#db.sqlite3
 db.sqlite3-journal
 
 # Flask stuff:

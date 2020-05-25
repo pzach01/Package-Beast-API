@@ -1,88 +1,49 @@
 from rest_framework import serializers
-from arrangements.models import Arrangement, ContainerLayout, ItemList
+from arrangements.models import Arrangement
 from django.utils.timezone import now
 from arrangements.Box_Stuff_Python3_Only import box_stuff2 as optimize
 
 from users.models import User
 from users.serializers import UserSerializer
+from containers.serializers import ContainerSerializer
+from items.serializers import ItemSerializer
+from items.models import Item
+from containers.models import Container
 
-class ItemListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ItemList
-        fields = ['height', 'width', 'length', 'volume', 'xCenter', 'yCenter', 'zCenter']
 
-class ContainerLayoutSerializer(serializers.ModelSerializer):
-    itemList = ItemListSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = ContainerLayout
-        fields = ['height', 'width', 'length', 'volume', 'cost', 'itemList']
-        
 class ArrangementSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
-    
-    containerLayout = ContainerLayoutSerializer(many=True, read_only=True)
+    containers = ContainerSerializer(many=True)
+    items = ItemSerializer(many=True)
+
     class Meta:
         model = Arrangement
-        fields = ['id', 'owner', 'created', 'containers', 'items', 'containerLayout']
+        fields = ['id', 'owner', 'created', 'containers', 'items']
 
     def create(self, validated_data):
-
+        containers = validated_data.pop('containers')
+        items = validated_data.pop('items')
         arrangement = Arrangement.objects.create(**validated_data)
 
-        containers = validated_data.get('containers')
-        items = validated_data.get('items')
-        containers = containers.split(',')
-        items = items.split(',')
-        calculated_containers=optimize.master_calculate_optimal_solution(containers,items)
-        print("ccc", calculated_containers)
+        # This is where we can call calculate optimal soution, passing in items and containers.
+        # Note, items and containers are both ordered dictionary lists now, not strings.
+        # Their length, width, height, x, y, z, and the item's container need to be modified before
+        # creating in database with .create method as shown below
+        # See model definitions in items.models and containers.models for additional info
 
-        containerDictionarys=[]
-        print("eee")
-        for calculated_container in calculated_containers:
-            print("aaa")
-            containerDictionarys.append(calculated_container.to_dictionary())
+        for container in containers:
+            Container.objects.create(arrangement=arrangement,
+                                     owner=validated_data['owner'], **container)
 
-        print("ddd")
-        for containerDictionary in containerDictionarys:
-            print("yyy")
-            containerDictionary.pop('id', None)
-            itemLists = containerDictionary.pop('itemList', None)
-            containerDictionary.pop('weightCapacity', None)
-            print("zzz", containerDictionary)
-            print("arrangement", arrangement.containers)
-            print("cd", containerDictionary)
-            containerLayout = ContainerLayout.objects.create(arrangement=arrangement, **containerDictionary)
-            print("qqq")
-            for itemList in itemLists:
-                print("sup")
-                itemList.pop('weight', None)
-                ItemList.objects.create(containerLayout=containerLayout, **itemList)
-        print("fff", arrangement)
+        #also, container=container
+        for item in items:
+            Item.objects.create(arrangement=arrangement,
+                                owner=validated_data['owner'], **item)
         return arrangement
 
     def update(self, instance, validated_data):
-        instance.containers = validated_data.get('containers', instance.containers)
-        instance.items = validated_data.get('items', instance.items)
-        ContainerLayout.objects.filter(arrangement=instance).delete()
-        containers = instance.containers.split(',')
-        items = instance.items.split(',')
 
-        calculated_containers=optimize.master_calculate_optimal_solution(containers,items)
-
-        containerDictionarys=[]
-        for calculated_containers in calculated_containers:
-            containerDictionarys.append(calculated_containers.to_dictionary())
-
-        for containerDictionary in containerDictionarys:
-            containerDictionary.pop('id', None)
-            itemLists = containerDictionary.pop('itemList', None)
-            containerDictionary.pop('weightCapacity', None)
-            containerLayout = ContainerLayout.objects.create(arrangement=instance, **containerDictionary)
-
-            for itemList in itemLists:
-                itemList.pop('weight', None)
-                ItemList.objects.create(containerLayout=containerLayout, **itemList)
+        # This doesn't work but I will fix it once we have the create method working
 
         instance.save()
         return instance

@@ -286,6 +286,9 @@ class BinAPI():
         self.weightCapacity=float(weightCapacity) if (weightCapacity is not None) else weightCapacity
         self.timedOut=timedOut
         self.boxes=[]
+        self.id=0
+    def set_id(self, id):
+        self.id=id
 
     
     def add_box(self, box):
@@ -321,7 +324,8 @@ class BoxAPI():
         self.x=None
         self.y=None
         self.z=None
-        
+
+
     def to_dictionary(self):
         aDictionary={}
         aDictionary['height']=self.height
@@ -357,7 +361,9 @@ def convert_to_api_form(minArrangment, binList, packageList, parameterBins, para
     for count in range(0, len(parameterBins)):
         ### implicit in bin is idea that it is ranked consistently height=longest side, width=second longest side, length=shortest side
         #def __init__(self,id,height, width, length,cost, weightCapacity)
-        binObjects.append(BinAPI(count, parameterBins[count].height, parameterBins[count].width, parameterBins[count].depth,costList[count],binWeightCapacitys[count],timedOut))    
+        newBin=BinAPI(count, parameterBins[count].height, parameterBins[count].width, parameterBins[count].depth,costList[count],binWeightCapacitys[count],timedOut)
+        newBin.set_id(count+1)
+        binObjects.append(newBin)
     
 
     

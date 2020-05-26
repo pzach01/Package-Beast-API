@@ -32,6 +32,18 @@ def test_1():
     assert(packer.unfit_items==[])
 
 
+def test_2():
+    container=ContainerPY3DBP('very-very-large-box', 5, 5, 10, 100)
+    items=[
+        ItemPY3DBP('50g [powder 2]', 5, 5, 5, 2),
+        ItemPY3DBP('50g [powder 2]', 5, 5, 5, 2),
+        
+        
+    ]
+
+    packer=single_pack.single_pack(container, items)
+    test_for_double_fit(packer, 10000)
+    assert(packer.unfit_items==[])
 
 
 
@@ -72,3 +84,4 @@ def test_for_double_fit(packer, iterationLimit):
         # note: percentage of points that exist within exactly one box is almost equal to the volume occupied
                 
 test_1()
+test_2()

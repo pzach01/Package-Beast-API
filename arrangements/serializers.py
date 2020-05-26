@@ -26,8 +26,6 @@ class ArrangementSerializer(serializers.ModelSerializer):
         arrangement = Arrangement.objects.create(**validated_data)
 
 
-        from .Box_Stuff_Python3_Only import box_stuff2 as bp
-        timeout=0
 
         # this string formatting will be replaced with something less stupid
         containerStrings=[]
@@ -36,25 +34,42 @@ class ArrangementSerializer(serializers.ModelSerializer):
             l,w,h=container['height'],container['width'],container['length']
             containerStrings.append(str(l)+'x'+str(w)+'x'+str(h))
         for item in items:
-            l,w,h=container['height'],container['width'],container['length']
+            l,w,h=item['height'],item['width'],item['length']
             itemStrings.append(str(l)+'x'+str(w)+'x'+str(h))
-        apiObjects=bp.master_calculate_optimal_solution(containerStrings,itemStrings,timeout)
 
+        from .Box_Stuff_Python3_Only import box_stuff2 as bp
+        timeout=0
+        apiObjects=bp.master_calculate_optimal_solution(containerStrings,itemStrings,timeout)
+        #print(apiObjects[0].to_string())
 
         # This is where we can call calculate optimal soution, passing in items and containers.
         # Note, items and containers are both ordered dictionary lists now, not strings.
         # Their length, width, height, x, y, z, and the item's container need to be modified before
         # creating in database with .create method as shown below
         # See model definitions in items.models and containers.models for additional info
-
+        containerList=[]
+        index=0
         for container in containers:
-            Container.objects.create(arrangement=arrangement,
-                                     owner=validated_data['owner'], **container)
+            height=apiObjects[index].height
+            width=apiObjects[index].width
+            length=apiObjects[index].length 
+            volume=apiObjects[index].volume
+            containerList.append(Container.objects.create(arrangement=arrangement, height=height, width=width, length=length, volume=length,
+                owner=validated_data['owner']))
+            index+=1
 
-        #also, container=container
-        for item in items:
-            Item.objects.create(arrangement=arrangement,
-                                owner=validated_data['owner'], **item)
+
+        for container in apiObjects:
+            for item in container.boxes:
+                height=item.height
+                width=item.width
+                length=item.length 
+                volume=item.volume
+                xCenter=item.x
+                yCenter=item.y
+                zCenter=item.z
+                Item.objects.create(height=height, width=width, length=length, volume=volume,container=containerList[container.id-1],arrangement=arrangement,
+                                    owner=validated_data['owner'],xCenter=xCenter, yCenter=yCenter, zCenter=zCenter)
         return arrangement
 
     def update(self, instance, validated_data):

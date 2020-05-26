@@ -96,7 +96,6 @@ def get_xyz_of_optimal_solution(minArrangment,bins1, boxs1,endTimeRendering):
             
             try:
                 coordinateDict=box_stuff1.slot_bin_with_coordinates_py3dbp(boxArrangment, bin)
-                print(coordinateDict)
             ### couldnt figure out how to add with this particurlar bin arrangment 
             except ValueError:
                 raise ValueError            
@@ -301,9 +300,6 @@ class BinAPI():
         for key in coordinateDictionary.keys():
             package=coordinateDictionary[key]
             height, width, depth=package.height, package.width, package.depth
-            print(height)
-            print(width)
-            print(depth)
             for boxIndex in range(0, len(self.boxes)):
                 # boxes have the same coordinates
                 if((self.boxes[boxIndex].height==height and self.boxes[boxIndex].width==width)and self.boxes[boxIndex].length==depth):

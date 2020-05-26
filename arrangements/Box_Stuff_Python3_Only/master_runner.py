@@ -1,8 +1,10 @@
 # these two lines=my computer specifically:
 import os
-
 import box_stuff2
 import rendering
+
+
+
 ### calculate the result for an arrangment of a bin that is 10x10x10 and 2 objects that are 5x5x5
 #bins=['10x10x10']
 #boxes=['5x5x5','5x5x5','5x5x5','5x5x5','5x5x5','5x5x5','5x5x5','5x5x5']

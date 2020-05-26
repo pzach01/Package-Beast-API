@@ -18,12 +18,14 @@ class ArrangementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Arrangement
-        fields = ['id', 'owner', 'created', 'containers', 'items']
+        fields = ['id', 'owner', 'multiBinPack', 'created',
+                  'containers', 'items']
 
     def create(self, validated_data):
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')
         arrangement = Arrangement.objects.create(**validated_data)
+        multiBinPack = arrangement.multiBinPack
 
         # this string formatting will be replaced with something less stupid
         containerStrings = []

@@ -6,7 +6,7 @@ class ContainerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Container
         fields = ['id', 'arrangement', 'sku', 'description',
-                  'height', 'width', 'length', 'volume']
+                  'height', 'width', 'length', 'volume', 'units']
         read_only_fields = ['arrangement', 'volume']
 
     def create(self, validated_data):

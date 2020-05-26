@@ -6,7 +6,7 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id', 'container', 'arrangement', 'sku', 'description', 'height',
-                  'width', 'length', 'volume', 'xCenter', 'yCenter', 'zCenter']
+                  'width', 'length', 'volume', 'xCenter', 'yCenter', 'zCenter', 'units']
         read_only_fields = ['container', 'arrangement',
                             'volume', 'xCenter', 'yCenter', 'zCenter']
 

@@ -53,10 +53,14 @@ class ArrangementSerializer(serializers.ModelSerializer):
             width = apiObjects[index].width
             length = apiObjects[index].length
             volume = apiObjects[index].volume
+            sku = container['sku']
+            description = container['description']
+            units = container['units']
             containerList.append(Container.objects.create(arrangement=arrangement, height=height, width=width, length=length, volume=volume,
-                                                          owner=validated_data['owner']))
+                                                          owner=validated_data['owner'], sku=sku, description=description, units=units))
             index += 1
 
+        index = 0
         for container in apiObjects:
             for item in container.boxes:
                 height = item.height
@@ -66,8 +70,12 @@ class ArrangementSerializer(serializers.ModelSerializer):
                 xCenter = item.x
                 yCenter = item.y
                 zCenter = item.z
+                sku = items[index]['sku']
+                description = items[index]['description']
+                units = items[index]['units']
                 Item.objects.create(height=height, width=width, length=length, volume=volume, container=containerList[container.id-1], arrangement=arrangement,
-                                    owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter)
+                                    owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units)
+                index += 1
         return arrangement
 
     def update(self, instance, validated_data):

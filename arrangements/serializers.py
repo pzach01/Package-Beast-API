@@ -25,6 +25,22 @@ class ArrangementSerializer(serializers.ModelSerializer):
         items = validated_data.pop('items')
         arrangement = Arrangement.objects.create(**validated_data)
 
+
+        from .Box_Stuff_Python3_Only import box_stuff2 as bp
+        timeout=0
+
+        # this string formatting will be replaced with something less stupid
+        containerStrings=[]
+        itemStrings=[]
+        for container in containers:
+            l,w,h=container['height'],container['width'],container['length']
+            containerStrings.append(str(l)+'x'+str(w)+'x'+str(h))
+        for item in items:
+            l,w,h=container['height'],container['width'],container['length']
+            itemStrings.append(str(l)+'x'+str(w)+'x'+str(h))
+        apiObjects=bp.master_calculate_optimal_solution(containerStrings,itemStrings,timeout)
+
+
         # This is where we can call calculate optimal soution, passing in items and containers.
         # Note, items and containers are both ordered dictionary lists now, not strings.
         # Their length, width, height, x, y, z, and the item's container need to be modified before

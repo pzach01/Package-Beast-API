@@ -5,7 +5,12 @@ import itertools
 
 
 def single_pack(container, itemList,iterationLimit=1000):
+    # container volume greater then sum of items we are trying to fit
+    if container.volume< sum([item.volume for item in itemList]):
+        return None
+
     import math
+
     bin_weight_capacity = math.inf
     
 

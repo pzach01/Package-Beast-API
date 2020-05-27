@@ -1,7 +1,13 @@
 
 from . import box_stuff2
 
-
+def test_1():
+    print("Test 1 starting")
+    bins=['10x10x10', '10x10x10']
+    boxes=['5x5x5' for ele in range(0, 16)]
+    containerList=box_stuff2.master_calculate_optimal_solution(bins,boxes,timeout=30)    
+    usedVolume=sum([bin.volume for bin in containerList if len(bin.boxes) is not 0 ])
+    assert(usedVolume==2000)
 
 # test if adding the cost constraint behaves as 'sposed to
 def cost_testing():
@@ -67,3 +73,5 @@ def weight_testing():
 weight_testing()
 
 cost_testing()
+
+test_1()

@@ -45,7 +45,19 @@ def test_2():
     test_for_double_fit(packer, 10000)
     assert(packer.unfit_items==[])
 
+def test_3():
+    container=ContainerPY3DBP('very-very-large-box', 5, 5, 10, 100)
+    items=[
+        ItemPY3DBP('50g [powder 2]', 5, 5, 5, 2),
+        ItemPY3DBP('50g [powder 2]', 5, 5, 5, 2),
+        ItemPY3DBP('50g [powder 2]', 5, 5, 5, 2),
 
+        
+    ]
+
+    packer=single_pack.single_pack(container, items)
+    # 'None' valid arrangment
+    assert(packer==None)
 
     
 # iterationLimit (for each container)
@@ -85,3 +97,4 @@ def test_for_double_fit(packer, iterationLimit):
                 
 test_1()
 test_2()
+test_3()

@@ -39,7 +39,7 @@ import itertools
 import copy
 
 import time
-from . import new_is_valid_corner_point_code
+#from . import new_is_valid_corner_point_code
 
 
 
@@ -186,7 +186,6 @@ def sort_points_we_can_add_to(pointsWeCanAddTo):
 
 def binpack(packages, bin=None, iterlimit=1000000):
    
-    from . import binpack_simple as bp 
     
     from . import single_pack as sp
     # convert to single pack format

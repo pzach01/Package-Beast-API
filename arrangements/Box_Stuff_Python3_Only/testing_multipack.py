@@ -1,5 +1,5 @@
-
-from . import box_stuff2
+from . import test_imports
+from .test_imports import *
 
 def test_1():
     print("Test 1 starting")

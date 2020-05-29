@@ -1,9 +1,5 @@
-from .py3dbp_main import Packer, ContainerPY3DBP, ItemPY3DBP
-import itertools
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-import random
-from .import single_pack
+from . import test_imports
+from .test_imports import *
 def draw_bin(ax,bin_width, bin_height, bin_depth, bin_edge_color='black'):
     ax.plot3D([0,bin_width], [0,0], [0, 0], bin_edge_color)
     ax.plot3D([0, 0], [0,bin_height], [0, 0], bin_edge_color)

@@ -7,15 +7,8 @@
 # obviously a ton of room to adjust the 'hardness' of the problem here by controlling n, range of boxes (nearly rectangular/square or both mixed together) 
 # and distance from max volume
 
-import random
-# makes test deterministic (reproducable)
-random.seed(0)
-
-from . import py3dbp_main
-from .py3dbp_main import ContainerPY3DBP,ItemPY3DBP
-from . import single_pack
-from . import testing_single_pack
-
+from . import test_imports
+from .test_imports import *
 # generates arrangment that can be fit if algorithm is optimal. may be too hard or too easy
 
 def generate_bins_that_fit(iterationLimit):
@@ -124,13 +117,10 @@ def try_to_expand_in_one_direction(existingShape, interiorPoints, directionToExp
 
 
 
-specialContainer, specialItems=None,None
-failedAt1000Iterations=0
-import copy
-for ele in range(0, 1000):
-    
-    print(ele)
-    container, items,coordinates=generate_bins_that_fit(10)
+
+
+def test_one_underfit(ele):
+    container, items,coordinates=generate_bins_that_fit(4)
     container=ContainerPY3DBP('',container.width, container.height, container.depth,100)
     itemList=[ItemPY3DBP('',item.width, item.height, item.depth, 1) for item in items]
     packer=single_pack.single_pack(container, itemList,1000)
@@ -151,7 +141,7 @@ for ele in range(0, 1000):
             pointHeight=random.random()*container.depth    
         '''
         # failed
-        break
+        raise Exception
     else:
         testing_single_pack.test_for_double_fit(packer, 10000)
         # what we did
@@ -164,17 +154,12 @@ for ele in range(0, 1000):
         #print("Occupacy percentage:"+str(volumeOccupied))
         
         
-print(failedAt1000Iterations/100)
-#13
-#3
-#1
+def test_underfits():
+    specialContainer, specialItems=None,None
+    failedAt1000Iterations=0
+    import copy
+    for ele in range(0, 1000):
+        print(ele)
+        test_one_underfit(ele)
 
-
-#2
-#1
-#1
-
-
-#1
-#11
-#7
+test_underfits()

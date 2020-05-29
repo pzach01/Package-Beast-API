@@ -1,12 +1,7 @@
 
 
-
-from . import single_pack
-from . import py3dbp_main
-from .py3dbp_main import ContainerPY3DBP,ItemPY3DBP
-import random
-# makes test deterministic (reproducable)
-random.seed(0)
+from . import test_imports
+from .test_imports import *
 
 
 
@@ -80,9 +75,9 @@ def test_for_double_fit(packer, iterationLimit):
             cubesPointIsIn=0
             for item in container.items:
                 # this is dumb; requiring us to reference the bins field by a different name then the items, why not just bin.depth?
-                lowerWidth, upperWidth=item.position[0], item.position[0]+item.width
-                lowerDepth, upperDepth=item.position[1], item.position[1]+item.height
-                lowerHeight, upperHeight=item.position[2], item.position[2]+item.depth
+                lowerWidth, upperWidth=item.position[0], item.position[0]+item.get_dimension()[0]
+                lowerDepth, upperDepth=item.position[1], item.position[1]+item.get_dimension()[1]
+                lowerHeight, upperHeight=item.position[2], item.position[2]+item.get_dimension()[2]
                 if(lowerWidth < pointWidth < upperWidth):
                     if(lowerDepth < pointDepth < upperDepth):
                         if(lowerHeight < pointHeight <upperHeight):
@@ -92,9 +87,9 @@ def test_for_double_fit(packer, iterationLimit):
             
             # point should never be within two cubes interior at the same time 
             if(cubesPointIsIn>1):
-                break
+                raise Exception
         # note: percentage of points that exist within exactly one box is almost equal to the volume occupied
                 
-test_1()
-test_2()
-test_3()
+#test_1()
+#test_2()
+#test_3()

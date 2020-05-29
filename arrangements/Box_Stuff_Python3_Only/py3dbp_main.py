@@ -76,6 +76,8 @@ class ContainerPY3DBP:
 
 
     def put_item(self, item, pivot):
+            if pivot[0]<0 or pivot[1]<0 or pivot[2]<0:
+                return False
             fit = False
             valid_item_position = item.position
             item.position = pivot
@@ -85,6 +87,8 @@ class ContainerPY3DBP:
 
                     item.rotation_type = i
                     dimension = item.get_dimension()
+
+
                     if (
                         self.width < pivot[0] + dimension[0] or
                         self.height < pivot[1] + dimension[1] or
@@ -106,8 +110,15 @@ class ContainerPY3DBP:
 
                         #print("item appended to bin:", item.string())
                         self.items.append(item)
-                        
-
+                    
+                    # experimental below: need something like this to prevent item from going outside bin
+                    if (item.width+item.get_dimension()[0]<0):
+                        fit=False
+                    if (item.height+item.get_dimension()[1]<0):
+                        fit=False
+                    if (item.depth+item.get_dimension()[2]<0):
+                        fit=False
+    
                     if not fit:
                         item.position = valid_item_position
 
@@ -196,26 +207,28 @@ class Packer:
             return
 
         for axis in range(0, len(Axis.ALL)):
-            for ib in bin.items:
+            for currentItem in bin.items:
                 pivot = [0, 0, 0]
-                if axis == Axis.WIDTH:
-                    pivot = [
-                        ib.position[0] + ib.width,
-                        ib.position[1],
-                        ib.position[2]
-                    ]
-                elif axis == Axis.HEIGHT:
-                    pivot = [
-                        ib.position[0],
-                        ib.position[1] + ib.height,
-                        ib.position[2]
-                    ]
-                elif axis == Axis.DEPTH:
-                    pivot = [
-                        ib.position[0],
-                        ib.position[1],
-                        ib.position[2] + ib.depth
-                    ]
+
+                # 3 'bit' string in base 3 yields 27 combinations
+                # 1st 'bit'= +, -, or no addition
+                # 2nd 'bit' =+, -, or no addition
+                # 3rd 'bit' =+, -, or no addition 
+                # not sure if this line is neccessary
+                axisCopy=axis
+                firstBit=axisCopy//(3**2)
+                axisCopy=axisCopy%(3**2)
+                secondBit=axisCopy//(3**1)
+                axisCopy=axisCopy%(3**1)
+                thirdBit=axisCopy
+                firstValue=[0 if firstBit==0 else 1 if firstBit==1 else -1][0]
+                secondValue=[0 if secondBit==0 else 1 if secondBit==1 else -1][0]
+                thirdValue=[0 if thirdBit==0 else 1 if thirdBit==1 else -1][0]
+                pivot=[
+                    currentItem.position[0]+firstValue*currentItem.width,
+                    currentItem.position[1]+secondValue*currentItem.height,
+                    currentItem.position[2]+thirdValue*currentItem.depth
+                ]
 
                 if bin.put_item(item, pivot):
                     fitted = True
@@ -227,11 +240,12 @@ class Packer:
     def pack(self, bigger_first=False, distribute_items=False):
         self.bins.sort(key=lambda bin: bin.volume, reverse=bigger_first)
         # self.items.sort(key=lambda item: item.volume, reverse=bigger_first)
-
+        for item in self.items:
+            print(item.string())
         for bin in self.bins:
             for item in self.items:
                 self.pack_to_bin(bin, item)
-
+            print('\n')
             if distribute_items:
                 for item in bin.items:
                     self.items.remove(item)

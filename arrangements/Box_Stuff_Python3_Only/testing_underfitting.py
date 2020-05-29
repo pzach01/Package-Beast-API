@@ -173,13 +173,14 @@ def try_to_expand_in_one_direction(existingShape, interiorPoints, directionToExp
 
 
 def test_one_underfit(ele):
-    container, items,coordinates=generate_bins_that_fit(4)
+    container, items,coordinates=generate_bins_that_fit(10)
     container=ContainerPY3DBP('',container.width, container.height, container.depth,100)
     itemList=[ItemPY3DBP('',item.width, item.height, item.depth, 1) for item in items]
     packer=single_pack.single_pack(container, itemList,1000)
     
     if packer==None:
-        
+        for item in itemList:
+            print(item.string())
         #packer=single_pack.single_pack(container, itemList,1000)        
         #specialContainer,specialItems=container,items
         #print("failed")
@@ -270,7 +271,7 @@ def test_underfits():
     specialContainer, specialItems=None,None
     failedAt1000Iterations=0
     import copy
-    for ele in range(0, 1000):
+    for ele in range(0, 100000):
         print(ele)
         packer, container, items, coordinates=test_one_underfit(ele)
         if packer==None:

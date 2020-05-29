@@ -13,5 +13,11 @@ class Axis:
     WIDTH = 0
     HEIGHT = 1
     DEPTH = 2
+    WIDTH_HEIGHT=3
+    WIDTH_DEPTH=4
+    HEIGHT_DEPTH=5
+    WIDTH_HEIGHT_DEPTH=6
+    #ORIGIN=6
 
-    ALL = [WIDTH, HEIGHT, DEPTH]
+    ALL = [ele for ele in range(0, 27)]
+

@@ -51,39 +51,8 @@ def draw_boxes(ax,x_vals, y_vals, z_vals, widths, heights, depths):
         ax.plot3D([x_vals[i],x_vals[i]], [y_vals[i]+heights[i],y_vals[i]+heights[i]], [z_vals[i], z_vals[i]+depths[i]], colors[i%len(colors)])
         ax.plot3D([x_vals[i]+widths[i],x_vals[i]+widths[i]], [y_vals[i]+heights[i],y_vals[i]+heights[i]], [z_vals[i], z_vals[i]+depths[i]], colors[i%len(colors)])
 
-def render_test():
 
-    bin_width = 1800
-    bin_height = 1800
-    bin_depth = 2400
-    import math
-    bin_weight_capacity = math.inf
-    container=ContainerPY3DBP('very-very-large-box', bin_width, bin_height, bin_depth, bin_weight_capacity)
-
-    items = [
-        ItemPY3DBP('50g [powder 2]', 450, 793, 975, 2),
-        ItemPY3DBP('50g [powder 2]', 450, 793, 975, 2),
-        ItemPY3DBP('50g [powder 2]', 450, 793, 975, 2),
-
-
-
-
-        ]
-
-
-
-
-
-
-
-
-
-
-
-
-
-    packer=single_pack.single_pack(container, items)
-
+def render(packer,bin_width, bin_height, bin_depth):
     if packer.bins[0].unfitted_items:
         raise Exception("doesn't fit")
         # print("'doesn't fit'")
@@ -136,6 +105,41 @@ def render_test():
         ax.set_zlabel('Depth (z)')
 
         plt.show()
-        
 
+def render_test():
+
+    bin_width = 1800
+    bin_height = 1800
+    bin_depth = 2400
+    import math
+    bin_weight_capacity = math.inf
+    container=ContainerPY3DBP('very-very-large-box', bin_width, bin_height, bin_depth, bin_weight_capacity)
+
+    items = [
+        ItemPY3DBP('50g [powder 2]', 450, 793, 975, 2),
+        ItemPY3DBP('50g [powder 2]', 450, 793, 975, 2),
+        ItemPY3DBP('50g [powder 2]', 450, 793, 975, 2),
+
+
+
+
+        ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+    packer=single_pack.single_pack(container, items)
+
+    render(packer, bin_width,bin_height,bin_depth)
+    
 render_test()
+

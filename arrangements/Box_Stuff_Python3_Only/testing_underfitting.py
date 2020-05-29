@@ -1,3 +1,56 @@
+def draw_bin(ax,bin_width, bin_height, bin_depth, bin_edge_color='black'):
+    ax.plot3D([0,bin_width], [0,0], [0, 0], bin_edge_color)
+    ax.plot3D([0, 0], [0,bin_height], [0, 0], bin_edge_color)
+    ax.plot3D([0,0], [0,0], [0, bin_depth], bin_edge_color)
+
+    ax.plot3D([0,bin_width], [bin_height,bin_height], [0, 0], bin_edge_color)
+    ax.plot3D([0,bin_width], [0,0], [bin_depth, bin_depth], bin_edge_color)
+    ax.plot3D([0,bin_width], [bin_height,bin_height], [bin_depth, bin_depth], bin_edge_color)
+
+    ax.plot3D([bin_width, bin_width], [0,bin_height], [0, 0], bin_edge_color)
+    ax.plot3D([0, 0], [0,bin_height], [bin_depth, bin_depth], bin_edge_color)
+    ax.plot3D([bin_width, bin_width], [0,bin_height], [bin_depth, bin_depth], bin_edge_color)
+
+    ax.plot3D([bin_width,bin_width], [0,0], [0, bin_depth], bin_edge_color)
+    ax.plot3D([0,0], [bin_height,bin_height], [0, bin_depth], bin_edge_color)
+    ax.plot3D([bin_width,bin_width], [bin_height,bin_height], [0, bin_depth], bin_edge_color)
+
+    ax.set_xlim(0,max(bin_width, bin_height, bin_depth))
+    ax.set_ylim(0,max(bin_width, bin_height, bin_depth))
+    ax.set_zlim(0,max(bin_width, bin_height, bin_depth))
+
+def draw_boxes(ax,x_vals, y_vals, z_vals, widths, heights, depths):
+
+    colors = ['red', 'green', 'blue', 'yellow', 'purple']
+    for i in range(len(x_vals)):
+        ax.scatter(x_vals[i], y_vals[i], z_vals[i], c=colors[i%len(colors)], marker='o')
+        ax.scatter(x_vals[i]+widths[i], y_vals[i], z_vals[i], c=colors[i%len(colors)], marker='o')
+        ax.scatter(x_vals[i], y_vals[i]+heights[i], z_vals[i], c=colors[i%len(colors)], marker='o')
+        ax.scatter(x_vals[i]+widths[i], y_vals[i]+heights[i], z_vals[i], c=colors[i%len(colors)], marker='o')
+
+        ax.scatter(x_vals[i], y_vals[i], z_vals[i]+depths[i], c=colors[i%len(colors)], marker='o')
+        ax.scatter(x_vals[i]+widths[i], y_vals[i], z_vals[i]+depths[i], c=colors[i%len(colors)], marker='o')
+        ax.scatter(x_vals[i], y_vals[i]+heights[i], z_vals[i]+depths[i], c=colors[i%len(colors)], marker='o')
+        ax.scatter(x_vals[i]+widths[i], y_vals[i]+heights[i], z_vals[i]+depths[i], c=colors[i%len(colors)], marker='o')
+
+        ax.plot3D([x_vals[i],x_vals[i]+widths[i]], [y_vals[i],y_vals[i]], [z_vals[i], z_vals[i]], colors[i%len(colors)])
+        ax.plot3D([x_vals[i], x_vals[i]], [y_vals[i],y_vals[i]+heights[i]], [z_vals[i], z_vals[i]], colors[i%len(colors)])
+        ax.plot3D([x_vals[i],x_vals[i]], [y_vals[i],y_vals[i]], [z_vals[i], z_vals[i]+depths[i]], colors[i%len(colors)])
+
+        ax.plot3D([x_vals[i],x_vals[i]+widths[i]], [y_vals[i]+heights[i],y_vals[i]+heights[i]], [z_vals[i], z_vals[i]], colors[i%len(colors)])
+        ax.plot3D([x_vals[i],x_vals[i]+widths[i]], [y_vals[i],y_vals[i]], [z_vals[i]+depths[i], z_vals[i]+depths[i]], colors[i%len(colors)])
+        ax.plot3D([x_vals[i],x_vals[i]+widths[i]], [y_vals[i]+heights[i],y_vals[i]+heights[i]], [z_vals[i]+depths[i], z_vals[i]+depths[i]], colors[i%len(colors)])
+
+        ax.plot3D([x_vals[i]+widths[i], x_vals[i]+widths[i]], [y_vals[i],y_vals[i]+heights[i]], [z_vals[i], z_vals[i]], colors[i%len(colors)])
+        ax.plot3D([x_vals[i], x_vals[i]], [y_vals[i],y_vals[i]+heights[i]], [z_vals[i]+depths[i], z_vals[i]+depths[i]], colors[i%len(colors)])
+        ax.plot3D([x_vals[i]+widths[i], x_vals[i]+widths[i]], [y_vals[i],y_vals[i]+heights[i]], [z_vals[i]+depths[i], z_vals[i]+depths[i]], colors[i%len(colors)])
+
+        ax.plot3D([x_vals[i]+widths[i],x_vals[i]+widths[i]], [y_vals[i],y_vals[i]], [z_vals[i], z_vals[i]+depths[i]], colors[i%len(colors)])
+        ax.plot3D([x_vals[i],x_vals[i]], [y_vals[i]+heights[i],y_vals[i]+heights[i]], [z_vals[i], z_vals[i]+depths[i]], colors[i%len(colors)])
+        ax.plot3D([x_vals[i]+widths[i],x_vals[i]+widths[i]], [y_vals[i]+heights[i],y_vals[i]+heights[i]], [z_vals[i], z_vals[i]+depths[i]], colors[i%len(colors)])
+
+
+
 # test for underfitting into a single container by
 # generating difficult arrangments
 
@@ -25,7 +78,7 @@ def generate_bins_that_fit(iterationLimit):
         for yVal in range(0, int(containerY/resolution)):
             for zVal in range(0, int(containerZ/resolution)):
                 interiorPoints.append((xVal, yVal, zVal))
-                
+    assert(len(interiorPoints)==(containerX*containerY*containerZ/(resolution**3)))
     # implicitly prioritzes x>y>z
     interiorPoints=sorted(interiorPoints)
     # a list of points, can easily be used to get the dimensions of a box but keep points to demonstrate test integrity
@@ -65,7 +118,7 @@ def generate_bins_that_fit(iterationLimit):
                 repeatCount=0
             # this is super stupid and slow, replace with popping the dimensions that cant be changed logic
             if repeatCount==20:
-                coordinates[point]=len(existingShape)
+                coordinates[len(existingShape)]=point
                 break            
         items.append(currentItem)
     container=ContainerPY3DBP('',containerX, containerY, containerZ,1000)
@@ -76,9 +129,9 @@ def generate_bins_that_fit(iterationLimit):
         maxTuple=item[len(item)-1]
         # no points or lines allowed, only planes
         if(((not (minTuple[0] ==maxTuple[0])) and (not(minTuple[1]==maxTuple[1]))) and (not(minTuple[2]==maxTuple[2]))):
-            
-            newItem=ItemPY3DBP('', int(maxTuple[0]-minTuple[0]+1), int(maxTuple[1]-minTuple[1]+1), int(maxTuple[2]-minTuple[2]+1), 1)
-            assert(newItem.depth*newItem.height*newItem.width==len(item))
+            # to see why this makes sense, consider that a 1x1x1 container has volume 1, but 8 points
+            newItem=ItemPY3DBP('', int(maxTuple[0]-minTuple[0]), int(maxTuple[1]-minTuple[1]), int(maxTuple[2]-minTuple[2]), 1)
+            assert((newItem.depth+1)*(newItem.height+1)*(newItem.width+1)==len(item))
             returnItems.append(newItem)
     return container, returnItems,coordinates
 # key invariant, if we can't expand, just return the shapes with no modification
@@ -141,7 +194,7 @@ def test_one_underfit(ele):
             pointHeight=random.random()*container.depth    
         '''
         # failed
-        raise Exception
+        return packer, container, items, coordinates
     else:
         testing_single_pack.test_for_double_fit(packer, 10000)
         # what we did
@@ -152,14 +205,80 @@ def test_one_underfit(ele):
         assert(packer.unfit_items==[])
         #print("N: "+str(len(items)))
         #print("Occupacy percentage:"+str(volumeOccupied))
-        
-        
+    return packer, container, items, coordinates
+# note that we use this when we failure to render by PY3DBP, but have coordinates from test_one_underfit()
+def render_something_that_failed(container, items,coordinates):
+    packer=Packer()
+    bin_width,bin_height,bin_depth=container.width,container.height,container.depth
+    newItems=[]
+    import copy
+    for item in items:
+        newItem=ItemPY3DBP('',item.width, item.height, item.depth, item.weight)
+        # remember generate_bins_that_fit uses number of points in a cube, not the volume
+        x,y,z=coordinates[(item.width+1)*(item.height+1)*(item.depth+1)][0],coordinates[(item.width+1)*(item.height+1)*(item.depth+1)][1],coordinates[(item.width+1)*(item.height+1)*(item.depth+1)][2]
+        newItem.position=[x,y,z]
+        print(item.string())
+        print([x,y,z])
+        print([item.get_dimension()[0],item.get_dimension()[1],item.get_dimension()[2]])
+        print('\n')
+        newItems.append(copy.deepcopy(newItem))
+    packer.items=newItems
+
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    x_vals = []
+    y_vals = []
+    z_vals = []
+    widths = []
+    heights = []
+    depths = []
+
+        #print(":::::::::::", b.string())
+
+    #print("FITTED ITEMS:")
+    for item in packer.items:
+        #print("====> ", item.string())
+        x_vals.append(float(item.position[0]))
+        y_vals.append(float(item.position[1]))
+        z_vals.append(float(item.position[2]))
+
+        # print("width:", float(item.width), "height:", float(item.height), "depth:", float(item.depth))
+        # print("dim_0:", item.get_dimension()[0], "dim_1:", item.get_dimension()[1], "dim_2:", item.get_dimension()[2])
+        widths.append(float(item.get_dimension()[0]))
+        heights.append(float(item.get_dimension()[1]))
+        depths.append(float(item.get_dimension()[2]))
+
+            #print(item.rotation_type)
+
+            #print("====> ", item.string())
+
+        #print("***************************************************")
+        #print("***************************************************")
+
+
+
+    draw_bin(ax,bin_width, bin_height, bin_depth)
+    draw_boxes(ax,x_vals, y_vals, z_vals, widths, heights, depths)
+    ax.set_xlabel('Width (x)')
+    ax.set_ylabel('Height (y)')
+    ax.set_zlabel('Depth (z)')
+
+    plt.show() 
 def test_underfits():
     specialContainer, specialItems=None,None
     failedAt1000Iterations=0
     import copy
     for ele in range(0, 1000):
         print(ele)
-        test_one_underfit(ele)
+        packer, container, items, coordinates=test_one_underfit(ele)
+        if packer==None:
+            # can do this to recieve verification that you can fit it in 
+            #render_something_that_failed(container, items, coordinates)
+            raise Exception
+
+
+
 
 test_underfits()

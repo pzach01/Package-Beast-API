@@ -240,12 +240,11 @@ class Packer:
     def pack(self, bigger_first=False, distribute_items=False):
         self.bins.sort(key=lambda bin: bin.volume, reverse=bigger_first)
         # self.items.sort(key=lambda item: item.volume, reverse=bigger_first)
-        for item in self.items:
-            print(item.string())
+
         for bin in self.bins:
             for item in self.items:
                 self.pack_to_bin(bin, item)
-            print('\n')
+            #print('\n')
             if distribute_items:
                 for item in bin.items:
                     self.items.remove(item)

@@ -85,7 +85,6 @@ def generate_bins_that_fit(iterationLimit):
     items=[]
     coordinates={}
     for i in range(0, n):
-        
         if(len(interiorPoints)==0):
             # full volume
             break
@@ -110,7 +109,6 @@ def generate_bins_that_fit(iterationLimit):
             
             
             interiorPoints, existingShape=try_to_expand_in_one_direction(currentItem, interiorPoints,directionToExpandIn, resolution)
-            
             if sorted(existingShape)==sorted(currentItem):
                 repeatCount+=1
             else:
@@ -118,9 +116,12 @@ def generate_bins_that_fit(iterationLimit):
                 repeatCount=0
             # this is super stupid and slow, replace with popping the dimensions that cant be changed logic
             if repeatCount==20:
-                coordinates[len(existingShape)]=point
+
+                coordinates[sorted(currentItem)[0]]=len(existingShape)
+                items.append(currentItem)
+
                 break            
-        items.append(currentItem)
+
     container=ContainerPY3DBP('',containerX, containerY, containerZ,1000)
     returnItems=[]
     for item in items:
@@ -179,8 +180,6 @@ def test_one_underfit(ele):
     packer=single_pack.single_pack(container, itemList,1000)
     
     if packer==None:
-        for item in itemList:
-            print(item.string())
         #packer=single_pack.single_pack(container, itemList,1000)        
         #specialContainer,specialItems=container,items
         #print("failed")
@@ -212,11 +211,23 @@ def render_something_that_failed(container, items,coordinates):
     packer=Packer()
     bin_width,bin_height,bin_depth=container.width,container.height,container.depth
     newItems=[]
+    coordinateList=[]
+    for point in coordinates.keys():
+        coordinateList.append((point, coordinates[point]))
+    
     import copy
     for item in items:
         newItem=ItemPY3DBP('',item.width, item.height, item.depth, item.weight)
+        # BUG: THIS MIGHT NOT BE UNIQUE
         # remember generate_bins_that_fit uses number of points in a cube, not the volume
-        x,y,z=coordinates[(item.width+1)*(item.height+1)*(item.depth+1)][0],coordinates[(item.width+1)*(item.height+1)*(item.depth+1)][1],coordinates[(item.width+1)*(item.height+1)*(item.depth+1)][2]
+        internalVolume=(item.width+1)*(item.height+1)*(item.depth+1)
+        newCoord=None
+        for coord in coordinateList:
+            if coord[1]==internalVolume:
+                newCoord=coord
+                coordinateList.remove(coord)
+                break
+        x,y,z=newCoord[0][0],newCoord[0][1],newCoord[0][2]
         newItem.position=[x,y,z]
         print(item.string())
         print([x,y,z])
@@ -274,9 +285,10 @@ def test_underfits():
     for ele in range(0, 100000):
         print(ele)
         packer, container, items, coordinates=test_one_underfit(ele)
+
         if packer==None:
             # can do this to recieve verification that you can fit it in 
-            #render_something_that_failed(container, items, coordinates)
+            render_something_that_failed(container, items, coordinates)
             raise Exception
 
 

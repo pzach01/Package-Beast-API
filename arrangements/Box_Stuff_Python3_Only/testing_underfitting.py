@@ -74,11 +74,12 @@ def generate_bins_that_fit(iterationLimit):
     interiorPoints=[]
     # can quickly exceed memory limit; increase resolution (size) if going over memory or approximate container to 
     # generate the interior points
-    for xVal in range(0, int(containerX/resolution)):
-        for yVal in range(0, int(containerY/resolution)):
-            for zVal in range(0, int(containerZ/resolution)):
+    for xVal in range(0, int((containerX+1)/resolution)):
+        for yVal in range(0, int((containerY+1)/resolution)):
+            for zVal in range(0, int((containerZ+1)/resolution)):
                 interiorPoints.append((xVal, yVal, zVal))
-    assert(len(interiorPoints)==(containerX*containerY*containerZ/(resolution**3)))
+    # there are more points then the volume (consider the 1x1x1 example; has 8 points volume 1)
+    assert(len(interiorPoints)==((containerX+1)*(containerY+1)*(containerZ+1)/(resolution**3)))
     # implicitly prioritzes x>y>z
     interiorPoints=sorted(interiorPoints)
     # a list of points, can easily be used to get the dimensions of a box but keep points to demonstrate test integrity
@@ -117,7 +118,6 @@ def generate_bins_that_fit(iterationLimit):
             # this is super stupid and slow, replace with popping the dimensions that cant be changed logic
             if repeatCount==20:
 
-                coordinates[sorted(currentItem)[0]]=len(existingShape)
                 items.append(currentItem)
 
                 break            
@@ -125,13 +125,18 @@ def generate_bins_that_fit(iterationLimit):
     container=ContainerPY3DBP('',containerX, containerY, containerZ,1000)
     returnItems=[]
     for item in items:
+
+
         item=sorted(item)
         minTuple=item[0]
         maxTuple=item[len(item)-1]
         # no points or lines allowed, only planes
         if(((not (minTuple[0] ==maxTuple[0])) and (not(minTuple[1]==maxTuple[1]))) and (not(minTuple[2]==maxTuple[2]))):
             # to see why this makes sense, consider that a 1x1x1 container has volume 1, but 8 points
+
             newItem=ItemPY3DBP('', int(maxTuple[0]-minTuple[0]), int(maxTuple[1]-minTuple[1]), int(maxTuple[2]-minTuple[2]), 1)
+            coordinates[sorted(item)[0]]=(newItem.width, newItem.height, newItem.depth)
+
             assert((newItem.depth+1)*(newItem.height+1)*(newItem.width+1)==len(item))
             returnItems.append(newItem)
     return container, returnItems,coordinates
@@ -208,30 +213,21 @@ def test_one_underfit(ele):
     return packer, container, items, coordinates
 # note that we use this when we failure to render by PY3DBP, but have coordinates from test_one_underfit()
 def render_something_that_failed(container, items,coordinates):
+    print(len(items))
     packer=Packer()
     bin_width,bin_height,bin_depth=container.width,container.height,container.depth
     newItems=[]
-    coordinateList=[]
-    for point in coordinates.keys():
-        coordinateList.append((point, coordinates[point]))
-    
     import copy
-    for item in items:
-        newItem=ItemPY3DBP('',item.width, item.height, item.depth, item.weight)
+    for key in coordinates.keys():
+
+
+        newItem=ItemPY3DBP('',coordinates[key][0], coordinates[key][1], coordinates[key][2], 1)
         # BUG: THIS MIGHT NOT BE UNIQUE
         # remember generate_bins_that_fit uses number of points in a cube, not the volume
-        internalVolume=(item.width+1)*(item.height+1)*(item.depth+1)
-        newCoord=None
-        for coord in coordinateList:
-            if coord[1]==internalVolume:
-                newCoord=coord
-                coordinateList.remove(coord)
-                break
-        x,y,z=newCoord[0][0],newCoord[0][1],newCoord[0][2]
-        newItem.position=[x,y,z]
-        print(item.string())
-        print([x,y,z])
-        print([item.get_dimension()[0],item.get_dimension()[1],item.get_dimension()[2]])
+
+        newItem.position=[key[0],key[1],key[2]]
+        print([key[0],key[1],key[2]])
+        print([newItem.get_dimension()[0],newItem.get_dimension()[1],newItem.get_dimension()[2]])
         print('\n')
         newItems.append(copy.deepcopy(newItem))
     packer.items=newItems
@@ -285,7 +281,7 @@ def test_underfits():
     for ele in range(0, 100000):
         print(ele)
         packer, container, items, coordinates=test_one_underfit(ele)
-
+        #render_something_that_failed(container, items, coordinates)
         if packer==None:
             # can do this to recieve verification that you can fit it in 
             render_something_that_failed(container, items, coordinates)
@@ -295,3 +291,4 @@ def test_underfits():
 
 
 test_underfits()
+

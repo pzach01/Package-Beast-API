@@ -69,7 +69,7 @@ def generate_bins_that_fit(iterationLimit):
     n=iterationLimit
     # each point is at least .1 away from o
     resolution=1
-    containerX,containerY,containerZ=20,20,20
+    containerX,containerY,containerZ=random.randint(1,25), random.randint(1,25),random.randint(1,25)
     
     interiorPoints=[]
     # can quickly exceed memory limit; increase resolution (size) if going over memory or approximate container to 
@@ -124,8 +124,9 @@ def generate_bins_that_fit(iterationLimit):
 
     container=ContainerPY3DBP('',containerX, containerY, containerZ,1000)
     returnItems=[]
+    count=0
     for item in items:
-
+        count+=1
 
         item=sorted(item)
         minTuple=item[0]
@@ -134,7 +135,7 @@ def generate_bins_that_fit(iterationLimit):
         if(((not (minTuple[0] ==maxTuple[0])) and (not(minTuple[1]==maxTuple[1]))) and (not(minTuple[2]==maxTuple[2]))):
             # to see why this makes sense, consider that a 1x1x1 container has volume 1, but 8 points
 
-            newItem=ItemPY3DBP('', int(maxTuple[0]-minTuple[0]), int(maxTuple[1]-minTuple[1]), int(maxTuple[2]-minTuple[2]), 1)
+            newItem=ItemPY3DBP(str(count), int(maxTuple[0]-minTuple[0]), int(maxTuple[1]-minTuple[1]), int(maxTuple[2]-minTuple[2]), 1)
             coordinates[sorted(item)[0]]=(newItem.width, newItem.height, newItem.depth)
 
             assert((newItem.depth+1)*(newItem.height+1)*(newItem.width+1)==len(item))
@@ -176,14 +177,28 @@ def try_to_expand_in_one_direction(existingShape, interiorPoints, directionToExp
 
 
 
+def test_4():
+    container=ContainerPY3DBP('',25,6,15,1000)
+    # 17,2,10
+    items=[
+        ItemPY3DBP('',17,2,10,1),
+        ItemPY3DBP('',14,4,7,1),
+        ItemPY3DBP('',19,3,5,1),
+        ItemPY3DBP('',19,3,8,1)
+    ]
+    
 
+
+    packer=single_pack.single_pack(container, items)
+    # 'None' valid arrangment
+    assert(not(packer==None))
 
 def test_one_underfit(ele):
-    container, items,coordinates=generate_bins_that_fit(10)
-    container=ContainerPY3DBP('',container.width, container.height, container.depth,100)
-    itemList=[ItemPY3DBP('',item.width, item.height, item.depth, 1) for item in items]
-    packer=single_pack.single_pack(container, itemList,1000)
-    
+    numContainers=random.randint(1,10)
+    container, items,coordinates=generate_bins_that_fit(numContainers)
+    container=ContainerPY3DBP('Container',container.width, container.height, container.depth,100)
+    packer=single_pack.single_pack(container, items,1000)
+    assert(len(packer.items)==len(items))
     if packer==None:
         #packer=single_pack.single_pack(container, itemList,1000)        
         #specialContainer,specialItems=container,items
@@ -202,6 +217,9 @@ def test_one_underfit(ele):
         return packer, container, items, coordinates
     else:
         testing_single_pack.test_for_double_fit(packer, 10000)
+        for item in items:
+            if outside_container(item, container.width,container.height,container.depth):
+                raise Exception
         # what we did
         volumeOccupied=sum([item.volume for item in items])/container.volume
         # what py3dbp did
@@ -289,6 +307,6 @@ def test_underfits():
 
 
 
-
+test_4()
 test_underfits()
 

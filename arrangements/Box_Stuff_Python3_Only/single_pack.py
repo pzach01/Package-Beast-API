@@ -35,13 +35,19 @@ def single_pack(container, itemList,iterationLimit=1000):
     
     #
     import copy
+    count=0
+
     for item_permutation in item_permutations:
+        render=False
+        
+        count+=1
+        
         packer =Packer()
         packer.add_bin(copy.deepcopy(container))
         for item in item_permutation:
             packer.add_item(item)
     
-        packer.pack()
+        packer.pack(render)
         if packer.bins[0].unfitted_items:
             pass
             #print("doesn't fit, yo")

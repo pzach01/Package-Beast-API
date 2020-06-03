@@ -1,7 +1,7 @@
 from . import py3dbp_constants
 from .py3dbp_constants import RotationType, Axis
 from . import py3dbp_auxiliary_methods
-from .py3dbp_auxiliary_methods import intersect
+from .py3dbp_auxiliary_methods import intersect_lucas
 
 START_POSITION = [0, 0, 0]
 
@@ -28,20 +28,28 @@ class ItemPY3DBP:
         return self.width * self.height * self.depth
 
     def get_dimension(self):
-        if self.rotation_type == RotationType.RT_WHD:
-            dimension = [self.width, self.height, self.depth]
-        elif self.rotation_type == RotationType.RT_HWD:
-            dimension = [self.height, self.width, self.depth]
-        elif self.rotation_type == RotationType.RT_HDW:
-            dimension = [self.height, self.depth, self.width]
-        elif self.rotation_type == RotationType.RT_DHW:
-            dimension = [self.depth, self.height, self.width]
-        elif self.rotation_type == RotationType.RT_DWH:
-            dimension = [self.depth, self.width, self.height]
-        elif self.rotation_type == RotationType.RT_WDH:
-            dimension = [self.width, self.depth, self.height]
-        else:
-            dimension = []
+        # is a number
+        axisCopy=self.rotation_type
+        firstBit=axisCopy//(3**2)
+        axisCopy=axisCopy%(3**2)
+        secondBit=axisCopy//(3**1)
+        axisCopy=axisCopy%(3**1)
+        thirdBit=axisCopy
+        #firstValue=[0 if firstBit==0 else 1 if firstBit==1 else -1][0]
+        #secondValue=[0 if secondBit==0 else 1 if secondBit==1 else -1][0]
+        #thirdValue=[0 if thirdBit==0 else 1 if thirdBit==1 else -1][0]
+        firstValue=1 if firstBit==0 else -1
+        secondValue=1 if secondBit==0 else -1
+        thirdValue=1 if thirdBit==0 else -1
+        dimension=[
+            firstValue*self.width,
+            secondValue*self.height,
+            thirdValue*self.depth
+        ]
+
+
+
+
 
         return dimension
 
@@ -99,7 +107,7 @@ class ContainerPY3DBP:
                     fit = True
 
                     for current_item_in_bin in self.items:
-                        if intersect(current_item_in_bin, item):
+                        if intersect_lucas(current_item_in_bin, item,self.width,self.height, self.depth):
                             fit = False
                             break
 
@@ -195,7 +203,7 @@ class Packer:
 
         return self.items.append(item)
 
-    def pack_to_bin(self, bin, item):
+    def pack_to_bin(self, bin, item,render):
         fitted = False
 
         if not bin.items:
@@ -216,34 +224,60 @@ class Packer:
                 # 3rd 'bit' =+, -, or no addition 
                 # not sure if this line is neccessary
                 axisCopy=axis
-                firstBit=axisCopy//(3**2)
-                axisCopy=axisCopy%(3**2)
-                secondBit=axisCopy//(3**1)
-                axisCopy=axisCopy%(3**1)
+                firstBit=axisCopy//(2**2)
+                axisCopy=axisCopy%(2**2)
+                secondBit=axisCopy//(2**1)
+                axisCopy=axisCopy%(2**1)
                 thirdBit=axisCopy
-                firstValue=[0 if firstBit==0 else 1 if firstBit==1 else -1][0]
-                secondValue=[0 if secondBit==0 else 1 if secondBit==1 else -1][0]
-                thirdValue=[0 if thirdBit==0 else 1 if thirdBit==1 else -1][0]
+                #firstValue=[0 if firstBit==0 else 1 if firstBit==1 else -1][0]
+                #secondValue=[0 if secondBit==0 else 1 if secondBit==1 else -1][0]
+                #thirdValue=[0 if thirdBit==0 else 1 if thirdBit==1 else -1][0]
+                firstValue=0 if firstBit==0 else 1
+                secondValue=0 if secondBit==0 else 1
+                thirdValue=0 if thirdBit==0 else 1
                 pivot=[
                     currentItem.position[0]+firstValue*currentItem.width,
                     currentItem.position[1]+secondValue*currentItem.height,
                     currentItem.position[2]+thirdValue*currentItem.depth
                 ]
 
-                if bin.put_item(item, pivot):
+
+                render=False
+                if render:
+                    from . import testing_underfitting
+                    from .testing_underfitting import render_something_that_failed
+                    coordinates={}
+                    innerItems=[]
+                    count=0
+                    doneBefore=False
+                    for itemInner in bin.items+[item]:
+                        count+=1
+                        # this is because equality is custom defined
+                        if itemInner==item and (not doneBefore):
+                            coordinates[(pivot[0],pivot[1],pivot[2],count)]=(itemInner.get_dimension()[0], itemInner.get_dimension()[1], itemInner.get_dimension()[2])
+                            doneBefore=True
+                        else:
+                            coordinates[(itemInner.position[0],itemInner.position[1],itemInner.position[2],count)]=(itemInner.get_dimension()[0], itemInner.get_dimension()[1], itemInner.get_dimension()[2])
+                        innerItems.append(itemInner)
+                    render_something_that_failed(bin, innerItems,coordinates)
+                res=bin.put_item(item,pivot)
+
+                if res:
                     fitted = True
                     break
+
+
 
         if not fitted:
             bin.unfitted_items.append(item)
 
-    def pack(self, bigger_first=False, distribute_items=False):
+    def pack(self,render=False, bigger_first=False, distribute_items=False):
         self.bins.sort(key=lambda bin: bin.volume, reverse=bigger_first)
         # self.items.sort(key=lambda item: item.volume, reverse=bigger_first)
 
         for bin in self.bins:
             for item in self.items:
-                self.pack_to_bin(bin, item)
+                self.pack_to_bin(bin, item,render)
             #print('\n')
             if distribute_items:
                 for item in bin.items:

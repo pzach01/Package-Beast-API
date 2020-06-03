@@ -6,8 +6,8 @@ class RotationType:
     RT_DWH = 4
     RT_WDH = 5
 
-    ALL = [RT_WHD, RT_HWD, RT_HDW, RT_DHW, RT_DWH, RT_WDH]
-
+    #ALL = [RT_WHD, RT_HWD, RT_HDW, RT_DHW, RT_DWH, RT_WDH]
+    ALL=[ele for ele in range(0,16)]
 
 class Axis:
     WIDTH = 0
@@ -19,5 +19,5 @@ class Axis:
     WIDTH_HEIGHT_DEPTH=6
     #ORIGIN=6
 
-    ALL = [ele for ele in range(0, 27)]
+    ALL = [ele for ele in range(0,8)]
 

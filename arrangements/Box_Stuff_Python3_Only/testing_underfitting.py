@@ -261,27 +261,18 @@ def render_something_that_failed(container, items,coordinates):
     heights = []
     depths = []
 
-        #print(":::::::::::", b.string())
 
-    #print("FITTED ITEMS:")
     for item in packer.items:
-        #print("====> ", item.string())
         x_vals.append(float(item.position[0]))
         y_vals.append(float(item.position[1]))
         z_vals.append(float(item.position[2]))
 
-        # print("width:", float(item.width), "height:", float(item.height), "depth:", float(item.depth))
-        # print("dim_0:", item.get_dimension()[0], "dim_1:", item.get_dimension()[1], "dim_2:", item.get_dimension()[2])
+
         widths.append(float(item.get_dimension()[0]))
         heights.append(float(item.get_dimension()[1]))
         depths.append(float(item.get_dimension()[2]))
 
-            #print(item.rotation_type)
 
-            #print("====> ", item.string())
-
-        #print("***************************************************")
-        #print("***************************************************")
 
 
 

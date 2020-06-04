@@ -25,7 +25,7 @@ class ItemPY3DBP:
         )
 
     def get_volume(self):
-        return self.width * self.height * self.depth
+        return abs(self.width * self.height * self.depth)
 
     def get_dimension(self):
         # is a number
@@ -72,7 +72,7 @@ class ContainerPY3DBP:
         )
 
     def get_volume(self):
-        return self.width * self.height * self.depth
+        return abs(self.width * self.height * self.depth)
 
     def get_total_weight(self):
         total_weight = 0

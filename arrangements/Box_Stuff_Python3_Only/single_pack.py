@@ -4,10 +4,11 @@ import itertools
 
 
 
-def single_pack(container, itemList,iterationLimit=1000):
+def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True):
     # container volume greater then sum of items we are trying to fit
-    if container.volume< sum([item.volume for item in itemList]):
-        return None
+    if volumeSafeGuard:
+        if container.volume< sum([item.volume for item in itemList]):
+            return None
 
     import math
 

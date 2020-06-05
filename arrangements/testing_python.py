@@ -9,7 +9,7 @@ import Box_Stuff_Python3_Only.testing_multipack
 import Box_Stuff_Python3_Only.testing_single_pack
 #print("Passed single pack tests")
 
-import Box_Stuff_Python3_Only.testing_rendering
+#import Box_Stuff_Python3_Only.testing_rendering
 
 # lots of tests
 import Box_Stuff_Python3_Only.testing_underfitting as ut
@@ -17,3 +17,5 @@ import Box_Stuff_Python3_Only.testing_underfitting as ut
 
 # lots of tests
 #import Box_Stuff_Python3_Only.testing_overfitting
+# 0-10,000
+# 7:51 -8:37

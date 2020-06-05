@@ -223,10 +223,12 @@ def edges_intersect(newShape, oldShape):
                 return True
     return False
 
+
+
 def new_is_valid_corner_point(existingShapes,newShape):
     # can't have points nested within each other
     if(strictly_within(existingShapes, newShape) or strictly_within(existingShapes,newShape)):
-        return False            
+        return False     
     ### keep checking the list if this newShape is strictly outside oldShape
     if(same_shape(newShape, existingShapes)):
         return False

@@ -216,7 +216,7 @@ def test_one_underfit(ele):
         # failed
         return packer, container, items, coordinates
     else:
-        testing_single_pack.test_for_double_fit(packer, 10000)
+        testing_single_pack.test_for_double_fit(packer, 1000)
         for item in items:
             if outside_container(item, container.width,container.height,container.depth):
                 raise Exception

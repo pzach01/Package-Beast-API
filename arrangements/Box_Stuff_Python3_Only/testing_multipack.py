@@ -1,6 +1,15 @@
 from . import test_imports
 from .test_imports import *
 
+
+
+
+def test_2():
+    containers=['20x20x20','22x20x20']
+    items=['2x2x2','3x2x1','4x5x2','3x7x2']
+    containerList=box_stuff2.master_calculate_optimal_solution(containers,items,timeout=30)    
+    usedVolume=sum([bin.volume for bin in containerList if len(bin.boxes) is not 0 ])
+    assert(usedVolume==8000)
 def test_1():
     print("Test 1 starting")
     bins=['10x10x10', '10x10x10']
@@ -70,8 +79,8 @@ def weight_testing():
     
     
      
-weight_testing()
+#weight_testing()
 
-cost_testing()
-
-test_1()
+#cost_testing()
+#test_2()
+#test_1()

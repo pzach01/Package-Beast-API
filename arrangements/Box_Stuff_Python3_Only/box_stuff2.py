@@ -305,7 +305,10 @@ class BinAPI():
             height, width, depth=package.height, package.width, package.depth
             for boxIndex in range(0, len(self.boxes)):
                 # boxes have the same coordinates
-                if((self.boxes[boxIndex].height==height and self.boxes[boxIndex].width==width)and self.boxes[boxIndex].length==depth):
+                
+                # we have to do this because internally the HxLxD might get swapped around by the algorithm
+                if (sorted([self.boxes[boxIndex].height,self.boxes[boxIndex].width,self.boxes[boxIndex].length])==sorted([height,width,depth])):
+#                if((self.boxes[boxIndex].height==height and self.boxes[boxIndex].width==width)and self.boxes[boxIndex].length==depth):
                     self.boxes[boxIndex].set_center(key)
                     slotted.append(self.boxes.pop(boxIndex))
                     break

@@ -302,14 +302,19 @@ class BinAPI():
         slotted=[]
         for key in coordinateDictionary.keys():
             package=coordinateDictionary[key]
-            height, width, depth=package.height, package.width, package.depth
+            height, width, depth,weight=package.height, package.width, package.depth,package.weight
+            if package.weight==None:
+                weight=0
             for boxIndex in range(0, len(self.boxes)):
                 # boxes have the same coordinates
                 
                 # we have to do this because internally the HxLxD might get swapped around by the algorithm
                 if (sorted([self.boxes[boxIndex].height,self.boxes[boxIndex].width,self.boxes[boxIndex].length])==sorted([height,width,depth])):
-#                if((self.boxes[boxIndex].height==height and self.boxes[boxIndex].width==width)and self.boxes[boxIndex].length==depth):
                     self.boxes[boxIndex].set_center(key)
+                    self.boxes[boxIndex].height=height
+                    self.boxes[boxIndex].width=width
+                    self.boxes[boxIndex].depth=depth
+                    self.boxes[boxIndex].weight=weight
                     slotted.append(self.boxes.pop(boxIndex))
                     break
                 

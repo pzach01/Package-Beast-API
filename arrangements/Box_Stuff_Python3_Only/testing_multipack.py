@@ -2,7 +2,12 @@ from . import test_imports
 from .test_imports import *
 
 
-
+def test_3():
+    containers=['20x20x20','20x20x20']
+    items=['20x20x20','20x20x20']
+    containerList=box_stuff2.master_calculate_optimal_solution(containers,items,timeout=30)    
+    usedContainers=len([container for container in containerList if len(container.boxes)>0])
+    assert(usedContainers==2)
 
 def test_2():
     containers=['20x20x20','22x20x20']
@@ -82,5 +87,6 @@ def weight_testing():
 #weight_testing()
 
 #cost_testing()
-#test_2()
+test_2()
 #test_1()
+#test_3()

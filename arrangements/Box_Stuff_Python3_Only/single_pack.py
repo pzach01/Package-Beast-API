@@ -1,8 +1,8 @@
 from . import py3dbp_main
 from .py3dbp_main import Packer, ContainerPY3DBP, ItemPY3DBP
-from .py3dbp_constants import CouldntFit
 import itertools
 import random
+random.seed(0)
 # same as item permutations but randomly iterates and using this generator can yield the same permutation twice
 class CustomItemPermutations():
 

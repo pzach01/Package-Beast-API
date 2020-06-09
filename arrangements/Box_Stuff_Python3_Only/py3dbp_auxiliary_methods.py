@@ -1,8 +1,4 @@
-from . import py3dbp_constants
-from .py3dbp_constants import Axis
-
-
-
+from .intersection_methods import objects_intersect
 
 
 def outside_container(item, containerX,containerY,containerZ):
@@ -31,15 +27,14 @@ def strictly_outside(item1Min, item1Max, item2Min, item2Max):
         return True
 
 def intersect_lucas(item1,item2,containerX,containerY,containerZ):
-
-    from . import new_is_valid_corner_point_code
-    from .new_is_valid_corner_point_code import new_is_valid_corner_point_v2 as np
+    '''
+    # dont think we need to do this because it is checked upon adding to bin
     # check within bounds
     if outside_container(item1, containerX,containerY,containerZ):
         return True
     if outside_container(item2, containerX,containerY,containerZ):
         return True
-
+    '''
     # we don't need to do this dynamically (could be stored)
     # my old method
     item1C=sorted([
@@ -74,7 +69,4 @@ def intersect_lucas(item1,item2,containerX,containerY,containerZ):
     if strictly_outside(item1C[0], item1C[7], item2C[0], item2C[7]):
         return False
 
-    # computational speedup; not strictly necessary
-
-
-    return (not (np(item1C, item2C)))
+    return (not (objects_intersect(item1C, item2C)))

@@ -70,31 +70,26 @@ def render(packer,bin_width, bin_height, bin_depth):
         heights = []
         depths = []
 
-        for b in packer.bins:
-            #print(":::::::::::", b.string())
 
-            #print("FITTED ITEMS:")
-            for item in b.items:
-                #print("====> ", item.string())
-                x_vals.append(float(item.position[0]))
-                y_vals.append(float(item.position[1]))
-                z_vals.append(float(item.position[2]))
+        for item in packer.items:
+            #print("====> ", item.string())
+            x_vals.append(float(item.position[0]))
+            y_vals.append(float(item.position[1]))
+            z_vals.append(float(item.position[2]))
 
-                # print("width:", float(item.width), "height:", float(item.height), "depth:", float(item.depth))
-                # print("dim_0:", item.get_dimension()[0], "dim_1:", item.get_dimension()[1], "dim_2:", item.get_dimension()[2])
-                widths.append(float(item.get_dimension()[0]))
-                heights.append(float(item.get_dimension()[1]))
-                depths.append(float(item.get_dimension()[2]))
+            # print("width:", float(item.width), "height:", float(item.height), "depth:", float(item.depth))
+            # print("dim_0:", item.get_dimension()[0], "dim_1:", item.get_dimension()[1], "dim_2:", item.get_dimension()[2])
+            widths.append(float(item.get_dimension()[0]))
+            heights.append(float(item.get_dimension()[1]))
+            depths.append(float(item.get_dimension()[2]))
 
-                #print(item.rotation_type)
+            #print(item.rotation_type)
 
-            #print("UNFITTED ITEMS:")
-            for item in b.unfitted_items:
-                pass
-                #print("====> ", item.string())
 
-            #print("***************************************************")
-            #print("***************************************************")
+            #print("====> ", item.string())
+
+        #print("***************************************************")
+        #print("***************************************************")
 
 
 
@@ -116,10 +111,7 @@ def render_test():
     container=ContainerPY3DBP('very-very-large-box', bin_width, bin_height, bin_depth, bin_weight_capacity)
 
     items = [
-        ItemPY3DBP('50g [powder 2]', 450, 793, 975, 2),
-        ItemPY3DBP('50g [powder 3]', 450, 793, 975, 2),
-        ItemPY3DBP('50g [powder 4]', 450, 793, 975, 2),
-
+        ItemPY3DBP(str(ele), 450, 793, 975, 2) for ele in range(0, 17)
 
 
 
@@ -137,18 +129,38 @@ def render_test():
 
 
 
-    packer=single_pack.single_pack(container, items)
+    packer=single_pack.single_pack(container, items,1000,True, True)
 
     render(packer, bin_width,bin_height,bin_depth)
 # another bug encountered
-def render_test2():
+
+
+def test_4_render():
     container=ContainerPY3DBP('',25,6,15,1000)
     # 17,2,10
     items=[
-        ItemPY3DBP('',17,2,10,1),
-        ItemPY3DBP('',14,4,7,1),
-        ItemPY3DBP('',19,3,5,1),
-        ItemPY3DBP('',19,3,8,1)
+        ItemPY3DBP('1',17,2,10,1),
+        ItemPY3DBP('2',14,4,7,1),
+        ItemPY3DBP('3',19,3,5,1),
+        ItemPY3DBP('4',19,3,8,1)
+    ]
+    
+
+
+    packer=single_pack.single_pack(container, items)
+    render(packer, container.width, container.height, container.depth)
+    # 'None' valid arrangment
+    assert(not(packer==None))
+
+
+def render_test2():
+    container=ContainerPY3DBP('Container',25,6,15,1000)
+    # 17,2,10
+    items=[
+        ItemPY3DBP('1',17,2,10,1),
+        ItemPY3DBP('2',14,4,7,1),
+        ItemPY3DBP('3',19,3,5,1),
+        ItemPY3DBP('4',19,3,8,1)
     ]
     
     '''
@@ -166,5 +178,38 @@ def render_test2():
     packer=single_pack.single_pack(container, items)
     render(packer, container.width, container.height, container.depth)
 
+
+
+def recursive_bug():
+    '''
+    Container: Container(1x12x4, max_weight:100) vol(48)
+    1(1.000000x4.000000x3.000000, weight: 1) pos(0.000000, 0.000000, 0.000000) rt(0) vol(12)
+    2(1.000000x1.000000x1.000000, weight: 1) pos(0.000000, 0.000000, 0.000000) rt(0) vol(1)
+    4(1.000000x2.000000x1.000000, weight: 1) pos(0.000000, 0.000000, 0.000000) rt(0) vol(2)
+    6(1.000000x2.000000x1.000000, weight: 1) pos(0.000000, 0.000000, 0.000000) rt(0) vol(2)
+    7(1.000000x2.000000x1.000000, weight: 1) pos(0.000000, 0.000000, 0.000000) rt(0) vol(2)
+    8(1.000000x4.000000x2.000000, weight: 1) pos(0.000000, 0.000000, 0.000000) rt(0) vol(8)
+    '''
+    container=ContainerPY3DBP('very-very-large-box', 1, 12, 4, 100)
+
+
+    items = [
+        ItemPY3DBP('1', 1, 5, 3, 2),
+        ItemPY3DBP('2', 1, 1, 1, 2),
+        ItemPY3DBP('3',1,3,3,2),
+        ItemPY3DBP('4', 1, 2, 1, 2),
+        ItemPY3DBP('5',1,2,3,2),
+        ItemPY3DBP('6', 1, 2, 1, 2),
+        ItemPY3DBP('7', 1, 2, 1, 2),
+        ItemPY3DBP('8', 1, 4, 2, 2),
+        
+    ]
+
+    packer=single_pack.single_pack(container, items,1000,True, True)
+    render(packer,container.width, container.height,container.depth)
+    assert (not (packer==None))
+    test_for_double_fit(packer, 10000)
+#test_4_render()
+#recursive_bug()
 #render_test()
-render_test2()
+#render_test2()

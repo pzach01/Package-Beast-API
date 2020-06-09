@@ -140,7 +140,28 @@ def generate_bins_that_fit(iterationLimit):
 
             assert((newItem.depth+1)*(newItem.height+1)*(newItem.width+1)==len(item))
             returnItems.append(newItem)
-    return container, returnItems,coordinates
+    returnItemsRandomized=[]
+    count=0
+    while(len(returnItems)>0):
+        itemToPop=random.randint(0,len(returnItems)-1)
+        item=returnItems.pop(itemToPop)
+        ordering=random.randint(0,5)
+        #ordering=0
+        newItem=None
+        if ordering==0:
+            newItem=ItemPY3DBP(item.name, item.width, item.height, item.depth, item.weight)
+        if ordering==1:
+            newItem=ItemPY3DBP(item.name, item.width, item.depth, item.height, item.weight)
+        if ordering==2:
+            newItem=ItemPY3DBP(item.name, item.height, item.width, item.depth, item.weight)
+        if ordering==3:
+            newItem=ItemPY3DBP(item.name, item.height, item.depth, item.width, item.weight)
+        if ordering==4:
+            newItem=ItemPY3DBP(item.name, item.depth, item.width, item.height, item.weight)
+        if ordering==5:
+            newItem=ItemPY3DBP(item.name, item.depth, item.height, item.width, item.weight)
+        returnItemsRandomized.append(newItem)
+    return container, returnItemsRandomized,coordinates
 # key invariant, if we can't expand, just return the shapes with no modification
 def try_to_expand_in_one_direction(existingShape, interiorPoints, directionToExpandIn, resolution):
     existingShape=sorted(existingShape)
@@ -177,27 +198,16 @@ def try_to_expand_in_one_direction(existingShape, interiorPoints, directionToExp
 
 
 
-def test_4():
-    container=ContainerPY3DBP('',25,6,15,1000)
-    # 17,2,10
-    items=[
-        ItemPY3DBP('',17,2,10,1),
-        ItemPY3DBP('',14,4,7,1),
-        ItemPY3DBP('',19,3,5,1),
-        ItemPY3DBP('',19,3,8,1)
-    ]
-    
 
-
-    packer=single_pack.single_pack(container, items)
-    # 'None' valid arrangment
-    assert(not(packer==None))
 
 def test_one_underfit(ele):
+
     numContainers=random.randint(1,10)
     container, items,coordinates=generate_bins_that_fit(numContainers)
+
+
     container=ContainerPY3DBP('Container',container.width, container.height, container.depth,100)
-    packer=single_pack.single_pack(container, items,1000)
+    packer=single_pack.single_pack(container, items,1000,True, True)
     assert(len(packer.items)==len(items))
     if packer==None:
         #packer=single_pack.single_pack(container, itemList,1000)        
@@ -217,9 +227,9 @@ def test_one_underfit(ele):
         return packer, container, items, coordinates
     else:
         testing_single_pack.test_for_double_fit(packer, 1000)
-        for item in items:
+        for item in packer.items:
             if outside_container(item, container.width,container.height,container.depth):
-                raise Exception
+                raise Exception("rendered outside container")
         # what we did
         volumeOccupied=sum([item.volume for item in items])/container.volume
         # what py3dbp did
@@ -231,7 +241,6 @@ def test_one_underfit(ele):
     return packer, container, items, coordinates
 # note that we use this when we failure to render by PY3DBP, but have coordinates from test_one_underfit()
 def render_something_that_failed(container, items,coordinates):
-    print(len(items))
     packer=Packer()
     bin_width,bin_height,bin_depth=container.width,container.height,container.depth
     newItems=[]
@@ -244,9 +253,6 @@ def render_something_that_failed(container, items,coordinates):
         # remember generate_bins_that_fit uses number of points in a cube, not the volume
 
         newItem.position=[key[0],key[1],key[2]]
-        print([key[0],key[1],key[2]])
-        print([newItem.get_dimension()[0],newItem.get_dimension()[1],newItem.get_dimension()[2]])
-        print('\n')
         newItems.append(copy.deepcopy(newItem))
     packer.items=newItems
 
@@ -289,7 +295,13 @@ def test_underfits():
     import copy
     for ele in range(0, 100000):
         print(ele)
+        packer=None
         packer, container, items, coordinates=test_one_underfit(ele)
+#        try:
+#            packer, container, items, coordinates=test_one_underfit(ele)
+#        except Exception:
+#            print('Failed')
+#            break
         #render_something_that_failed(container, items, coordinates)
         if packer==None:
             # can do this to recieve verification that you can fit it in 
@@ -297,7 +309,5 @@ def test_underfits():
             raise Exception
 
 
-
-test_4()
 test_underfits()
 

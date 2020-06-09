@@ -1,10 +1,21 @@
 from . import py3dbp_main
 from .py3dbp_main import Packer, ContainerPY3DBP, ItemPY3DBP
+from .py3dbp_constants import CouldntFit
 import itertools
+import random
+# same as item permutations but randomly iterates and using this generator can yield the same permutation twice
+class CustomItemPermutations():
 
+    def __init__(self):
+        pass
+    def next(self,itemList):
+        returnItems=[]
+        while(len(itemList)>0):
+            toSelect=random.randint(0, len(itemList)-1)
+            returnItems.append(itemList.pop(toSelect))
+        return returnItems
 
-
-def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True):
+def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True,printIteration=True):
     # container volume greater then sum of items we are trying to fit
     if volumeSafeGuard:
         if container.volume< sum([item.volume for item in itemList]):
@@ -22,70 +33,161 @@ def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True):
     
     # Option 2 All permutations of the items
     # This takes forever to generate the permutations
-    item_permutations=(itertools.permutations(itemList,len(itemList)))
-    #item_sets=set(itertools.permutations(itemList))
-    #print(type(item_permutations))
-    #print(type(item_sets))
 
 
-    # Option 3 Shuffle items n times to form n different orders to try to place items
-    
-    #item_permutations = []
-    #for i in range(iterationLimit):
-    #    item_permutations.append(random.sample(itemList, len(itemList)))
-    
-    #
-    import copy
-    count=0
+    randomSearch=True
+    if not randomSearch:
+        item_permutations=(itertools.permutations(itemList,len(itemList)))
 
-    for item_permutation in item_permutations:
-        render=False
+
+        #item_sets=set(itertools.permutations(itemList))
+        #print(type(item_permutations))
+        #print(type(item_sets))
+
+
+        # Option 3 Shuffle items n times to form n different orders to try to place items
         
-        count+=1
+        #item_permutations = []
+        #for i in range(iterationLimit):
+        #    item_permutations.append(random.sample(itemList, len(itemList)))
         
-        packer =Packer()
-        packer.add_bin(copy.deepcopy(container))
-        for item in item_permutation:
-            packer.add_item(item)
-    
-        packer.pack(render)
-        if packer.bins[0].unfitted_items:
-            pass
-            #print("doesn't fit, yo")
-        if not packer.bins[0].unfitted_items:
-            #print("fits, yo!")
-    
-    
-
-    
-            x_vals = []
-            y_vals = []
-            z_vals = []
-            widths = []
-            heights = []
-            depths = []
-    
-            for b in packer.bins:
-    
-                for item in b.items:
-                    x_vals.append(float(item.position[0]))
-                    y_vals.append(float(item.position[1]))
-                    z_vals.append(float(item.position[2]))
-    
-                    # print("width:", float(item.width), "height:", float(item.height), "depth:", float(item.depth))
-                    # print("dim_0:", item.get_dimension()[0], "dim_1:", item.get_dimension()[1], "dim_2:", item.get_dimension()[2])
-                    widths.append(float(item.get_dimension()[0]))
-                    heights.append(float(item.get_dimension()[1]))
-                    depths.append(float(item.get_dimension()[2]))
-    
-                    #print(item.rotation_type)
-    
-                for item in b.unfitted_items:
-                    pass
-    
-    
-    
-            return packer
-            #
+        #
+        import copy
+        count=0
+        if len(itemList)==0:
+            p= Packer()
+            p.items=[]
+            p.unfit_items=[]
+            p.bins=[container]
+            return p
+        for item_permutation in item_permutations:
+            mixer=DimensionalMixupsGenerator(item_permutation)
+            count+=1
             
-    
+            innerIteration=0
+            while(True):
+                try:
+                    print("           innerIteration: "+str(innerIteration))
+                    innerIteration+=1
+                    render=False
+                    itemsMixedUp=mixer.next()
+                
+
+
+
+                    packer =Packer()
+                    packer.add_bin(copy.deepcopy(container))
+                    for item in itemsMixedUp:
+                        packer.add_item(item)
+                    
+                    res=packer.pack(render)
+                    if res:
+                        return packer
+
+                except StopIteration:
+
+                    break
+            if printIteration:
+                print("     Iteration: "+str(count))
+
+
+                #
+        # if you couldn't find an arrangment
+        return None    
+
+
+    if randomSearch:
+        count=0
+        if len(itemList)==0:
+            p= Packer()
+            p.items=[]
+            p.unfit_items=[]
+            p.bins=[container]
+            return p
+        # generates random permutations
+        item_permutations_generator=CustomItemPermutations()
+        import copy
+        
+
+        while(True):
+            render=False
+
+
+            item_permutation=item_permutations_generator.next(copy.deepcopy(itemList))
+            
+            mixer=DimensionalMixupsGenerator(item_permutation)
+            mixer.count=random.randint(0, 6**(len(itemList))-1)
+            itemsMixedUp=mixer.next()
+        
+
+
+
+            packer =Packer()
+            packer.add_bin(copy.deepcopy(container))
+            for item in itemsMixedUp:
+                packer.add_item(item)
+            
+            res=packer.pack(render)
+            if res:
+                return packer
+
+
+            if printIteration:
+                print("     Iteration: "+str(count))
+            count+=1
+
+
+                #
+        # if you couldn't find an arrangment; Never happens here (because we don't know which ones have been used)
+        return None    
+
+
+# next() returns one of the possible ways to mixup the Length Width Height of an item for each item in the permutation
+# thus 6**n mixups
+# ie. for each item
+# L x W x H
+# L x H x W
+# H x L x W
+# H x W x L
+# W x H x L
+# W x L x H
+class DimensionalMixupsGenerator():
+    def base_6_as_switches(self, number, n):
+        # want to throw a bug right away if something dumb happens
+        switches=[-1 for ele in range(0, n)]
+        for index in reversed(range(0, n)):
+            switches[index]=number%(6)
+            number=number//(6)
+        return switches
+
+    def __init__(self, item_permutation):
+        self.item_permutation=item_permutation
+        self.count=0
+        self.max=6**(len(item_permutation))
+    def next(self):
+        # have enumerated all permutations
+        if self.count==self.max:
+            raise StopIteration
+
+        newItems=[]
+        switches=self.base_6_as_switches(self.count, len(self.item_permutation))
+        
+        for index in range(0, len(self.item_permutation)):
+            if switches[index]==0:
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].width, self.item_permutation[index].height, self.item_permutation[index].depth,self.item_permutation[index].weight))
+            if switches[index]==1:
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].width, self.item_permutation[index].depth, self.item_permutation[index].height,self.item_permutation[index].weight))
+            if switches[index]==2:
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].height, self.item_permutation[index].width, self.item_permutation[index].depth,self.item_permutation[index].weight))
+            if switches[index]==3:
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].height, self.item_permutation[index].depth, self.item_permutation[index].width,self.item_permutation[index].weight))
+            if switches[index]==4:
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].depth, self.item_permutation[index].width, self.item_permutation[index].height,self.item_permutation[index].weight))
+            if switches[index]==5:
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].depth, self.item_permutation[index].height, self.item_permutation[index].width,self.item_permutation[index].weight))
+
+
+        
+
+        self.count+=1
+        return newItems

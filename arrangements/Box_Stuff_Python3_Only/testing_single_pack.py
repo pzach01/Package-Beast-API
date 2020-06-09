@@ -5,7 +5,6 @@ from .test_imports import *
 
 
 
-
 # tests for overfitting when we are packing items into a single container
 
 def test_1():
@@ -62,7 +61,7 @@ def dz_test():
     items=[]
     for i in range(0, 13):
         items.append(ItemPY3DBP(str(i),450,975,793,1))
-    packer=single_pack.single_pack(container,items)
+    packer=single_pack.single_pack(container,items,iterationLimit=1000,volumeSafeGuard=True, printIteration=True)
     assert(not (packer==None))
     
 # iterationLimit (for each container)
@@ -111,7 +110,7 @@ def test_for_double_fit(packer, iterationLimit):
 def test_doublefitting_raises_exception():
     item1=ItemPY3DBP('id=1', 10,10,10,1)
     item2=ItemPY3DBP('id=2',10,10,10,1)
-    container=ContainerPY3DBP('id=COntainer',20,20,20,4)
+    container=ContainerPY3DBP('id=Container',20,20,20,4)
     packer=Packer()
     packer.bins=[container]
     item1.position=[0,0,0]
@@ -127,5 +126,5 @@ def test_doublefitting_raises_exception():
 test_1()
 test_2()
 test_3()
-dz_test()
+#dz_test()
 test_doublefitting_raises_exception()

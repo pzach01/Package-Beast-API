@@ -7,7 +7,8 @@ class RotationType:
     RT_WDH = 5
 
     #ALL = [RT_WHD, RT_HWD, RT_HDW, RT_DHW, RT_DWH, RT_WDH]
-    ALL=[ele for ele in range(0,16)]
+    # 6 permutations
+    ALL=[ele for ele in range(0,8)]
 
 class Axis:
     WIDTH = 0
@@ -21,3 +22,6 @@ class Axis:
 
     ALL = [ele for ele in range(0,8)]
 
+
+class CouldntFit(Exception):
+    pass

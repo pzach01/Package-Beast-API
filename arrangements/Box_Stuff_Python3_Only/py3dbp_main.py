@@ -1,9 +1,11 @@
 from . import py3dbp_constants
-from .py3dbp_constants import RotationType, Axis
+from .py3dbp_constants import RotationType, Axis, CouldntFit
 from . import py3dbp_auxiliary_methods
-from .py3dbp_auxiliary_methods import intersect_lucas
+from .py3dbp_auxiliary_methods import intersect_lucas,outside_container
 
 START_POSITION = [0, 0, 0]
+
+
 
 class ItemPY3DBP:
     def __init__(self, name, width, height, depth, weight):
@@ -16,7 +18,43 @@ class ItemPY3DBP:
         self.rotation_type = 0
         self.position = START_POSITION
         self.volume = self.get_volume()
+        self.firstValue=1
+        self.secondValue=1
+        self.thirdValue=1
+    def set_rotation_type(self, rotation_type):
+        self.rotation_type=rotation_type
 
+        permutation=self.rotation_type//(8**1)
+        axisCopy=self.rotation_type%(8**1)
+        
+        firstBit=axisCopy//(2**2)
+        axisCopy=axisCopy%(2**2)
+        secondBit=axisCopy//(2**1)
+        axisCopy=axisCopy%(2**1)
+        thirdBit=axisCopy
+        self.firstValue=1 if firstBit==0 else -1
+        self.secondValue=1 if secondBit==0 else -1
+        self.thirdValue=1 if thirdBit==0 else -1
+
+        if permutation==0:
+            self.width,self.height,self.depth=self.width,self.height,self.depth
+        if permutation==1:
+            self.width,self.height,self.depth=self.width, self.depth, self.height
+        if permutation==2:
+            self.width, self.height, self.depth=self.height, self.width, self.depth
+        if permutation==3:
+            self.width, self.height, self.depth==self.height, self.depth, self.width
+        if permutation==4:
+            self.width, self.height, self.depth=self.depth, self.width, self.height
+        if permutation==5:
+            self.width, self.height, self.depth=self.depth, self.height, self.width
+        # also there is 
+        # LxWxH
+        # LxHxW
+        # HxLxW
+        # HxWxL
+        # WxHxL
+        # WxLxH
 
     def string(self):
         return "%s(%fx%fx%f, weight: %s) pos(%f, %f, %f) rt(%s) vol(%s)" % (
@@ -29,24 +67,30 @@ class ItemPY3DBP:
 
     def get_dimension(self):
         # is a number
-        axisCopy=self.rotation_type
-        firstBit=axisCopy//(3**2)
-        axisCopy=axisCopy%(3**2)
-        secondBit=axisCopy//(3**1)
-        axisCopy=axisCopy%(3**1)
-        thirdBit=axisCopy
+
         #firstValue=[0 if firstBit==0 else 1 if firstBit==1 else -1][0]
         #secondValue=[0 if secondBit==0 else 1 if secondBit==1 else -1][0]
         #thirdValue=[0 if thirdBit==0 else 1 if thirdBit==1 else -1][0]
-        firstValue=1 if firstBit==0 else -1
-        secondValue=1 if secondBit==0 else -1
-        thirdValue=1 if thirdBit==0 else -1
+        '''
+        if self.rotation_type==0:
+            return [self.width, self.height, self.depth]
+        if self.rotation_type==1:
+            return [self.width, self.depth, self.height]
+        if self.rotation_type==2:
+            return [self.height, self.width, self.depth]
+        if self.rotation_type==3:
+            return [self.height, self.depth, self.width]
+        if self.rotation_type==4:
+            return [self.depth, self.width, self.height]
+        if self.rotation_type==5:
+            return [self.depth, self.height, self.width]
+        '''
         dimension=[
-            firstValue*self.width,
-            secondValue*self.height,
-            thirdValue*self.depth
+            self.firstValue*self.width,
+            self.secondValue*self.height,
+            self.thirdValue*self.depth
         ]
-
+        
 
 
 
@@ -83,60 +127,6 @@ class ContainerPY3DBP:
         return total_weight
 
 
-    def put_item(self, item, pivot):
-            if pivot[0]<0 or pivot[1]<0 or pivot[2]<0:
-                return False
-            fit = False
-            valid_item_position = item.position
-            item.position = pivot
-
-            for i in range(0, len(RotationType.ALL)):
-                if item not in self.items:
-
-                    item.rotation_type = i
-                    dimension = item.get_dimension()
-
-
-                    if (
-                        self.width < pivot[0] + dimension[0] or
-                        self.height < pivot[1] + dimension[1] or
-                        self.depth < pivot[2] + dimension[2]
-                    ):
-                        continue
-
-                    fit = True
-
-                    for current_item_in_bin in self.items:
-                        if intersect_lucas(current_item_in_bin, item,self.width,self.height, self.depth):
-                            fit = False
-                            break
-
-                    if fit:
-                        if self.get_total_weight() + item.weight > self.max_weight:
-                            fit = False
-                            return fit
-
-                        #print("item appended to bin:", item.string())
-                        self.items.append(item)
-                    
-                    # experimental below: need something like this to prevent item from going outside bin
-                    if (item.width+item.get_dimension()[0]<0):
-                        fit=False
-                    if (item.height+item.get_dimension()[1]<0):
-                        fit=False
-                    if (item.depth+item.get_dimension()[2]<0):
-                        fit=False
-    
-                    if not fit:
-                        item.position = valid_item_position
-
-                    return fit
-
-            if not fit:
-                item.position = valid_item_position
-
-            return fit
-
 
         
         # def put_item(self, item, pivot):
@@ -161,7 +151,6 @@ class ContainerPY3DBP:
 
         #             fit = True
         #             item.rotation_type = i   
-        #             print(i)
 
         #             for current_item_in_bin in self.items:
         #                 if intersect(current_item_in_bin, item):
@@ -172,10 +161,7 @@ class ContainerPY3DBP:
         #                 if self.get_total_weight() + item.weight > self.max_weight:
         #                     fit = False
         #                     return fit
-        #                 print("p-0", pivot[0], "p-1", pivot[1], "p-2", pivot[2])
-        #                 print("dim-0", dimension[0], "dim-1", dimension[1], "dim-2", dimension[2])
-        #                 print("rotation", item.rotation_type)
-        #                 print("sss", item.string())
+
         #                 self.items.append(item)   
 
         #             if not fit:
@@ -187,13 +173,15 @@ class ContainerPY3DBP:
         #     return fit
         
 
-
+# return None if you can't pack to bin otherwise the items with their positions
 class Packer:
     def __init__(self):
         self.bins = []
         self.items = []
         self.unfit_items = []
         self.total_items = 0
+        self.cache=[]
+
 
     def add_bin(self, bin):
         return self.bins.append(bin)
@@ -202,12 +190,12 @@ class Packer:
         self.total_items = len(self.items) + 1
 
         return self.items.append(item)
-
+    
     def pack_to_bin(self, bin, item,render):
         fitted = False
 
-        if not bin.items:
-            response = bin.put_item(item, START_POSITION)
+        if len(bin.items)==0:
+            bin.put_item(item, START_POSITION)
 
             if not response:
                 bin.unfitted_items.append(item)
@@ -216,50 +204,17 @@ class Packer:
 
         for axis in range(0, len(Axis.ALL)):
             for currentItem in bin.items:
+                #print('Axis: '+str(axis))
                 pivot = [0, 0, 0]
 
-                # 3 'bit' string in base 3 yields 27 combinations
-                # 1st 'bit'= +, -, or no addition
-                # 2nd 'bit' =+, -, or no addition
-                # 3rd 'bit' =+, -, or no addition 
+                # 1st 'bit'= +, -
+                # 2nd 'bit' =+, -
+                # 3rd 'bit' =+, - 
                 # not sure if this line is neccessary
-                axisCopy=axis
-                firstBit=axisCopy//(2**2)
-                axisCopy=axisCopy%(2**2)
-                secondBit=axisCopy//(2**1)
-                axisCopy=axisCopy%(2**1)
-                thirdBit=axisCopy
-                #firstValue=[0 if firstBit==0 else 1 if firstBit==1 else -1][0]
-                #secondValue=[0 if secondBit==0 else 1 if secondBit==1 else -1][0]
-                #thirdValue=[0 if thirdBit==0 else 1 if thirdBit==1 else -1][0]
-                firstValue=0 if firstBit==0 else 1
-                secondValue=0 if secondBit==0 else 1
-                thirdValue=0 if thirdBit==0 else 1
-                pivot=[
-                    currentItem.position[0]+firstValue*currentItem.width,
-                    currentItem.position[1]+secondValue*currentItem.height,
-                    currentItem.position[2]+thirdValue*currentItem.depth
-                ]
 
 
-                render=False
-                if render:
-                    from . import testing_underfitting
-                    from .testing_underfitting import render_something_that_failed
-                    coordinates={}
-                    innerItems=[]
-                    count=0
-                    doneBefore=False
-                    for itemInner in bin.items+[item]:
-                        count+=1
-                        # this is because equality is custom defined
-                        if itemInner==item and (not doneBefore):
-                            coordinates[(pivot[0],pivot[1],pivot[2],count)]=(itemInner.get_dimension()[0], itemInner.get_dimension()[1], itemInner.get_dimension()[2])
-                            doneBefore=True
-                        else:
-                            coordinates[(itemInner.position[0],itemInner.position[1],itemInner.position[2],count)]=(itemInner.get_dimension()[0], itemInner.get_dimension()[1], itemInner.get_dimension()[2])
-                        innerItems.append(itemInner)
-                    render_something_that_failed(bin, innerItems,coordinates)
+
+
                 res=bin.put_item(item,pivot)
 
                 if res:
@@ -272,13 +227,139 @@ class Packer:
             bin.unfitted_items.append(item)
 
     def pack(self,render=False, bigger_first=False, distribute_items=False):
-        self.bins.sort(key=lambda bin: bin.volume, reverse=bigger_first)
-        # self.items.sort(key=lambda item: item.volume, reverse=bigger_first)
+        import copy
+        self.unfit_items=copy.deepcopy(self.items)
+        self.items=[]
+        # recursive calls
+        if self.try_to_place_an_item(self.unfit_items[0]):
 
-        for bin in self.bins:
-            for item in self.items:
-                self.pack_to_bin(bin, item,render)
-            #print('\n')
-            if distribute_items:
-                for item in bin.items:
-                    self.items.remove(item)
+            return True
+        else:
+            return False
+
+                
+    # returns True if item can be placed here, False otherwise
+    def try_to_place_an_item(self,item):
+    
+        # remember this is the entry point
+
+        if self.items==[]:
+            # try to place it at the origin
+                for dimensionalRotation in RotationType.ALL:
+                    item.rotation_type=dimensionalRotation
+                    # true by default item.position=[0,0,0]
+                    if self.can_place_at_position(item):
+                        # then do it
+                        self.items.append(item)
+                        self.unfit_items.remove(item)
+                        if self.unfit_items==[]:
+                            return True
+                        elif self.try_to_place_an_item(self.unfit_items[0]):
+                            return True
+                        else:
+                            self.items.remove(item)
+                            self.unfit_items.append(item)
+                # couldn't find an arrangment
+                return False
+        possiblePivots=[]
+        for currentItem in self.items:
+            # 8 pivot points
+            for pivotPoint in Axis.ALL:
+
+                # update the pivot; this should proably be hid behind a 'get_pivot' method
+                pivotCopy=pivotPoint
+                thirdValue=pivotCopy//(2**2)
+                pivotCopy=pivotCopy%(2**2)
+                secondValue=pivotCopy//(2**1)
+                pivotCopy=pivotCopy%(2**1)
+                firstValue=pivotCopy
+                #firstValue=[0 if firstBit==0 else 1 if firstBit==1 else -1][0]
+                #secondValue=[0 if secondBit==0 else 1 if secondBit==1 else -1][0]
+                #thirdValue=[0 if thirdBit==0 else 1 if thirdBit==1 else -1][0]
+        
+                #firstValue=0 if firstBit==0 else 1
+                #secondValue=0 if secondBit==0 else 1
+                #thirdValue=0 if thirdBit==0 else 1
+                '''
+                item.position=[
+                    currentItem.position[0]+firstValue*currentItem.width,
+                    currentItem.position[1]+secondValue*currentItem.height,
+                    currentItem.position[2]+thirdValue*currentItem.depth
+                ]
+                '''
+                possiblePivots.append(
+                    [currentItem.position[0]+firstValue*currentItem.width,
+                    currentItem.position[1]+secondValue*currentItem.height,
+                    currentItem.position[2]+thirdValue*currentItem.depth]
+                )
+
+
+        #print('unsorted:'+str(possiblePivots))
+        
+        possiblePivots=sorted(possiblePivots)
+        #print('sorted:'+str(possiblePivots))
+
+        for pivot in possiblePivots:
+            item.position=pivot
+            #print(pivot)
+            for dimensionalRotation in RotationType.ALL:
+                item.set_rotation_type(dimensionalRotation)
+
+                if self.can_place_at_position(item):
+                    # then do it
+                    self.items.append(item)
+                    self.unfit_items.remove(item)
+                    self.cache=[]
+                    if self.unfit_items==[]:
+                        return True
+                    elif self.try_to_place_an_item(self.unfit_items[0]):
+                        return True
+                    else:
+                        self.cache=[]
+                        self.items.remove(item)
+                        self.unfit_items.append(item)
+
+        return False
+    # returns true if you can place at a position
+    def can_place_at_position(self, item):
+        render=False
+        if render:
+            from . import testing_underfitting
+            from .testing_underfitting import render_something_that_failed
+            coordinates={}
+            innerItems=[]
+            count=0
+            doneBefore=False
+            for itemInner in self.items+[item]:
+                count+=1
+                # this is because equality is custom defined
+                if itemInner==item and (not doneBefore):
+                    coordinates[(item.position[0],item.position[1],item.position[2],count)]=(itemInner.get_dimension()[0], itemInner.get_dimension()[1], itemInner.get_dimension()[2])
+                    doneBefore=True
+                else:
+                    coordinates[(itemInner.position[0],itemInner.position[1],itemInner.position[2],count)]=(itemInner.get_dimension()[0], itemInner.get_dimension()[1], itemInner.get_dimension()[2])
+                innerItems.append(itemInner)
+            print(len(coordinates))
+
+            render_something_that_failed(self.bins[0], innerItems,coordinates)
+
+
+        # needed for special case where there are no other items in the container but still need to know if in bounds
+        if outside_container(item, self.bins[0].width,self.bins[0].height, self.bins[0].depth):
+            return False
+
+
+        # reverse to (hopefully) get collisions faster
+        if not (self.cache==[]):
+            if intersect_lucas(self.cache[0], item,self.bins[0].width, self.bins[0].height, self.bins[0].depth):
+                return False
+
+
+        for current_item_in_bin in reversed(self.items):
+            if current_item_in_bin is not item:
+                if intersect_lucas(current_item_in_bin, item,self.bins[0].width,self.bins[0].height, self.bins[0].depth):
+                    self.cache=[current_item_in_bin]
+                    #print('Insersected')
+                    return False
+        #print('No intersection')
+        return True

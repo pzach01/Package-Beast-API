@@ -14,7 +14,7 @@ def test_for_overfits_type_a():
         print(i)
         container, items=generate_an_overfit_arrangment_type_a()
         assert(sum([item.volume for item in items])>container.volume)
-        packer=single_pack.single_pack(container, items,math.inf,False)
+        packer=single_pack.single_pack(container, items,math.inf,False,True)
         assert(packer==None)
 # length/width/height overfit
 def test_for_overfits_type_b():
@@ -192,6 +192,6 @@ def try_to_expand_in_one_direction_2(existingShape, interiorPoints, directionToE
     return interiorPoints, existingShape
 
 
-#test_for_overfits_type_a()
+test_for_overfits_type_a()
 
-test_for_overfits_type_b()
+#test_for_overfits_type_b()

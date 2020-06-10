@@ -77,16 +77,14 @@ def calculate_cost(costList, arrangment):
 def get_xyz_of_optimal_solution(minArrangment,bins1, boxs1,endTimeRendering):
     arrangments=[]
     for index in range(0, len(minArrangment)):
-        if(len(minArrangment[index])!=0):
-            bin=bins1[index]
-            boxesUsed=[]
-            for setIndex in minArrangment[index]:
-                boxesUsed.append(boxs1[setIndex])
-            
-            boxArrangment=box_stuff1.binpack(boxesUsed, bin, 2000000)
-            arrangments.append(boxArrangment)  
-        else:
-            arrangments.append([])          
+        bin=bins1[index]
+        boxesUsed=[]
+        for setIndex in minArrangment[index]:
+            boxesUsed.append(boxs1[setIndex])
+        
+        boxArrangment=box_stuff1.binpack(boxesUsed, bin, 2000000)
+        arrangments.append(boxArrangment)  
+        
     return arrangments
 # do 'numBins' simulations to minimize cost
 # this is an exceedingly stupid way to do it, we make no assumptions about what an acceptable bin will look like and so (usually) produces suboptimal
@@ -249,7 +247,6 @@ class BinAPI():
         self.weightCapacity=float(weightCapacity) if (weightCapacity is not None) else weightCapacity
         self.timedOut=timedOut
         self.boxes=[]
-        self.id=0
     def set_id(self, id):
         self.id=id
 
@@ -330,23 +327,17 @@ def convert_to_api_form(arrangments,costList, binWeightCapacitys,timedOut):
 
 
     for containerIndex in range(0, len(arrangments)):
-        try:
-            newContainer=BinAPI(containerIndex+1,arrangments[containerIndex].bins[0].width,arrangments[containerIndex].bins[0].height, arrangments[containerIndex].bins[0].depth,costList[containerIndex],binWeightCapacitys[containerIndex],timedOut)
-            containerObjects.append(newContainer)
-        except Exception:
-            containerObjects.append([])
-            assert(len(arrangments[containerIndex])==0)
-    for containerIndex in range(0, len(arrangments)):
-        try:
-            for item in arrangments[containerIndex].items:
-                    x,y,z=item.position[0]+(item.get_dimension()[0]/2), item.position[1]+(item.get_dimension()[1]/2), item.position[2]+(item.get_dimension()[2]/2)
-                    newBox=BoxAPI(item.height,item.width,item.depth, item.volume, item.weight)
-                    newBox.set_center((x,y,z))
-                    (containerObjects[containerIndex]).add_box(newBox)
-        except Exception:
-            assert(len(arrangments[containerIndex])==0)
+        newContainer=BinAPI(containerIndex,arrangments[containerIndex].bins[0].width,arrangments[containerIndex].bins[0].height, arrangments[containerIndex].bins[0].depth,0,0,timedOut)
+        containerObjects.append(newContainer)
 
-    containerObjects=[arrangment for arrangment in containerObjects if (not(arrangment==[]))]            
+    for containerIndex in range(0, len(arrangments)):
+        for item in arrangments[containerIndex].items:
+            x,y,z=item.position[0]+(item.get_dimension()[0]/2), item.position[1]+(item.get_dimension()[1]/2), item.position[2]+(item.get_dimension()[2]/2)
+            newBox=BoxAPI(item.height,item.width,item.depth, item.volume, item.weight)
+            newBox.set_center((x,y,z))
+            (containerObjects[containerIndex]).add_box(newBox)
+
+
 
     '''
     boxObjects=[]

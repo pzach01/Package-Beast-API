@@ -53,7 +53,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
         for container in containers:
             height = apiObjects[index].height
             width = apiObjects[index].width
-            length = apiObjects[index].length
+            length = apiObjects[index].depth
             volume = apiObjects[index].volume
             sku = container['sku']
             description = container['description']
@@ -67,7 +67,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
             for item in container.boxes:
                 height = item.height
                 width = item.width
-                length = item.length
+                length = item.depth
                 volume = item.volume
                 xCenter = item.x
                 yCenter = item.y
@@ -75,7 +75,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
                 sku = items[index]['sku']
                 description = items[index]['description']
                 units = items[index]['units']
-                Item.objects.create(height=height, width=width, length=length, volume=volume, container=containerList[container.id-1], arrangement=arrangement,
+                Item.objects.create(height=height, width=width, length=length, volume=volume, container=containerList[container.id], arrangement=arrangement,
                                     owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units)
                 index += 1
         return arrangement

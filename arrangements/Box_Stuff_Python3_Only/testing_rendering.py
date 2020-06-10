@@ -132,25 +132,6 @@ def render_test():
     packer=single_pack.single_pack(container, items,1000,True, True)
 
     render(packer, bin_width,bin_height,bin_depth)
-# another bug encountered
-
-
-def test_4_render():
-    container=ContainerPY3DBP('',25,6,15,1000)
-    # 17,2,10
-    items=[
-        ItemPY3DBP('1',17,2,10,1),
-        ItemPY3DBP('2',14,4,7,1),
-        ItemPY3DBP('3',19,3,5,1),
-        ItemPY3DBP('4',19,3,8,1)
-    ]
-    
-
-
-    packer=single_pack.single_pack(container, items)
-    render(packer, container.width, container.height, container.depth)
-    # 'None' valid arrangment
-    assert(not(packer==None))
 
 
 def render_test2():
@@ -208,8 +189,7 @@ def recursive_bug():
     packer=single_pack.single_pack(container, items,1000,True, True)
     render(packer,container.width, container.height,container.depth)
     assert (not (packer==None))
-    test_for_double_fit(packer, 10000)
-#test_4_render()
-#recursive_bug()
+    testing_single_pack.test_for_double_fit(packer, 10000)
+recursive_bug()
 #render_test()
-#render_test2()
+render_test2()

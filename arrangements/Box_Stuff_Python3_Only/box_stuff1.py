@@ -279,6 +279,8 @@ class OptimizeBoxesGenerator:
         return float('inf')
     # always returns the cheapest item first so need to keep track of solution (list is sorted)
     def knapsack(self,volumeList,costList, currentVolume, currentCost,lowerBoundOnCheapestPossibleVolume, depthLimit):
+
+        
         for index in range(0, len(volumeList)):
             if(depthLimit==0):
                 if(volumeList[index]+currentVolume>= lowerBoundOnCheapestPossibleVolume):
@@ -288,7 +290,7 @@ class OptimizeBoxesGenerator:
                 return self.knapsack(volumeList[0:index]+volumeList[index+1::],costList[0:index]+costList[index+1::], currentVolume+volumeList[index],currentCost+costList[index], lowerBoundOnCheapestPossibleVolume, depthLimit-1)
         # no solution
         return None
-            
+         
             
     # reverse of other
     def disqualify_overly_cheap_solutions(self,partitions,listOfCosts, cheapestPossible):

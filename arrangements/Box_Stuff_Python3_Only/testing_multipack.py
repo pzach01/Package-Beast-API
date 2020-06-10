@@ -4,13 +4,19 @@ from .test_imports import *
 def render_off_api():
     pass
 
+def test_4():
+    items=['4x4x4','4x4x4']
+    containers=['4x4x4','4x4x4','10x5x5']
+    containerList=box_stuff2.master_calculate_optimal_solution(containers,items,1000000)    
+    usedContainers=len([container for container in containerList if len(container.boxes)>0])
+    assert(usedContainers==2)
 
 def test_3():
     items=['5x5x5','5x5x5','7x7x7']
     containers=['5x5x5','5x5x5','7x7x7']
     containerList=box_stuff2.master_calculate_optimal_solution(containers,items,timeout=30)    
     usedContainers=len([container for container in containerList if len(container.boxes)>0])
-    assert(usedContainers==1)
+    assert(usedContainers==3)
 
 def test_2():
     containers=['20x20x20','22x20x20']
@@ -90,6 +96,7 @@ def weight_testing():
 #weight_testing()
 
 #cost_testing()
-#test_2()
-#test_1()
+test_2()
+test_1()
 test_3()
+test_4()

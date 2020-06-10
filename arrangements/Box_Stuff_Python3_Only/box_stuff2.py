@@ -150,8 +150,12 @@ def string_wrapper_for_container_class(itemString):
     l,w,h=float(itemString.split('x')[0]),float(itemString.split('x')[1]),float(itemString.split('x')[2])
     return ContainerPY3DBP('',l,w,h,0)
 # bin weights must be in same order, same for box weights
-def master_calculate_optimal_solution(bins1, boxs1,timeout=0,costList=None,binWeightCapacitys=None, boxWeights=None):
+def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,costList=None,binWeightCapacitys=None, boxWeights=None):
     # metaparameter, expose to API at some point
+    if not multibinpack:
+        return fit_all(bins1, boxs1, timeout, costList, binWeightCapacitys, boxWeights)
+
+
     renderingPercentageOfComputation=.5
     
     computationTimeout=timeout*(1-renderingPercentageOfComputation)

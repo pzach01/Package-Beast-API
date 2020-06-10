@@ -8,9 +8,8 @@ def test_not_multibinpack():
     items=['4x4x4','4x4x4']
     containers=['4x4x4','4x4x4','10x5x5']
     containerList=box_stuff2.master_calculate_optimal_solution(containers,items,1000000,False)
-    print('here')
-    assert(len(containerList)==1)
-    assert(containerList[0].volume==(10*5*5))
+    usedContainer=[container for container in containerList if (len(container.boxes)>0)][0]
+    assert(usedContainer.volume==(10*5*5))
     
 
 # tests for overfitting when we are packing items into a single container

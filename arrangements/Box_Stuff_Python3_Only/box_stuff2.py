@@ -75,8 +75,7 @@ def calculate_cost(costList, arrangment):
 
 # an arrangment of boxes and bins doesnt come with xyz coordinates in pyshipping, but arrangment seems to be implied by pyshipping (relatively untested)
 def get_xyz_of_optimal_solution(minArrangment,bins1, boxs1,endTimeRendering):
-    binList=[]
-    packageList=[]    
+    arrangments=[]
     for index in range(0, len(minArrangment)):
         if(len(minArrangment[index])!=0):
             bin=bins1[index]
@@ -84,48 +83,11 @@ def get_xyz_of_optimal_solution(minArrangment,bins1, boxs1,endTimeRendering):
             for setIndex in minArrangment[index]:
                 boxesUsed.append(boxs1[setIndex])
             
-            #print(boxesUsed)
-            #print(bin)
-            ### boxes used instead of leftover boxes are selected
             boxArrangment=box_stuff1.binpack(boxesUsed, bin, 2000000)
-            #rendering failed the second time
-            assert(boxArrangment is not None)
-            #select the first box
-            
-            
-            
-            try:
-                coordinateDict=box_stuff1.slot_bin_with_coordinates_py3dbp(boxArrangment, bin)
-            ### couldnt figure out how to add with this particurlar bin arrangment 
-            except ValueError:
-                raise ValueError            
-            
-            # old code that falsely claimed to enumerate all the ways we can arrange the boxes (ignores rotations!)
-            '''
-            # get all the orders in which boxes can be placed into a single bin
-            allArrangments=(itertools.permutations(boxArrangment,len(boxArrangment)))
-            try:
-                #get all permutations of the way boxes can fit in the bin: orientation doesnt matter (this is handled by slot_bin_with_coordinates) but order does
-                while(True):
-                    try:
-                        # python3 specific
-                        boxArrangment=next(allArrangments)
-                        coordinateDict=box_stuff1.slot_bin_with_coordinates(boxArrangment, bin)
-                        # if you find a single solution to pack the bin in; break
-                        break
-                    except ValueError:
-                        pass
-                        
-            ### couldnt figure out how to add with this particurlar bin arrangment 
-            except StopIteration:
-                raise ValueError
-            '''
-            
-            ### bins obviously dont have coordinates, also dictionary with bin as key could result in data overwrites if there are 2 of the same bin size
-            ### as a result I use 2 lists
-            binList.append(bin)
-            packageList.append(coordinateDict)   
-    return binList, packageList
+            arrangments.append(boxArrangment)  
+        else:
+            arrangments.append([])          
+    return arrangments
 # do 'numBins' simulations to minimize cost
 # this is an exceedingly stupid way to do it, we make no assumptions about what an acceptable bin will look like and so (usually) produces suboptimal
 # results unless you do a ton of simulations (maybe around 100k?, untested)
@@ -239,12 +201,13 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,costList=None,binWe
     
     ### these should be equal in length
 
-    binList, packageList=get_xyz_of_optimal_solution(minArrangment, bins1, boxs1,endTimeRendering)
+    # this is duplicate work; actually could be computationally intensive too
+    arrangments=get_xyz_of_optimal_solution(minArrangment, bins1, boxs1,endTimeRendering)
     
     #return binList,packageList
     
     # new stuff, last two things are only for debugging if necessary
-    apiFormat=convert_to_api_form(minArrangment, binList, packageList, bins1, boxs1, costList,binWeightCapacitys,boxWeights,timedOut)
+    apiFormat=convert_to_api_form(arrangments,costList, binWeightCapacitys, timedOut)
     ### now that minimum arrangment indices have been found, actually find the coordinates of such bins
 
     return apiFormat
@@ -273,13 +236,13 @@ class BinAPI():
         aDictionary['timedOut']=self.timedOut
         aDictionary['itemList']=[box.to_dictionary() for box in self.boxes]
         return aDictionary
-    def __init__(self,id,height, width, length,cost, weightCapacity,timedOut):
+    def __init__(self,id,width,height, depth,cost, weightCapacity,timedOut):
         self.id=id
         
         self.height=float(height)
         self.width=float(width)     
-        self.length=float(length)
-        self.volume=float(length*width*height)
+        self.depth=float(depth)
+        self.volume=float(width*height*depth)
         
         
         self.cost=float(cost)
@@ -309,7 +272,7 @@ class BinAPI():
                 # boxes have the same coordinates
                 
                 # we have to do this because internally the HxLxD might get swapped around by the algorithm
-                if (sorted([self.boxes[boxIndex].height,self.boxes[boxIndex].width,self.boxes[boxIndex].length])==sorted([height,width,depth])):
+                if (sorted([self.boxes[boxIndex].height,self.boxes[boxIndex].width,self.boxes[boxIndex].depth])==sorted([height,width,depth])):
                     self.boxes[boxIndex].set_center(key)
                     self.boxes[boxIndex].height=height
                     self.boxes[boxIndex].width=width
@@ -322,10 +285,10 @@ class BinAPI():
 
 
 class BoxAPI():
-    def __init__(self,height, width, length,volume,weight):
+    def __init__(self,height, width, depth,volume,weight):
         self.height=float(height)
         self.width=float(width)
-        self.length=float(length)
+        self.depth=float(depth)
         self.volume=float(volume)
         self.weight=float(weight) if weight is not None else weight
         
@@ -338,7 +301,7 @@ class BoxAPI():
         aDictionary={}
         aDictionary['height']=self.height
         aDictionary['width']=self.width
-        aDictionary['length']=self.length
+        aDictionary['depth']=self.depth
         aDictionary['volume']=self.volume
         aDictionary['weight']=self.weight
         aDictionary['xCenter']=self.x
@@ -349,36 +312,43 @@ class BoxAPI():
     def set_center(self, center):
         self.x, self.y, self.z=float(center[0]), float(center[1]), float(center[2])
     def to_string(self):
-        return "<"+str(self.height)+","+str(self.width)+","+str(self.length)+","+str(self.volume)+","+str(self.weight)+","+str(self.x)+","+str(self.y)+","+str(self.z)+">"
+        return "<"+str(self.height)+","+str(self.width)+","+str(self.depth)+","+str(self.volume)+","+str(self.weight)+","+str(self.x)+","+str(self.y)+","+str(self.z)+">"
 # this is mostly due to not recognizing design failure earlier. binList and packageList don't allow ordering so we have this big mess of a method to make
 # things more clear
 
 # NOTE TO SELF: this makes the implicity assumption that the binList and packageList returned have the same order as minArrangment (although often smaller in size); think this is true but
 # good place to start if some bugs show up
-def convert_to_api_form(minArrangment, binList, packageList, parameterBins, parameterBoxes, costList,binWeightCapacitys,boxWeights,timedOut):
-    binObjects=[]
-    # initialize bins
-
-    # dummy initilizations for bin params
+def convert_to_api_form(arrangments,costList, binWeightCapacitys,timedOut):
+    
+        # dummy initilizations for bin params
     if costList==None:
-        costList=[None for ele in range(0, len(parameterBins))]
+        costList=[None for ele in range(0, len(arrangments))]
     if binWeightCapacitys==None:
-        binWeightCapacitys=[None for ele in range(0, len(parameterBins))]
+        binWeightCapacitys=[None for ele in range(0, len(arrangments))]
     
-    
-    for count in range(0, len(parameterBins)):
-        ### implicit in bin is idea that it is ranked consistently height=longest side, width=second longest side, length=shortest side
-        #def __init__(self,id,height, width, length,cost, weightCapacity)
-        newBin=BinAPI(count+1, parameterBins[count].height, parameterBins[count].width, parameterBins[count].depth,costList[count],binWeightCapacitys[count],timedOut)
-        binObjects.append(newBin)
-    
+    containerObjects=[]
 
-    
-    # dummy initilization for box params
-    if boxWeights==None:
-        boxWeights=[None for ele in range(0, len(parameterBoxes))]    
-    
-    
+
+    for containerIndex in range(0, len(arrangments)):
+        try:
+            newContainer=BinAPI(containerIndex+1,arrangments[containerIndex].bins[0].width,arrangments[containerIndex].bins[0].height, arrangments[containerIndex].bins[0].depth,costList[containerIndex],binWeightCapacitys[containerIndex],timedOut)
+            containerObjects.append(newContainer)
+        except Exception:
+            containerObjects.append([])
+            assert(len(arrangments[containerIndex])==0)
+    for containerIndex in range(0, len(arrangments)):
+        try:
+            for item in arrangments[containerIndex].items:
+                    x,y,z=item.position[0]+(item.get_dimension()[0]/2), item.position[1]+(item.get_dimension()[1]/2), item.position[2]+(item.get_dimension()[2]/2)
+                    newBox=BoxAPI(item.height,item.width,item.depth, item.volume, item.weight)
+                    newBox.set_center((x,y,z))
+                    (containerObjects[containerIndex]).add_box(newBox)
+        except Exception:
+            assert(len(arrangments[containerIndex])==0)
+
+    containerObjects=[arrangment for arrangment in containerObjects if (not(arrangment==[]))]            
+
+    '''
     boxObjects=[]
     # initialize the boxes
     for count in range(0,len(parameterBoxes)):
@@ -395,19 +365,19 @@ def convert_to_api_form(minArrangment, binList, packageList, parameterBins, para
                 # add the box, add the coordinates with it
                 binObjects[currentBin].add_box(boxObjects[boxIndex])
                 # there is a bug if this fails
-            try:
-                # put the coordinates into their corresponding location with the box                    
+                # put the coordinates into their corresponding location with the box  
+                
                 binObjects[currentBin].format_coordinates(packageList.pop(0))
-            except Exception:
-                print("Bug, contact Lucas")
-                break
         currentBin+=1
                 
-
+    '''
     
-    return binObjects
+    return containerObjects
 
         
+
+
+
 
 
 

@@ -1,6 +1,9 @@
 from . import test_imports
 from .test_imports import *
 
+def render_off_api():
+    pass
+
 
 def test_3():
     containers=['20x20x20','20x20x20']
@@ -84,9 +87,9 @@ def weight_testing():
     
     
      
-#weight_testing()
+weight_testing()
 
 #cost_testing()
 test_2()
-#test_1()
-#test_3()
+test_1()
+test_3()

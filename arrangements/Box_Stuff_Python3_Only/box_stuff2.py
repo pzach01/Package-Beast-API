@@ -112,35 +112,49 @@ def fit_all(bins1, boxs1, timeout=0, costList=None, binWeightCapacitys=None, box
     minCost=math.inf
     minArrangment=None
     
-    # this is exact replication of code in bruteforce, suboptimal but allows us to seperate api and backend
-    internalBoxs1=[Package(box) for box in boxs1]
-    internalBins1=[Package(bin) for bin in bins1] 
+
     assert((binWeightCapacitys==None and boxWeights==None) or (binWeightCapacitys!=None and binWeightCapacitys!=None))
     if(costList==None):
-        internalCostList=[bin.volume for bin in internalBins1]    
+        costList=[]
+        # use volume
+        for ele in bins1:
+            x,y,z=float(ele.split('x')[0]),float(ele.split('x')[1]),float(ele.split('x')[2])
+            volume=x*y*z
+            costList.append(volume)
     # end replication of bruteforce code
-    
+    indexUsed=None
     for ele in range(0, len(bins1)):
         try:
-            if(internalCostList[ele]<minCost):
+            if(costList[ele]<minCost):
                 # cant subscript none so must use lambda
                 miniCostList=None if costList==None else [costList[ele]]
                 miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
                 # call master_calculate_optimal_solution with just one bin
     
-                apiFormat=master_calculate_optimal_solution([bins1[ele]], boxs1,timeout, miniCostList, miniBinWeightCapacitys, boxWeights)
+                apiFormat=master_calculate_optimal_solution([bins1[ele]], boxs1,timeout,True, miniCostList, miniBinWeightCapacitys, boxWeights)
                 
                 # no error, update to better solution
                 minArrangment=apiFormat
-                minCost=internalCostList[ele]
-                
+                minCost=costList[ele]
+                indexUsed=ele
         # ran out of time
         except TimeoutError:
             pass
         # no solution, look for next bin
         except NotImplementedError:
             pass
-    return apiFormat
+    # we have to jankily reformat the API to add a bunch of empty containers
+    containersUsed=[]
+    if indexUsed==None:
+        raise Exception("no arrangment possible")
+    else:
+        for ele in range(0, len(bins1)):
+            if ele==indexUsed:
+                containersUsed.append(apiFormat[0])
+            else:
+                x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])
+                containersUsed.append(BinAPI(ele,x,y,z,costList[ele],0,False))
+    return containersUsed
 
 # wrapper for the ItemPY3DBP class
 def string_wrapper_for_item_class(itemString):

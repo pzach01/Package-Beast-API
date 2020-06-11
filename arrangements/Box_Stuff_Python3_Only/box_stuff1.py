@@ -263,14 +263,13 @@ class OptimizeBoxesGenerator:
         # we cant have a set of bins that has volume lower then this in a valid solution
         lowerBoundOnCheapestPossibleVolume=sum([box.volume for box in objectList])
         
-        volumeList=sorted([bin.volume for bin in binList])
-        costList=sorted(listOfCosts)
+        volumeList=([bin.volume for bin in binList])
         
         # no solution possible
         if(sum(volumeList)<lowerBoundOnCheapestPossibleVolume):
             return float('inf')
         # try single element subsets
-        return self.knapsack(volumeList, costList, 0, lowerBoundOnCheapestPossibleVolume)
+        return self.knapsack(volumeList, listOfCosts, 0, lowerBoundOnCheapestPossibleVolume)
     # always returns the cheapest item first so need to keep track of solution (list is sorted)
     def knapsack(self,volumeList, costList, currentVolume, minVolume):
         if currentVolume>=minVolume:

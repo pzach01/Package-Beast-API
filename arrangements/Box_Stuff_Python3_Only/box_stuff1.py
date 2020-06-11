@@ -37,7 +37,7 @@
 from __future__ import division
 import itertools
 import copy
-
+import math
 import time
 #from . import new_is_valid_corner_point_code
 
@@ -270,26 +270,20 @@ class OptimizeBoxesGenerator:
         if(sum(volumeList)<lowerBoundOnCheapestPossibleVolume):
             return float('inf')
         # try single element subsets
-        for index in range(0, len(volumeList)):
-            
-            cheapestPossible=self.knapsack(volumeList,costList, 0,0, lowerBoundOnCheapestPossibleVolume, index)
-            if(cheapestPossible!=None):
-                return cheapestPossible
-        # no solution
-        return float('inf')
+        return self.knapsack(volumeList, costList, 0, lowerBoundOnCheapestPossibleVolume)
     # always returns the cheapest item first so need to keep track of solution (list is sorted)
-    def knapsack(self,volumeList,costList, currentVolume, currentCost,lowerBoundOnCheapestPossibleVolume, depthLimit):
-
-        
-        for index in range(0, len(volumeList)):
-            if(depthLimit==0):
-                if(volumeList[index]+currentVolume>= lowerBoundOnCheapestPossibleVolume):
-                    return costList[index]+currentCost
+    def knapsack(self,volumeList, costList, currentVolume, minVolume):
+        if currentVolume>=minVolume:
+            return 0
+        bestCost=math.inf
+        for index in range(0,len(volumeList)):
+            if volumeList[index]+currentVolume>=minVolume:
+                currentCost=costList[index]
             else:
-                # return the value obtained by using this element with further depth
-                return self.knapsack(volumeList[0:index]+volumeList[index+1::],costList[0:index]+costList[index+1::], currentVolume+volumeList[index],currentCost+costList[index], lowerBoundOnCheapestPossibleVolume, depthLimit-1)
-        # no solution
-        return None
+                currentCost=costList[index]+self.knapsack(volumeList[0:(index)]+volumeList[(index+1):], costList[0:(index)]+costList[(index+1):], currentVolume+volumeList[index], minVolume)
+            if currentCost<bestCost:
+                bestCost=currentCost
+        return bestCost
          
             
     # reverse of other

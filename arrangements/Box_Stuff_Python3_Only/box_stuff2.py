@@ -159,10 +159,10 @@ def fit_all(bins1, boxs1, timeout=0, costList=None, binWeightCapacitys=None, box
 # wrapper for the ItemPY3DBP class
 def string_wrapper_for_item_class(itemString):
     l,w,h=float(itemString.split('x')[0]),float(itemString.split('x')[1]),float(itemString.split('x')[2])
-    return ItemPY3DBP('',l,w,h,0)
+    return ItemPY3DBP('',l,w,h)
 def string_wrapper_for_container_class(itemString):
     l,w,h=float(itemString.split('x')[0]),float(itemString.split('x')[1]),float(itemString.split('x')[2])
-    return ContainerPY3DBP('',l,w,h,0)
+    return ContainerPY3DBP('',l,w,h)
 # bin weights must be in same order, same for box weights
 def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,costList=None,binWeightCapacitys=None, boxWeights=None):
     # metaparameter, expose to API at some point
@@ -351,7 +351,8 @@ def convert_to_api_form(arrangments,costList, binWeightCapacitys,timedOut):
     for containerIndex in range(0, len(arrangments)):
         for item in arrangments[containerIndex].items:
             x,y,z=item.position[0]+(item.get_dimension()[0]/2), item.position[1]+(item.get_dimension()[1]/2), item.position[2]+(item.get_dimension()[2]/2)
-            newBox=BoxAPI(item.height,item.width,item.depth, item.volume, item.weight)
+            # weight unitilized here
+            newBox=BoxAPI(item.height,item.width,item.depth, item.volume,0)
             newBox.set_center((x,y,z))
             (containerObjects[containerIndex]).add_box(newBox)
 

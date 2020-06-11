@@ -43,17 +43,17 @@ def generate_an_overfit_arrangment_type_a():
     thirdDim=math.ceil(desiredObjectVolume/(firstDim*secondDim))+1
     dimensionalOrder=random.randint(0,5)
     if dimensionalOrder==0:
-        items.append(ItemPY3DBP(str('itemCausingFailure'),firstDim,secondDim,thirdDim,1))
+        items.append(ItemPY3DBP(str('itemCausingFailure'),firstDim,secondDim,thirdDim))
     if dimensionalOrder==1:
-        items.append(ItemPY3DBP(str('itemCausingFailure'),firstDim, thirdDim,secondDim,1))
+        items.append(ItemPY3DBP(str('itemCausingFailure'),firstDim, thirdDim,secondDim))
     if dimensionalOrder==2:
-        items.append(ItemPY3DBP(str('itemCausingFailure'),secondDim,firstDim,thirdDim,1))
+        items.append(ItemPY3DBP(str('itemCausingFailure'),secondDim,firstDim,thirdDim))
     if dimensionalOrder==3:
-        items.append(ItemPY3DBP(str('itemCausingFailure'),secondDim,thirdDim,firstDim,1))
+        items.append(ItemPY3DBP(str('itemCausingFailure'),secondDim,thirdDim,firstDim))
     if dimensionalOrder==4:
-        items.append(ItemPY3DBP(str('itemCausingFailure'),thirdDim,secondDim,firstDim,1))
+        items.append(ItemPY3DBP(str('itemCausingFailure'),thirdDim,secondDim,firstDim))
     if dimensionalOrder==5:
-        items.append(ItemPY3DBP(str('itemCausingFailure'),thirdDim,firstDim,secondDim,1))
+        items.append(ItemPY3DBP(str('itemCausingFailure'),thirdDim,firstDim,secondDim))
     return container, items
 
 def generate_an_overfit_arrangment_type_b():
@@ -141,7 +141,7 @@ def generate_bins_that_fit_2(iterationLimit):
 
                 break            
 
-    container=ContainerPY3DBP('',containerX, containerY, containerZ,1000)
+    container=ContainerPY3DBP('',containerX, containerY, containerZ)
     returnItems=[]
     count=0
     for item in items:
@@ -154,7 +154,7 @@ def generate_bins_that_fit_2(iterationLimit):
         if(((not (minTuple[0] ==maxTuple[0])) and (not(minTuple[1]==maxTuple[1]))) and (not(minTuple[2]==maxTuple[2]))):
             # to see why this makes sense, consider that a 1x1x1 container has volume 1, but 8 points
 
-            newItem=ItemPY3DBP(str(count), int(maxTuple[0]-minTuple[0]), int(maxTuple[1]-minTuple[1]), int(maxTuple[2]-minTuple[2]), 1)
+            newItem=ItemPY3DBP(str(count), int(maxTuple[0]-minTuple[0]), int(maxTuple[1]-minTuple[1]), int(maxTuple[2]-minTuple[2]))
             coordinates[sorted(item)[0]]=(newItem.width, newItem.height, newItem.depth)
 
             assert((newItem.depth+1)*(newItem.height+1)*(newItem.width+1)==len(item))

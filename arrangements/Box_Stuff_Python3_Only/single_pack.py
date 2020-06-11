@@ -167,17 +167,17 @@ class DimensionalMixupsGenerator():
         
         for index in range(0, len(self.item_permutation)):
             if switches[index]==0:
-                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].width, self.item_permutation[index].height, self.item_permutation[index].depth,self.item_permutation[index].weight))
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].width, self.item_permutation[index].height, self.item_permutation[index].depth))
             if switches[index]==1:
-                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].width, self.item_permutation[index].depth, self.item_permutation[index].height,self.item_permutation[index].weight))
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].width, self.item_permutation[index].depth, self.item_permutation[index].height))
             if switches[index]==2:
-                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].height, self.item_permutation[index].width, self.item_permutation[index].depth,self.item_permutation[index].weight))
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].height, self.item_permutation[index].width, self.item_permutation[index].depth))
             if switches[index]==3:
-                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].height, self.item_permutation[index].depth, self.item_permutation[index].width,self.item_permutation[index].weight))
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].height, self.item_permutation[index].depth, self.item_permutation[index].width))
             if switches[index]==4:
-                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].depth, self.item_permutation[index].width, self.item_permutation[index].height,self.item_permutation[index].weight))
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].depth, self.item_permutation[index].width, self.item_permutation[index].height))
             if switches[index]==5:
-                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].depth, self.item_permutation[index].height, self.item_permutation[index].width,self.item_permutation[index].weight))
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].depth, self.item_permutation[index].height, self.item_permutation[index].width))
 
 
         

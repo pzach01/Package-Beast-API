@@ -122,7 +122,7 @@ def generate_bins_that_fit(iterationLimit):
 
                 break            
 
-    container=ContainerPY3DBP('',containerX, containerY, containerZ,1000)
+    container=ContainerPY3DBP('',containerX, containerY, containerZ)
     returnItems=[]
     count=0
     for item in items:
@@ -135,7 +135,7 @@ def generate_bins_that_fit(iterationLimit):
         if(((not (minTuple[0] ==maxTuple[0])) and (not(minTuple[1]==maxTuple[1]))) and (not(minTuple[2]==maxTuple[2]))):
             # to see why this makes sense, consider that a 1x1x1 container has volume 1, but 8 points
 
-            newItem=ItemPY3DBP(str(count), int(maxTuple[0]-minTuple[0]), int(maxTuple[1]-minTuple[1]), int(maxTuple[2]-minTuple[2]), 1)
+            newItem=ItemPY3DBP(str(count), int(maxTuple[0]-minTuple[0]), int(maxTuple[1]-minTuple[1]), int(maxTuple[2]-minTuple[2]))
             coordinates[sorted(item)[0]]=(newItem.width, newItem.height, newItem.depth)
 
             assert((newItem.depth+1)*(newItem.height+1)*(newItem.width+1)==len(item))
@@ -149,17 +149,17 @@ def generate_bins_that_fit(iterationLimit):
         #ordering=0
         newItem=None
         if ordering==0:
-            newItem=ItemPY3DBP(item.name, item.width, item.height, item.depth, item.weight)
+            newItem=ItemPY3DBP(item.name, item.width, item.height, item.depth)
         if ordering==1:
-            newItem=ItemPY3DBP(item.name, item.width, item.depth, item.height, item.weight)
+            newItem=ItemPY3DBP(item.name, item.width, item.depth, item.height)
         if ordering==2:
-            newItem=ItemPY3DBP(item.name, item.height, item.width, item.depth, item.weight)
+            newItem=ItemPY3DBP(item.name, item.height, item.width, item.depth)
         if ordering==3:
-            newItem=ItemPY3DBP(item.name, item.height, item.depth, item.width, item.weight)
+            newItem=ItemPY3DBP(item.name, item.height, item.depth, item.width)
         if ordering==4:
-            newItem=ItemPY3DBP(item.name, item.depth, item.width, item.height, item.weight)
+            newItem=ItemPY3DBP(item.name, item.depth, item.width, item.height)
         if ordering==5:
-            newItem=ItemPY3DBP(item.name, item.depth, item.height, item.width, item.weight)
+            newItem=ItemPY3DBP(item.name, item.depth, item.height, item.width)
         returnItemsRandomized.append(newItem)
     return container, returnItemsRandomized,coordinates
 # key invariant, if we can't expand, just return the shapes with no modification
@@ -206,7 +206,7 @@ def test_one_underfit(ele):
     container, items,coordinates=generate_bins_that_fit(numContainers)
 
 
-    container=ContainerPY3DBP('Container',container.width, container.height, container.depth,100)
+    container=ContainerPY3DBP('Container',container.width, container.height, container.depth)
     packer=single_pack.single_pack(container, items,1000,True, True)
     assert(len(packer.items)==len(items))
     if packer==None:

@@ -8,13 +8,12 @@ START_POSITION = [0, 0, 0]
 
 
 class ItemPY3DBP:
-    def __init__(self, name, width, height, depth, weight):
+    def __init__(self, name, width, height, depth):
 
         self.name = name
         self.width = width
         self.height = height
         self.depth = depth
-        self.weight = weight
         self.rotation_type = 0
         self.position = START_POSITION
         self.volume = self.get_volume()
@@ -62,32 +61,25 @@ class ItemPY3DBP:
 
 
 class ContainerPY3DBP:
-    def __init__(self, name, width, height, depth, max_weight):
+    def __init__(self, name, width, height, depth):
         self.name = name
         self.width = width
         self.height = height
         self.depth = depth
-        self.max_weight = max_weight
         self.items = []
         self.unfitted_items = []
         self.volume = self.get_volume()
 
     def string(self):
         return "%s(%sx%sx%s, max_weight:%s) vol(%s)" % (
-            self.name, self.width, self.height, self.depth, self.max_weight,
+            self.name, self.width, self.height, self.depth,
             self.volume
         )
 
     def get_volume(self):
         return abs(self.width * self.height * self.depth)
 
-    def get_total_weight(self):
-        total_weight = 0
 
-        for item in self.items:
-            total_weight += item.weight
-
-        return total_weight
 
 
 

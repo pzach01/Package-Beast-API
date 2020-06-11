@@ -10,19 +10,22 @@ import math
 # volume overfit
 def test_for_overfits_type_a():
     iterations=10000
+    timeout=60
     for i in range(0, iterations):
         print(i)
         container, items=generate_an_overfit_arrangment_type_a()
         assert(sum([item.volume for item in items])>container.volume)
-        packer=single_pack.single_pack(container, items,math.inf,False,True)
+        packer=single_pack.single_pack(container, items,math.inf,False,False,timeout)
         assert(packer==None)
 # length/width/height overfit
 def test_for_overfits_type_b():
     iterations=10000
+    timeout=60
+
     for i in range(0, iterations):
         print(i)
         container, items=generate_an_overfit_arrangment_type_b()
-        packer=single_pack.single_pack(container, items,math.inf,False)
+        packer=single_pack.single_pack(container, items,math.inf,False,False, timeout)
         assert(packer==None)
 
 

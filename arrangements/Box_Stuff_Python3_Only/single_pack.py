@@ -2,6 +2,8 @@ from . import py3dbp_main
 from .py3dbp_main import Packer, ContainerPY3DBP, ItemPY3DBP
 import itertools
 import random
+import time
+import math
 random.seed(1)
 # same as item permutations but randomly iterates and using this generator can yield the same permutation twice
 class CustomItemPermutations():
@@ -15,43 +17,30 @@ class CustomItemPermutations():
             returnItems.append(itemList.pop(toSelect))
         return returnItems
 
-def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True,printIteration=True):
+def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True,printIteration=True,timeout=None):
+
+    endTime=None
+    if timeout==None:
+        endTime=math.inf
+    else:
+        endTime=time.time()+timeout  
     # container volume greater then sum of items we are trying to fit
     if volumeSafeGuard:
         if container.volume< sum([item.volume for item in itemList]):
             return None
 
-    import math
 
     bin_weight_capacity = math.inf
     
 
     
     
-    # Option 1 Just trys to place the items in the order defined. This may or may not find a solution since order matters
-    #item_permutations = [items]
-    
-    # Option 2 All permutations of the items
-    # This takes forever to generate the permutations
+
 
 
     randomSearch=True
     if not randomSearch:
         item_permutations=(itertools.permutations(itemList,len(itemList)))
-
-
-        #item_sets=set(itertools.permutations(itemList))
-        #print(type(item_permutations))
-        #print(type(item_sets))
-
-
-        # Option 3 Shuffle items n times to form n different orders to try to place items
-        
-        #item_permutations = []
-        #for i in range(iterationLimit):
-        #    item_permutations.append(random.sample(itemList, len(itemList)))
-        
-        #
         import copy
         count=0
         if len(itemList)==0:
@@ -83,6 +72,9 @@ def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True,pri
                     res=packer.pack(render)
                     if res:
                         return packer
+                    # timeout
+                    if time.time()>endTime:
+                        return None
 
                 except StopIteration:
 
@@ -130,7 +122,8 @@ def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True,pri
             res=packer.pack(render)
             if res:
                 return packer
-
+            if time.time()>endTime:
+                return None
 
             if printIteration:
                 print("     Iteration: "+str(count))

@@ -95,7 +95,7 @@ def weight_testing():
 #weight_testing()
 
 #cost_testing()
-test_2()
-test_1()
-test_3()
+#test_2()
+#test_1()
+#test_3()
 #test_4()

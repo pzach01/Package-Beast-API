@@ -20,7 +20,10 @@ class ItemPY3DBP:
         self.firstValue=1
         self.secondValue=1
         self.thirdValue=1
-    def set_rotation_type(self, rotation_type):
+        self.dimension=None
+        # updates dimension
+        self.set_rotation_type_and_dimension(self.rotation_type)
+    def set_rotation_type_and_dimension(self, rotation_type):
         self.rotation_type=rotation_type
 
         axisCopy=self.rotation_type%(8**1)
@@ -35,6 +38,12 @@ class ItemPY3DBP:
         self.thirdValue=1 if thirdBit==0 else -1
 
 
+        self.dimension=[
+            self.firstValue*self.width,
+            self.secondValue*self.height,
+            self.thirdValue*self.depth
+        ]
+
 
 
     def string(self):
@@ -47,11 +56,7 @@ class ItemPY3DBP:
         return abs(self.width * self.height * self.depth)
 
     def get_dimension(self):
-        dimension=[
-            self.firstValue*self.width,
-            self.secondValue*self.height,
-            self.thirdValue*self.depth
-        ]
+        return self.dimension
         
 
 
@@ -122,7 +127,7 @@ class Packer:
         if self.items==[]:
             # try to place it at the origin
                 for dimensionalRotation in RotationType.ALL:
-                    item.set_rotation_type(dimensionalRotation)
+                    item.set_rotation_type_and_dimension(dimensionalRotation)
                     # true by default item.position=[0,0,0]
                     if self.can_place_at_position(item):
                         # then do it
@@ -163,7 +168,7 @@ class Packer:
         for pivot in possiblePivots:
             item.position=pivot
             for dimensionalRotation in RotationType.ALL:
-                item.set_rotation_type(dimensionalRotation)
+                item.set_rotation_type_and_dimension(dimensionalRotation)
 
                 if self.can_place_at_position(item):
                     # then do it

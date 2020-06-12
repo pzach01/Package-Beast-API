@@ -21,7 +21,7 @@ def vertices_inside(item1, item2):
 def objects_intersect(item1, item2):
     # can't have points nested within each other
     if(vertices_inside(item1, item2) or vertices_inside(item2, item1)):
-        return False
+        return True
     # already sorted here
     min1, max1=item1[0],item1[7]
     min2, max2=item1[0],item2[7]
@@ -61,7 +61,7 @@ def objects_intersect(item1, item2):
                         break
 
             if split and seen:
-                return True
+                return False
 
         for axis in axises:
             split=True
@@ -79,6 +79,6 @@ def objects_intersect(item1, item2):
                         split=False
                         break
             if split and seen:
-                return True
-    return False
+                return False
+    return True
     # if we can find an axis that splits the cubes  (view in 2d) then they don't intersect

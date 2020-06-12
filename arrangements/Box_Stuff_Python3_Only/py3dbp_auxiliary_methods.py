@@ -68,5 +68,4 @@ def intersect_lucas(item1,item2,containerX,containerY,containerZ):
     # consider experimental
     if strictly_outside(item1C[0], item1C[7], item2C[0], item2C[7]):
         return False
-
-    return (not (objects_intersect(item1C, item2C)))
+    return objects_intersect(item1C, item2C)

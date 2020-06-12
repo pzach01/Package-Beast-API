@@ -122,7 +122,7 @@ class Packer:
         if self.items==[]:
             # try to place it at the origin
                 for dimensionalRotation in RotationType.ALL:
-                    item.rotation_type=dimensionalRotation
+                    item.set_rotation_type(dimensionalRotation)
                     # true by default item.position=[0,0,0]
                     if self.can_place_at_position(item):
                         # then do it

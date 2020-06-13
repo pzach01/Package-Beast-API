@@ -139,7 +139,7 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
         res= single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, 30,RotationType.HEURISTIC,randomSearch)
         if not(res==None):
             return res
-        return single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, timeout-30,RotationType.ALL,randomSearch)
+        return single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, timeout,RotationType.ALL,randomSearch)
     else:
         res= single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, 30,RotationType.HEURISTIC,randomSearch)
         if not(res==None):

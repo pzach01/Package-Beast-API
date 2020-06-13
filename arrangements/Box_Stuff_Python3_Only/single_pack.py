@@ -137,13 +137,13 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
     randomSearch=True
     if timeout==None:
         res= single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, 30,RotationType.HEURISTIC,randomSearch)
-    elif timeout<30:
+        if not(res==None):
+            return res
+        return single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, timeout-30,RotationType.ALL,randomSearch)
+    else:
         res= single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, 30,RotationType.HEURISTIC,randomSearch)
-    else:
-        res= single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, timeout,RotationType.HEURISTIC,randomSearch)
-    if (not(res==None)):
-        return res
-    else:
+        if not(res==None):
+            return res
         return single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, timeout-30,RotationType.ALL,randomSearch)
 
 

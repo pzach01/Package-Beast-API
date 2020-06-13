@@ -1,5 +1,5 @@
 from . import py3dbp_constants
-from .py3dbp_constants import RotationType, Axis
+from .py3dbp_constants import RotationType,Axis
 from . import py3dbp_auxiliary_methods
 from .py3dbp_auxiliary_methods import intersect_lucas,outside_container
 
@@ -90,12 +90,14 @@ class ContainerPY3DBP:
 
         
 class Packer:
-    def __init__(self):
+    # default initilization of rotation types to all rotations (-,-,-) to (+,+,+); all 8
+    def __init__(self,rotationTypes):
         self.bins = []
         self.items = []
         self.unfit_items = []
         self.total_items = 0
         self.cache=[]
+        self.rotationTypes=rotationTypes
 
 
     def add_bin(self, bin):
@@ -126,7 +128,7 @@ class Packer:
 
         if self.items==[]:
             # try to place it at the origin
-                for dimensionalRotation in RotationType.ALL:
+                for dimensionalRotation in self.rotationTypes:
                     item.set_rotation_type_and_dimension(dimensionalRotation)
                     # true by default item.position=[0,0,0]
                     if self.can_place_at_position(item):

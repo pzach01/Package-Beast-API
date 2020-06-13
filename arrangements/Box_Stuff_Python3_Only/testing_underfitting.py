@@ -207,7 +207,7 @@ def test_one_underfit(ele):
 
 
     container=ContainerPY3DBP('Container',container.width, container.height, container.depth)
-    packer=single_pack.single_pack(container, items,1000,True, True)
+    packer=single_pack.single_pack(container, items,True, True)
     assert(len(packer.items)==len(items))
     if packer==None:
         #packer=single_pack.single_pack(container, itemList,1000)        

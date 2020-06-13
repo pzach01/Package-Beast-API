@@ -16,14 +16,14 @@ def test_not_multibinpack():
 
 def test_1():
     print("testing")
-    container=ContainerPY3DBP('very-very-large-box', 8, 9, 10, 100)
+    container=ContainerPY3DBP('very-very-large-box', 8, 9, 10)
 
 
     items = [
-        ItemPY3DBP('50g [powder 2]', 4, 4, 10, 2),
-        ItemPY3DBP('50g [powder 2]', 4, 4, 10, 2),
-        ItemPY3DBP('50g [powder 2]', 4, 4, 10, 2),
-        ItemPY3DBP('50g [powder 2]', 4, 4, 10, 2),
+        ItemPY3DBP('50g [powder 2]', 4, 4, 10),
+        ItemPY3DBP('50g [powder 2]', 4, 4, 10),
+        ItemPY3DBP('50g [powder 2]', 4, 4, 10),
+        ItemPY3DBP('50g [powder 2]', 4, 4, 10),
         
         
     ]
@@ -34,10 +34,10 @@ def test_1():
 
 
 def test_2():
-    container=ContainerPY3DBP('very-very-large-box', 5, 5, 10, 100)
+    container=ContainerPY3DBP('very-very-large-box', 5, 5, 10)
     items=[
-        ItemPY3DBP('50g [powder 2]', 5, 5, 5, 2),
-        ItemPY3DBP('50g [powder 2]', 5, 5, 5, 2),
+        ItemPY3DBP('50g [powder 2]', 5, 5, 5),
+        ItemPY3DBP('50g [powder 2]', 5, 5, 5),
         
         
     ]
@@ -47,11 +47,11 @@ def test_2():
     assert(packer.unfit_items==[])
 
 def test_3():
-    container=ContainerPY3DBP('very-very-large-box', 5, 5, 10, 100)
+    container=ContainerPY3DBP('very-very-large-box', 5, 5, 10)
     items=[
-        ItemPY3DBP('50g [powder 2]', 5, 5, 5, 2),
-        ItemPY3DBP('50g [powder 2]', 5, 5, 5, 2),
-        ItemPY3DBP('50g [powder 2]', 5, 5, 5, 2),
+        ItemPY3DBP('50g [powder 2]', 5, 5, 5),
+        ItemPY3DBP('50g [powder 2]', 5, 5, 5),
+        ItemPY3DBP('50g [powder 2]', 5, 5, 5),
 
         
     ]
@@ -68,7 +68,7 @@ def dz_test():
     items=[]
     for i in range(0, 13):
         items.append(ItemPY3DBP(str(i),450,975,793,1))
-    packer=single_pack.single_pack(container,items,iterationLimit=1000,volumeSafeGuard=True, printIteration=True)
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True)
     assert(not (packer==None))
     
 # iterationLimit (for each container)
@@ -115,10 +115,12 @@ def test_for_double_fit(packer, iterationLimit):
         pass
         #raise Exception('invalid inputs to test_for_double_fit')
 def test_doublefitting_raises_exception():
-    item1=ItemPY3DBP('id=1', 10,10,10,1)
-    item2=ItemPY3DBP('id=2',10,10,10,1)
-    container=ContainerPY3DBP('id=Container',20,20,20,4)
-    packer=Packer()
+    item1=ItemPY3DBP('id=1', 10,10,10)
+    item2=ItemPY3DBP('id=2',10,10,10)
+    container=ContainerPY3DBP('id=Container',20,20,20)
+    # had to do this to avoid a stupid import structure
+    rotationType=[0,1,2,3,4,5,6,7]
+    packer=Packer(rotationType)
     packer.bins=[container]
     item1.position=[0,0,0]
     item2.position=[0,0,0]

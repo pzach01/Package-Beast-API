@@ -135,13 +135,13 @@ def render_test():
 
 
 def render_test2():
-    container=ContainerPY3DBP('Container',25,6,15,1000)
+    container=ContainerPY3DBP('Container',25,6,15)
     # 17,2,10
     items=[
-        ItemPY3DBP('1',17,2,10,1),
-        ItemPY3DBP('2',14,4,7,1),
-        ItemPY3DBP('3',19,3,5,1),
-        ItemPY3DBP('4',19,3,8,1)
+        ItemPY3DBP('1',17,2,10),
+        ItemPY3DBP('2',14,4,7),
+        ItemPY3DBP('3',19,3,5),
+        ItemPY3DBP('4',19,3,8)
     ]
     
     '''
@@ -171,22 +171,22 @@ def recursive_bug():
     7(1.000000x2.000000x1.000000, weight: 1) pos(0.000000, 0.000000, 0.000000) rt(0) vol(2)
     8(1.000000x4.000000x2.000000, weight: 1) pos(0.000000, 0.000000, 0.000000) rt(0) vol(8)
     '''
-    container=ContainerPY3DBP('very-very-large-box', 1, 12, 4, 100)
+    container=ContainerPY3DBP('very-very-large-box', 1, 12, 4)
 
 
     items = [
-        ItemPY3DBP('1', 1, 5, 3, 2),
-        ItemPY3DBP('2', 1, 1, 1, 2),
-        ItemPY3DBP('3',1,3,3,2),
-        ItemPY3DBP('4', 1, 2, 1, 2),
-        ItemPY3DBP('5',1,2,3,2),
-        ItemPY3DBP('6', 1, 2, 1, 2),
-        ItemPY3DBP('7', 1, 2, 1, 2),
-        ItemPY3DBP('8', 1, 4, 2, 2),
+        ItemPY3DBP('1', 1, 5, 3),
+        ItemPY3DBP('2', 1, 1, 1),
+        ItemPY3DBP('3',1,3,3),
+        ItemPY3DBP('4', 1, 2, 1),
+        ItemPY3DBP('5',1,2,3),
+        ItemPY3DBP('6', 1, 2, 1),
+        ItemPY3DBP('7', 1, 2, 1),
+        ItemPY3DBP('8', 1, 4, 2),
         
     ]
 
-    packer=single_pack.single_pack(container, items,1000,True, True)
+    packer=single_pack.single_pack(container, items,True, True)
     render(packer,container.width, container.height,container.depth)
     assert (not (packer==None))
     testing_single_pack.test_for_double_fit(packer, 10000)

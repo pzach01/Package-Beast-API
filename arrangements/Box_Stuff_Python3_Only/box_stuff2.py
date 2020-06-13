@@ -82,7 +82,7 @@ def get_xyz_of_optimal_solution(minArrangment,bins1, boxs1,endTimeRendering):
         for setIndex in minArrangment[index]:
             boxesUsed.append(boxs1[setIndex])
         
-        boxArrangment=box_stuff1.binpack(boxesUsed, bin, 2000000)
+        boxArrangment=box_stuff1.binpack(boxesUsed, bin)
         arrangments.append(boxArrangment)  
         
     return arrangments

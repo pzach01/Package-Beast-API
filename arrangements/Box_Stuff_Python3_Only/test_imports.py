@@ -20,6 +20,8 @@ from . import box_stuff2
 
 from . import single_pack
 from . import testing_single_pack
+from . import py3dbp_constants
+from .py3dbp_constants import RotationType
 
 from . import py3dbp_auxiliary_methods
 from .py3dbp_auxiliary_methods import outside_container

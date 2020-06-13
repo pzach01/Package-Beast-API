@@ -15,7 +15,7 @@ def test_for_overfits_type_a():
         print(i)
         container, items=generate_an_overfit_arrangment_type_a()
         assert(sum([item.volume for item in items])>container.volume)
-        packer=single_pack.single_pack(container, items,math.inf,False,False,timeout)
+        packer=single_pack.single_pack(container, items,False,False,timeout)
         assert(packer==None)
 # length/width/height overfit
 def test_for_overfits_type_b():

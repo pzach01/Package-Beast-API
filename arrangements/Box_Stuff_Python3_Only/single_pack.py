@@ -1,5 +1,6 @@
 from . import py3dbp_main
 from .py3dbp_main import Packer, ContainerPY3DBP, ItemPY3DBP
+from .py3dbp_constants import RotationType
 import itertools
 import random
 import time
@@ -7,9 +8,6 @@ import math
 random.seed(1)
 # same as item permutations but randomly iterates and using this generator can yield the same permutation twice
 class CustomItemPermutations():
-
-    def __init__(self):
-        pass
     def next(self,itemList):
         returnItems=[]
         while(len(itemList)>0):
@@ -17,7 +15,7 @@ class CustomItemPermutations():
             returnItems.append(itemList.pop(toSelect))
         return returnItems
 
-def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True,printIteration=True,timeout=None):
+def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,timeout=None):
 
     endTime=None
     if timeout==None:
@@ -28,9 +26,6 @@ def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True,pri
     if volumeSafeGuard:
         if container.volume< sum([item.volume for item in itemList]):
             return None
-
-
-    bin_weight_capacity = math.inf
     
 
     
@@ -44,7 +39,7 @@ def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True,pri
         import copy
         count=0
         if len(itemList)==0:
-            p= Packer()
+            p= Packer(RotationType.ALL)
             p.items=[]
             p.unfit_items=[]
             p.bins=[container]
@@ -64,7 +59,7 @@ def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True,pri
 
 
 
-                    packer =Packer()
+                    packer =Packer(RotationType.ALL)
                     packer.add_bin(copy.deepcopy(container))
                     for item in itemsMixedUp:
                         packer.add_item(item)
@@ -91,7 +86,7 @@ def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True,pri
     if randomSearch:
         count=0
         if len(itemList)==0:
-            p= Packer()
+            p= Packer(RotationType.ALL)
             p.items=[]
             p.unfit_items=[]
             p.bins=[container]
@@ -114,7 +109,7 @@ def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True,pri
 
 
 
-            packer =Packer()
+            packer =Packer(RotationType.ALL)
             packer.add_bin(copy.deepcopy(container))
             for item in itemsMixedUp:
                 packer.add_item(item)
@@ -135,7 +130,8 @@ def single_pack(container, itemList,iterationLimit=1000,volumeSafeGuard=True,pri
         return None    
 
 
-# next() returns one of the possible ways to mixup the Length Width Height of an item for each item in the permutation
+# next() returns one of the possible ways to mixup the Length Width Height of an item for each item in the permutation; obviously not just 6 because it is for
+# each item in the current ordering; 
 # thus 6**n mixups
 # ie. for each item
 # L x W x H

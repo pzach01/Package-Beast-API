@@ -184,7 +184,7 @@ def sort_points_we_can_add_to(pointsWeCanAddTo):
 
 
 
-def binpack(packages, bin=None, iterlimit=1000000):
+def binpack(packages, bin=None):
    
     
     from . import single_pack as sp
@@ -192,7 +192,7 @@ def binpack(packages, bin=None, iterlimit=1000000):
 
     from . import py3dbp_main as m
 
-    packer=sp.single_pack(bin, packages,iterlimit)
+    packer=sp.single_pack(bin, packages)
 
 
 

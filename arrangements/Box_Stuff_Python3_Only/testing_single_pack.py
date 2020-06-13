@@ -64,10 +64,10 @@ def test_3():
 #bin=p.Package('1800x1800x2400')
 #box=p.Package('450x975x793') # 17 of these
 def dz_test():
-    container=ContainerPY3DBP('container', 1800,1800,2400,100000)
+    container=ContainerPY3DBP('container', 1800,1800,2400)
     items=[]
-    for i in range(0, 13):
-        items.append(ItemPY3DBP(str(i),450,975,793,1))
+    for i in range(0, 17):
+        items.append(ItemPY3DBP(str(i),450,975,793))
     packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True)
     assert(not (packer==None))
     

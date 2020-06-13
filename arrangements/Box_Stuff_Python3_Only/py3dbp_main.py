@@ -169,7 +169,7 @@ class Packer:
 
         for pivot in possiblePivots:
             item.position=pivot
-            for dimensionalRotation in RotationType.ALL:
+            for dimensionalRotation in self.rotationTypes:
                 item.set_rotation_type_and_dimension(dimensionalRotation)
 
                 if self.can_place_at_position(item):

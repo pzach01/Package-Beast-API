@@ -14,8 +14,9 @@ class CustomItemPermutations():
             toSelect=random.randint(0, len(itemList)-1)
             returnItems.append(itemList.pop(toSelect))
         return returnItems
+# attempt to pack items into a single container
 
-def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,timeout=None):
+def single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, timeout, rotationType,randomSearch):
 
     endTime=None
     if timeout==None:
@@ -33,13 +34,12 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
 
 
 
-    randomSearch=True
     if not randomSearch:
         item_permutations=(itertools.permutations(itemList,len(itemList)))
         import copy
         count=0
         if len(itemList)==0:
-            p= Packer(RotationType.ALL)
+            p= Packer(rotationType)
             p.items=[]
             p.unfit_items=[]
             p.bins=[container]
@@ -59,7 +59,7 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
 
 
 
-                    packer =Packer(RotationType.ALL)
+                    packer =Packer(rotationType)
                     packer.add_bin(copy.deepcopy(container))
                     for item in itemsMixedUp:
                         packer.add_item(item)
@@ -86,7 +86,7 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
     if randomSearch:
         count=0
         if len(itemList)==0:
-            p= Packer(RotationType.ALL)
+            p= Packer(rotationType)
             p.items=[]
             p.unfit_items=[]
             p.bins=[container]
@@ -109,7 +109,7 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
 
 
 
-            packer =Packer(RotationType.ALL)
+            packer =Packer(rotationType)
             packer.add_bin(copy.deepcopy(container))
             for item in itemsMixedUp:
                 packer.add_item(item)
@@ -128,6 +128,23 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
                 #
         # if you couldn't find an arrangment; Never happens here (because we don't know which ones have been used)
         return None    
+
+# wraps some of the higher level decisions up such as
+# whether to search randomly or bruteforce
+# whether to use the heuristic (and for how long)
+# how long to search each of these things
+def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,timeout=None):
+    randomSearch=True
+    if timeout==None:
+        res= single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, 30,RotationType.HEURISTIC,randomSearch)
+    elif timeout<30:
+        res= single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, 30,RotationType.HEURISTIC,randomSearch)
+    else:
+        res= single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, timeout,RotationType.HEURISTIC,randomSearch)
+    if (not(res==None)):
+        return res
+    else:
+        return single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, timeout,RotationType.ALL,randomSearch)
 
 
 # next() returns one of the possible ways to mixup the Length Width Height of an item for each item in the permutation; obviously not just 6 because it is for

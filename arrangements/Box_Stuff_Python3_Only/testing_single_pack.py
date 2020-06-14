@@ -93,7 +93,7 @@ def test_for_double_fit(packer, iterationLimit):
             pointHeight=random.random()*container.depth      
             
             cubesPointIsIn=0
-            for item in container.items:
+            for item in packer.items:
                 # this is dumb; requiring us to reference the bins field by a different name then the items, why not just bin.depth?
                 lowerWidth, upperWidth=item.position[0], item.position[0]+item.get_dimension()[0]
                 lowerDepth, upperDepth=item.position[1], item.position[1]+item.get_dimension()[1]
@@ -124,7 +124,7 @@ def test_doublefitting_raises_exception():
     packer.bins=[container]
     item1.position=[0,0,0]
     item2.position=[0,0,0]
-    container.items=[item1,item2]
+    packer.items=[item1,item2]
     exceptionRaised=False
     try:
         test_for_double_fit(packer,100000)
@@ -132,6 +132,7 @@ def test_doublefitting_raises_exception():
         exceptionRaised=True
     if not exceptionRaised:
         raise Exception('double fit didnt raise an exception')
+
 test_1()
 test_2()
 test_3()

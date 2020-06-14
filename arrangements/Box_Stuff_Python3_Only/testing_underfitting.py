@@ -293,7 +293,7 @@ def test_underfits():
     specialContainer, specialItems=None,None
     failedAt1000Iterations=0
     import copy
-    for ele in range(0, 100000):
+    for ele in range(0, 1000009):
         print(ele)
         packer=None
         packer, container, items, coordinates=test_one_underfit(ele)

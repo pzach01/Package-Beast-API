@@ -6,28 +6,28 @@ from .test_imports import *
 def test_4():
     items=['4x4x4','4x4x4']
     containers=['4x4x4','4x4x4','10x5x5']
-    containerList=box_stuff2.master_calculate_optimal_solution(containers,items,1000000)    
+    containerList=box_stuff2.master_calculate_optimal_solution(containers,items)    
     usedContainers=len([container for container in containerList if len(container.boxes)>0])
     assert(usedContainers==2)
 
 def test_3():
     items=['5x5x5','5x5x5','7x7x7']
     containers=['5x5x5','5x5x5','7x7x7']
-    containerList=box_stuff2.master_calculate_optimal_solution(containers,items,timeout=30)    
+    containerList=box_stuff2.master_calculate_optimal_solution(containers,items)    
     usedContainers=len([container for container in containerList if len(container.boxes)>0])
     assert(usedContainers==3)
 
 def test_2():
     containers=['20x20x20','22x20x20']
     items=['2x2x2','3x2x1','4x5x2','3x7x2']
-    containerList=box_stuff2.master_calculate_optimal_solution(containers,items,timeout=30)    
+    containerList=box_stuff2.master_calculate_optimal_solution(containers,items)    
     usedVolume=sum([bin.volume for bin in containerList if len(bin.boxes) is not 0 ])
     assert(usedVolume==8000)
 def test_1():
     print("Test 1 starting")
     bins=['10x10x10', '10x10x10']
     boxes=['5x5x5' for ele in range(0, 16)]
-    containerList=box_stuff2.master_calculate_optimal_solution(bins,boxes,timeout=30)    
+    containerList=box_stuff2.master_calculate_optimal_solution(bins,boxes)    
     usedVolume=sum([bin.volume for bin in containerList if len(bin.boxes) is not 0 ])
     assert(usedVolume==2000)
 
@@ -93,9 +93,9 @@ def weight_testing():
     
      
 weight_testing()
-
-#cost_testing()
-test_2()
 test_1()
+test_2()
 test_3()
 test_4()
+print('passed test 1-4')
+cost_testing()

@@ -132,9 +132,9 @@ def test_doublefitting_raises_exception():
         exceptionRaised=True
     if not exceptionRaised:
         raise Exception('double fit didnt raise an exception')
-#test_1()
-#test_2()
-#test_3()
+test_1()
+test_2()
+test_3()
 #dz_test()
-#test_doublefitting_raises_exception()
-#test_not_multibinpack()
+test_doublefitting_raises_exception()
+test_not_multibinpack()

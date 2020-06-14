@@ -5,7 +5,7 @@ from .py3dbp_main import ContainerPY3DBP,ItemPY3DBP,Packer
 import random
 # makes test deterministic (reproducable)
 seed=random.randint(0,10000)
-seed=777
+seed=778
 print('Seed:'+str(seed))
 random.seed(seed)
 

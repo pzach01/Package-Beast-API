@@ -35,7 +35,8 @@ def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeigh
                         boxes.append((boxMasterList[boxIndex]))
                     ### uses one box with nothing leftover
                     if(len(boxes)!=0):
-                        binpackResult=box_stuff1.binpack(boxes,bin)
+                        # make this less stupid later
+                        binpackResult=box_stuff1.binpack(boxes,bin,60)
                         if (binpackResult==None):
                             
                             valid=False

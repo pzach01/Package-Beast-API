@@ -233,7 +233,7 @@ def test_one_underfit(ele):
         # what we did
         volumeOccupied=sum([item.volume for item in items])/container.volume
         # what py3dbp did
-        volumeOccupied2=sum([item.volume for item in packer.items])/packer.bins[0].volume
+        volumeOccupied2=sum([item.volume for item in packer.items])/packer.container.volume
         assert(volumeOccupied==volumeOccupied2)
         assert(packer.unfit_items==[])
         #print("N: "+str(len(items)))

@@ -346,7 +346,7 @@ def convert_to_api_form(arrangments,costList, binWeightCapacitys,timedOut):
 
 
     for containerIndex in range(0, len(arrangments)):
-        newContainer=BinAPI(containerIndex,arrangments[containerIndex].bins[0].width,arrangments[containerIndex].bins[0].height, arrangments[containerIndex].bins[0].depth,0,0,timedOut)
+        newContainer=BinAPI(containerIndex,arrangments[containerIndex].container.width,arrangments[containerIndex].container.height, arrangments[containerIndex].container.depth,0,0,timedOut)
         containerObjects.append(newContainer)
 
     for containerIndex in range(0, len(arrangments)):

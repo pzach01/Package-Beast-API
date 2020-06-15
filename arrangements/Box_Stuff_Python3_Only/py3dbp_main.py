@@ -92,7 +92,7 @@ class ContainerPY3DBP:
 class Packer:
     # default initilization of rotation types to all rotations (-,-,-) to (+,+,+); all 8
     def __init__(self,rotationTypes):
-        self.bins = []
+        self.container = None
         self.items = []
         self.unfit_items = []
         self.total_items = 0
@@ -100,8 +100,8 @@ class Packer:
         self.rotationTypes=rotationTypes
 
 
-    def add_bin(self, bin):
-        return self.bins.append(bin)
+    def set_container(self, container):
+        self.container=container
 
     def add_item(self, item):
         self.total_items = len(self.items) + 1
@@ -211,17 +211,17 @@ class Packer:
             render_something_that_failed(self.bins[0], innerItems,coordinates)
 
 
-        if outside_container(item, self.bins[0].width,self.bins[0].height, self.bins[0].depth):
+        if outside_container(item, self.container.width,self.container.height, self.container.depth):
             return False
 
 
         if not (self.cache==[]):
-            if intersect_lucas(self.cache[0], item,self.bins[0].width, self.bins[0].height, self.bins[0].depth):
+            if intersect_lucas(self.cache[0], item,self.container.width, self.container.height, self.container.depth):
                 return False
 
         for current_item_in_bin in reversed(self.items):
             if current_item_in_bin is not item:
-                if intersect_lucas(current_item_in_bin, item,self.bins[0].width,self.bins[0].height, self.bins[0].depth):
+                if intersect_lucas(current_item_in_bin, item,self.container.width,self.container.height, self.container.depth):
                     self.cache=[current_item_in_bin]
                     return False
         return True

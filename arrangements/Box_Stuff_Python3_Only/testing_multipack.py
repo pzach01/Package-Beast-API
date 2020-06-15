@@ -91,7 +91,7 @@ def weight_testing():
     assert(usedVolume==10**3) 
     
     
-'''
+
 weight_testing()
 test_1()
 test_2()
@@ -99,4 +99,3 @@ test_3()
 test_4()
 print('passed test 1-4')
 cost_testing()
-'''

@@ -53,10 +53,10 @@ def draw_boxes(ax,x_vals, y_vals, z_vals, widths, heights, depths):
 
 
 def render(packer,bin_width, bin_height, bin_depth):
-    if packer.bins[0].unfitted_items:
+    if len(packer.unfit_items)>0:
         raise Exception("doesn't fit")
         # print("'doesn't fit'")
-    if not packer.bins[0].unfitted_items:
+    else:
         #print("fits, yo!")
 
 

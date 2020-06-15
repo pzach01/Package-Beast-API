@@ -42,7 +42,7 @@ def single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard,
             p= Packer(rotationType)
             p.items=[]
             p.unfit_items=[]
-            p.bins=[container]
+            p.set_container(container)
             return p
         for item_permutation in item_permutations:
             mixer=DimensionalMixupsGenerator(item_permutation)
@@ -60,7 +60,7 @@ def single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard,
 
 
                     packer =Packer(rotationType)
-                    packer.add_bin(copy.deepcopy(container))
+                    packer.set_container(copy.deepcopy(container))
                     for item in itemsMixedUp:
                         packer.add_item(item)
                     
@@ -89,7 +89,7 @@ def single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard,
             p= Packer(rotationType)
             p.items=[]
             p.unfit_items=[]
-            p.bins=[container]
+            p.set_container(container)
             return p
         # generates random permutations
         item_permutations_generator=CustomItemPermutations()
@@ -110,7 +110,7 @@ def single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard,
 
 
             packer =Packer(rotationType)
-            packer.add_bin(copy.deepcopy(container))
+            packer.set_container(copy.deepcopy(container))
             for item in itemsMixedUp:
                 packer.add_item(item)
             

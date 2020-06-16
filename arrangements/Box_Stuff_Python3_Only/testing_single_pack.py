@@ -87,9 +87,9 @@ def test_for_double_fit(packer, iterationLimit):
 
     for index in range(0, iterationLimit):
         # generate a random point
-        pointWidth=random.random()*packer.container.width
-        pointDepth=random.random()*packer.container.height
-        pointHeight=random.random()*packer.container.depth      
+        pointWidth=random.random()*packer.container.xDim
+        pointDepth=random.random()*packer.container.yDim
+        pointHeight=random.random()*packer.container.zDim      
         
         cubesPointIsIn=0
         for item in packer.items:

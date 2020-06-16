@@ -232,7 +232,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,c
 
 class BinAPI():
     def to_string(self):
-        binAttributes="("+str(self.id)+","+str(self.height)+","+str(self.width)+","+str(self.length)+","+str(self.volume)+","+str(self.cost)+","+str(self.weightCapacity)+","+str(self.timedOut)
+        binAttributes="("+str(self.id)+","+str(self.xDim)+","+str(self.yDim)+","+str(self.zDim)+","+str(self.volume)+","+str(self.cost)+","+str(self.weightCapacity)+","+str(self.timedOut)
         boxAttributes=""
         for box in self.boxes:
             boxAttributes+=box.to_string()
@@ -243,9 +243,9 @@ class BinAPI():
     def to_dictionary(self):
         aDictionary={}
         aDictionary['id']=self.id
-        aDictionary['height']=self.height
-        aDictionary['width']=self.width
-        aDictionary['length']=self.length
+        aDictionary['xDim']=self.xDim
+        aDictionary['yDim']=self.yDim
+        aDictionary['zDim']=self.zDim
         aDictionary['volume']=self.volume
         aDictionary['cost']=self.cost
         aDictionary['weightCapacity']=self.weightCapacity
@@ -253,13 +253,13 @@ class BinAPI():
         aDictionary['timedOut']=self.timedOut
         aDictionary['itemList']=[box.to_dictionary() for box in self.boxes]
         return aDictionary
-    def __init__(self,id,width,height, depth,cost, weightCapacity,timedOut):
+    def __init__(self,id,xDim,yDim, zDim,cost, weightCapacity,timedOut):
         self.id=id
         
-        self.height=float(height)
-        self.width=float(width)     
-        self.depth=float(depth)
-        self.volume=float(width*height*depth)
+        self.xDim=float(xDim)
+        self.yDim=float(yDim)     
+        self.zDim=float(zDim)
+        self.volume=float(xDim*yDim*zDim)
         
         
         self.cost=float(cost)
@@ -281,18 +281,18 @@ class BinAPI():
         slotted=[]
         for key in coordinateDictionary.keys():
             package=coordinateDictionary[key]
-            height, width, depth,weight=package.height, package.width, package.depth,package.weight
+            xDim, yDim, zDim,weight=package.xDim, package.yDim, package.zDim,package.weight
             if package.weight==None:
                 weight=0
             for boxIndex in range(0, len(self.boxes)):
                 # boxes have the same coordinates
                 
                 # we have to do this because internally the HxLxD might get swapped around by the algorithm
-                if (sorted([self.boxes[boxIndex].height,self.boxes[boxIndex].width,self.boxes[boxIndex].depth])==sorted([height,width,depth])):
+                if (sorted([self.boxes[boxIndex].xDim,self.boxes[boxIndex].yDim,self.boxes[boxIndex].zDim])==sorted([xDim,yDim,zDim])):
                     self.boxes[boxIndex].set_center(key)
-                    self.boxes[boxIndex].height=height
-                    self.boxes[boxIndex].width=width
-                    self.boxes[boxIndex].depth=depth
+                    self.boxes[boxIndex].xDim=xDim
+                    self.boxes[boxIndex].yDim=yDim
+                    self.boxes[boxIndex].zDim=zDim
                     self.boxes[boxIndex].weight=weight
                     slotted.append(self.boxes.pop(boxIndex))
                     break
@@ -301,10 +301,11 @@ class BinAPI():
 
 
 class BoxAPI():
-    def __init__(self,height, width, depth,volume,weight):
-        self.height=float(height)
-        self.width=float(width)
-        self.depth=float(depth)
+    def __init__(self,xDim, yDim, zDim,volume,weight):
+        self.xDim=float(xDim)
+        self.yDim=float(yDim)
+
+        self.zDim=float(zDim)
         self.volume=float(volume)
         self.weight=float(weight) if weight is not None else weight
         
@@ -315,9 +316,10 @@ class BoxAPI():
 
     def to_dictionary(self):
         aDictionary={}
-        aDictionary['height']=self.height
-        aDictionary['width']=self.width
-        aDictionary['depth']=self.depth
+        aDictionary['xDim']=self.xDim
+        aDictionary['yDim']=self.yDim
+
+        aDictionary['zDun']=self.zDun
         aDictionary['volume']=self.volume
         aDictionary['weight']=self.weight
         aDictionary['xCenter']=self.x
@@ -328,7 +330,7 @@ class BoxAPI():
     def set_center(self, center):
         self.x, self.y, self.z=float(center[0]), float(center[1]), float(center[2])
     def to_string(self):
-        return "<"+str(self.height)+","+str(self.width)+","+str(self.depth)+","+str(self.volume)+","+str(self.weight)+","+str(self.x)+","+str(self.y)+","+str(self.z)+">"
+        return "<"+str(self.xDim)+","+str(self.yDim)+","+str(self.zDim)+","+str(self.volume)+","+str(self.weight)+","+str(self.x)+","+str(self.y)+","+str(self.z)+">"
 # this is mostly due to not recognizing design failure earlier. binList and packageList don't allow ordering so we have this big mess of a method to make
 # things more clear
 
@@ -346,14 +348,14 @@ def convert_to_api_form(arrangments,costList, binWeightCapacitys,timedOut):
 
 
     for containerIndex in range(0, len(arrangments)):
-        newContainer=BinAPI(containerIndex,arrangments[containerIndex].container.width,arrangments[containerIndex].container.height, arrangments[containerIndex].container.depth,0,0,timedOut)
+        newContainer=BinAPI(containerIndex,arrangments[containerIndex].container.xDim,arrangments[containerIndex].container.yDim, arrangments[containerIndex].container.zDim,0,0,timedOut)
         containerObjects.append(newContainer)
 
     for containerIndex in range(0, len(arrangments)):
         for item in arrangments[containerIndex].items:
             x,y,z=item.position[0]+(item.get_dimension()[0]/2), item.position[1]+(item.get_dimension()[1]/2), item.position[2]+(item.get_dimension()[2]/2)
             # weight unitilized here
-            newBox=BoxAPI(item.height,item.width,item.depth, item.volume,0)
+            newBox=BoxAPI(item.xDim,item.yDim,item.zDim, item.volume,0)
             newBox.set_center((x,y,z))
             (containerObjects[containerIndex]).add_box(newBox)
 

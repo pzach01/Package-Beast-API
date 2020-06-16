@@ -135,8 +135,6 @@ def slot_bin_with_coordinates_py3dbp(packageArrangment, bin):
         yPos=float(item.position[1])
         zPos=float(item.position[2])
 
-        # print("width:", float(item.width), "height:", float(item.height), "depth:", float(item.depth))
-        # print("dim_0:", item.get_dimension()[0], "dim_1:", item.get_dimension()[1], "dim_2:", item.get_dimension()[2])
         xDim=int(item.get_dimension()[0])
         yDim=int(item.get_dimension()[1])
         zDim=int(item.get_dimension()[2])
@@ -205,7 +203,6 @@ def binpack(packages, bin=None,timeout=None):
 
 ### This is actually just the tetris algorithm. Given that there is an ordered arrangment whose orientation cant be changed,
 ### thus, we just need a list of extreme points and update each time. 
-#The values describe the width, height and depth of the knapsack in that order.
 
 
 

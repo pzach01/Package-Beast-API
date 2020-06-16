@@ -51,9 +51,9 @@ class ArrangementSerializer(serializers.ModelSerializer):
         containerList = []
         index = 0
         for container in containers:
-            height = apiObjects[index].height
-            width = apiObjects[index].width
-            length = apiObjects[index].depth
+            height = apiObjects[index].xDim
+            width = apiObjects[index].yDim
+            length = apiObjects[index].zDim
             volume = apiObjects[index].volume
             sku = container['sku']
             description = container['description']
@@ -65,9 +65,9 @@ class ArrangementSerializer(serializers.ModelSerializer):
         index = 0
         for container in apiObjects:
             for item in container.boxes:
-                height = item.height
-                width = item.width
-                length = item.depth
+                height = item.xDim
+                width = item.yDim
+                length = item.zDim
                 volume = item.volume
                 xCenter = item.x
                 yCenter = item.y

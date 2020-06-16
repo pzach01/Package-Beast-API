@@ -157,7 +157,7 @@ def render_test2():
     '''
 
     packer=single_pack.single_pack(container, items)
-    render(packer, container.width, container.height, container.depth)
+    render(packer, container.xDim, container.yDim, container.zDim)
 
 
 
@@ -187,7 +187,7 @@ def recursive_bug():
     ]
 
     packer=single_pack.single_pack(container, items,True, True)
-    render(packer,container.width, container.height,container.depth)
+    render(packer,container.xDim, container.yDim,container.zDim)
     assert (not (packer==None))
     testing_single_pack.test_for_double_fit(packer, 10000)
 recursive_bug()

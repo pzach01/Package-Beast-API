@@ -8,12 +8,12 @@ START_POSITION = [0, 0, 0]
 
 
 class ItemPY3DBP:
-    def __init__(self, name, width, height, depth):
+    def __init__(self, name, xDim, yDim, zDim):
 
         self.name = name
-        self.width = width
-        self.height = height
-        self.depth = depth
+        self.xDim = xDim
+        self.yDim = yDim
+        self.zDim = zDim
         self.rotation_type = 0
         self.position = START_POSITION
         self.volume = self.get_volume()
@@ -39,21 +39,21 @@ class ItemPY3DBP:
 
 
         self.dimension=[
-            self.firstValue*self.width,
-            self.secondValue*self.height,
-            self.thirdValue*self.depth
+            self.firstValue*self.xDim,
+            self.secondValue*self.yDim,
+            self.thirdValue*self.zDim
         ]
 
 
 
     def string(self):
         return "%s(%fx%fx%f, weight: %s) pos(%f, %f, %f) rt(%s) vol(%s)" % (
-            self.name, self.width, self.height, self.depth, self.weight,
+            self.name, self.xDim, self.yDim, self.zDim, self.weight,
             self.position[0], self.position[1], self.position[2], self.rotation_type, self.volume
         )
 
     def get_volume(self):
-        return abs(self.width * self.height * self.depth)
+        return abs(self.xDim * self.yDim * self.zDim)
 
     def get_dimension(self):
         return self.dimension
@@ -66,23 +66,23 @@ class ItemPY3DBP:
 
 
 class ContainerPY3DBP:
-    def __init__(self, name, width, height, depth):
+    def __init__(self, name, xDim, yDim, zDim):
         self.name = name
-        self.width = width
-        self.height = height
-        self.depth = depth
+        self.xDim = xDim
+        self.yDim = yDim
+        self.zDim = zDim
         self.items = []
         self.unfitted_items = []
         self.volume = self.get_volume()
 
     def string(self):
         return "%s(%sx%sx%s, max_weight:%s) vol(%s)" % (
-            self.name, self.width, self.height, self.depth,
+            self.name, self.xDim, self.yDim, self.zDim,
             self.volume
         )
 
     def get_volume(self):
-        return abs(self.width * self.height * self.depth)
+        return abs(self.xDim * self.yDim * self.zDim)
 
 
 
@@ -158,9 +158,9 @@ class Packer:
                 firstValue=pivotCopy
 
                 possiblePivots.append(
-                    [currentItem.position[0]+firstValue*currentItem.width,
-                    currentItem.position[1]+secondValue*currentItem.height,
-                    currentItem.position[2]+thirdValue*currentItem.depth]
+                    [currentItem.position[0]+firstValue*currentItem.xDim,
+                    currentItem.position[1]+secondValue*currentItem.yDim,
+                    currentItem.position[2]+thirdValue*currentItem.zDim]
                 )
 
 
@@ -211,17 +211,17 @@ class Packer:
             render_something_that_failed(self.bins[0], innerItems,coordinates)
 
 
-        if outside_container(item, self.container.width,self.container.height, self.container.depth):
+        if outside_container(item, self.container.xDim,self.container.yDim, self.container.zDim):
             return False
 
 
         if not (self.cache==[]):
-            if intersect_lucas(self.cache[0], item,self.container.width, self.container.height, self.container.depth):
+            if intersect_lucas(self.cache[0], item,self.container.xDim, self.container.yDim, self.container.zDim):
                 return False
 
         for current_item_in_bin in reversed(self.items):
             if current_item_in_bin is not item:
-                if intersect_lucas(current_item_in_bin, item,self.container.width,self.container.height, self.container.depth):
+                if intersect_lucas(current_item_in_bin, item,self.container.xDim,self.container.yDim, self.container.zDim):
                     self.cache=[current_item_in_bin]
                     return False
         return True

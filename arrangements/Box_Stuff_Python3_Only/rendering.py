@@ -14,13 +14,13 @@ def render_bin(bin, boxes):
     import random
     # This import registers the 3D projection, but is otherwise unused.
     supportedColors=['red','blue','green','magenta','cyan','yellow']
-    x, y, z = np.indices((bin.length,bin.width ,bin.heigth))   
+    x, y, z = np.indices((bin.length,bin.xDim ,bin.heigth))   
     cubeList=[]
     for key in boxes.keys():
         upperZ=key[0]+(boxes[key].heigth/2)
         lowerZ=key[0]-(boxes[key].heigth/2) 
-        upperY=key[1]+(boxes[key].width/2)
-        lowerY=key[1]-(boxes[key].width/2)
+        upperY=key[1]+(boxes[key].xDim/2)
+        lowerY=key[1]-(boxes[key].xDim/2)
         
         upperX=key[2]+(boxes[key].length/2)
         lowerX=key[2]-(boxes[key].length/2)

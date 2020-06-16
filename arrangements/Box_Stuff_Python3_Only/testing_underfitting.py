@@ -60,8 +60,8 @@ def draw_boxes(ax,x_vals, y_vals, z_vals, widths, heights, depths):
 # obviously a ton of room to adjust the 'hardness' of the problem here by controlling n, range of boxes (nearly rectangular/square or both mixed together) 
 # and distance from max volume
 
-from . import test_imports
-from .test_imports import *
+from . import testing_imports
+from .testing_imports import *
 # generates arrangment that can be fit if algorithm is optimal. may be too hard or too easy
 
 def generate_bins_that_fit(iterationLimit):

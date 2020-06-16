@@ -1,5 +1,5 @@
-from . import test_imports
-from .test_imports import *
+from . import testing_imports
+from .testing_imports import *
 
 
 

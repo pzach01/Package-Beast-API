@@ -1,5 +1,5 @@
-from . import test_imports
-from .test_imports import *
+from . import testing_imports
+from .testing_imports import *
 def draw_bin(ax,bin_width, bin_height, bin_depth, bin_edge_color='black'):
     ax.plot3D([0,bin_width], [0,0], [0, 0], bin_edge_color)
     ax.plot3D([0, 0], [0,bin_height], [0, 0], bin_edge_color)

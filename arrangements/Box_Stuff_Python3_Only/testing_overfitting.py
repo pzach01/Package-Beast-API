@@ -1,8 +1,8 @@
 # tests related to the software's ability to 
 # identify a case where it can't fit all the
 # items into a container
-from . import test_imports
-from .test_imports import *
+from . import testing_imports
+from .testing_imports import *
 import math
 
 

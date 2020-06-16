@@ -1,7 +1,7 @@
 
 
-from . import test_imports
-from .test_imports import *
+from . import testing_imports
+from .testing_imports import *
 # (not multibinpack= singlepack), this wierd name used to avoid confusing with single_pack.py, the 
 # file used to render/pack items into a single container
 def test_not_multibinpack():

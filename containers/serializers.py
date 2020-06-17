@@ -20,9 +20,9 @@ class ContainerSerializer(serializers.ModelSerializer):
         instance.sku = validated_data.get('sku', instance.height)
         instance.description = validated_data.get(
             'description', instance.width)
-        instance.height = validated_data.get('xDim', instance.xDim)
-        instance.width = validated_data.get('yDim', instance.yDim)
-        instance.length = validated_data.get('zDim', instance.zDim)
+        instance.xDim = validated_data.get('xDim', instance.xDim)
+        instance.yDim = validated_data.get('yDim', instance.yDim)
+        instance.zDim = validated_data.get('zDim', instance.zDim)
         instance.volume = instance.xDim * instance.yDim * instance.zDim
         instance.save()
         return instance

@@ -198,7 +198,7 @@ class Packer:
         return False
     # returns true if you can place at a position
     def can_place_at_position(self, item):
-        render=False
+        render=True
         if render:
             from . import testing_underfitting
             from .testing_underfitting import render_something_that_failed
@@ -217,7 +217,7 @@ class Packer:
                 innerItems.append(itemInner)
             print(len(coordinates))
 
-            render_something_that_failed(self.bins[0], innerItems,coordinates)
+            render_something_that_failed(self.container, innerItems,coordinates,self.rotationTypes)
 
 
         if outside_container(item, self.container.xDim,self.container.yDim, self.container.zDim):

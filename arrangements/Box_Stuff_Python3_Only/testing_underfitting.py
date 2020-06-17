@@ -240,15 +240,15 @@ def test_one_underfit(ele):
         #print("Occupacy percentage:"+str(volumeOccupied))
     return packer, container, items, coordinates
 # note that we use this when we failure to render by PY3DBP, but have coordinates from test_one_underfit()
-def render_something_that_failed(container, items,coordinates):
-    packer=Packer()
-    bin_width,bin_height,bin_depth=container.xDim,container.yDim,container.depth
+def render_something_that_failed(container, items,coordinates,rotationTypes):
+    packer=Packer(rotationTypes)
+    bin_width,bin_height,bin_depth=container.xDim,container.yDim,container.zDim
     newItems=[]
     import copy
     for key in coordinates.keys():
 
 
-        newItem=ItemPY3DBP('',coordinates[key][0], coordinates[key][1], coordinates[key][2], 1)
+        newItem=ItemPY3DBP('',coordinates[key][0], coordinates[key][1], coordinates[key][2])
         # BUG: THIS MIGHT NOT BE UNIQUE
         # remember generate_bins_that_fit uses number of points in a cube, not the volume
 
@@ -309,5 +309,5 @@ def test_underfits():
             raise Exception
 
 
-test_underfits()
+#test_underfits()
 

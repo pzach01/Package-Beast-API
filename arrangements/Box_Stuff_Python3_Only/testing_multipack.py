@@ -92,10 +92,10 @@ def weight_testing():
     
     
 
-weight_testing()
-test_1()
-test_2()
-test_3()
-test_4()
-print('passed test 1-4')
-cost_testing()
+#weight_testing()
+#test_1()
+#test_2()
+#test_3()
+#test_4()
+#print('passed test 1-4')
+#cost_testing()

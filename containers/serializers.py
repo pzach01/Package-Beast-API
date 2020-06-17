@@ -17,9 +17,9 @@ class ContainerSerializer(serializers.ModelSerializer):
         return container
 
     def update(self, instance, validated_data):
-        instance.sku = validated_data.get('sku', instance.height)
+        instance.sku = validated_data.get('sku', instance.sku)
         instance.description = validated_data.get(
-            'description', instance.width)
+            'description', instance.description)
         instance.xDim = validated_data.get('xDim', instance.xDim)
         instance.yDim = validated_data.get('yDim', instance.yDim)
         instance.zDim = validated_data.get('zDim', instance.zDim)

@@ -31,7 +31,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
         containerStrings = []
         itemStrings = []
         for container in containers:
-            l, w, h = container['xDim'], container['xDim'], container['zDim']
+            l, w, h = container['xDim'], container['yDim'], container['zDim']
             containerStrings.append(str(l)+'x'+str(w)+'x'+str(h))
         for item in items:
             l, w, h = item['xDim'], item['yDim'], item['zDim']

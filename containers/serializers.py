@@ -6,13 +6,13 @@ class ContainerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Container
         fields = ['id', 'arrangement', 'sku', 'description',
-                  'height', 'width', 'length', 'volume', 'units']
+                  'xDim', 'yDim', 'zDim', 'volume', 'units']
         read_only_fields = ['arrangement', 'volume']
 
     def create(self, validated_data):
         container = Container.objects.create(**validated_data)
-        container.volume = validated_data['height'] * \
-            validated_data['width']*validated_data['length']
+        container.volume = validated_data['xDim'] * \
+            validated_data['yDim']*validated_data['zDim']
         container.save()
         return container
 
@@ -20,9 +20,9 @@ class ContainerSerializer(serializers.ModelSerializer):
         instance.sku = validated_data.get('sku', instance.height)
         instance.description = validated_data.get(
             'description', instance.width)
-        instance.height = validated_data.get('height', instance.height)
-        instance.width = validated_data.get('width', instance.width)
-        instance.length = validated_data.get('length', instance.length)
-        instance.volume = instance.length * instance.width * instance.height
+        instance.height = validated_data.get('xDim', instance.xDim)
+        instance.width = validated_data.get('yDim', instance.yDim)
+        instance.length = validated_data.get('zDim', instance.zDim)
+        instance.volume = instance.xDim * instance.yDim * instance.zDim
         instance.save()
         return instance

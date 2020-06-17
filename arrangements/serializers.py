@@ -31,10 +31,10 @@ class ArrangementSerializer(serializers.ModelSerializer):
         containerStrings = []
         itemStrings = []
         for container in containers:
-            l, w, h = container['height'], container['width'], container['length']
+            l, w, h = container['xDim'], container['xDim'], container['zDim']
             containerStrings.append(str(l)+'x'+str(w)+'x'+str(h))
         for item in items:
-            l, w, h = item['height'], item['width'], item['length']
+            l, w, h = item['xDim'], item['yDim'], item['zDim']
             itemStrings.append(str(l)+'x'+str(w)+'x'+str(h))
 
         from .Box_Stuff_Python3_Only import box_stuff2 as bp
@@ -51,23 +51,23 @@ class ArrangementSerializer(serializers.ModelSerializer):
         containerList = []
         index = 0
         for container in containers:
-            width = apiObjects[index].xDim
-            height = apiObjects[index].yDim
-            length = apiObjects[index].zDim
+            xDim = apiObjects[index].xDim
+            yDim = apiObjects[index].yDim
+            zDim = apiObjects[index].zDim
             volume = apiObjects[index].volume
             sku = container['sku']
             description = container['description']
             units = container['units']
-            containerList.append(Container.objects.create(arrangement=arrangement, height=height, width=width, length=length, volume=volume,
+            containerList.append(Container.objects.create(arrangement=arrangement, xDim=xDim, yDim=yDim, zDim=zDim, volume=volume,
                                                           owner=validated_data['owner'], sku=sku, description=description, units=units))
             index += 1
 
         index = 0
         for container in apiObjects:
             for item in container.boxes:
-                width = item.xDim
-                height = item.yDim
-                length = item.zDim
+                xDim = item.xDim
+                yDim = item.yDim
+                zDim = item.zDim
                 volume = item.volume
                 xCenter = item.x
                 yCenter = item.y
@@ -75,7 +75,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
                 sku = items[index]['sku']
                 description = items[index]['description']
                 units = items[index]['units']
-                Item.objects.create(height=height, width=width, length=length, volume=volume, container=containerList[container.id], arrangement=arrangement,
+                Item.objects.create(xDim=xDim, yDim=yDim, zDim=zDim, volume=volume, container=containerList[container.id], arrangement=arrangement,
                                     owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units)
                 index += 1
         return arrangement

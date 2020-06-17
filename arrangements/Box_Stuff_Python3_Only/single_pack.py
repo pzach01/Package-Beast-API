@@ -5,6 +5,8 @@ import itertools
 import random
 import time
 import math
+import copy
+
 random.seed(1)
 # same as item permutations but randomly iterates and using this generator can yield the same permutation twice
 class CustomItemPermutations():
@@ -33,7 +35,6 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
 
     if not randomSearch:
         item_permutations=(itertools.permutations(itemList,len(itemList)))
-        import copy
         count=0
         if len(itemList)==0:
             p= Packer(rotationType)
@@ -90,7 +91,6 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
             return p
         # generates random permutations
         item_permutations_generator=CustomItemPermutations()
-        import copy
         
 
         while(True):

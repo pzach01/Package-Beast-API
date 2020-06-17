@@ -2,6 +2,7 @@ from . import py3dbp_constants
 from .py3dbp_constants import RotationType,Axis
 from . import py3dbp_auxiliary_methods
 from .py3dbp_auxiliary_methods import intersect_lucas,outside_container
+import copy
 
 START_POSITION = [0, 0, 0]
 
@@ -121,7 +122,6 @@ class Packer:
     
 
     def pack(self,render=False, bigger_first=False, distribute_items=False):
-        import copy
         self.unfit_items=copy.deepcopy(self.items)
         self.items=[]
         # recursive calls
@@ -167,12 +167,10 @@ class Packer:
                 secondValue=pivotCopy//(2**1)
                 pivotCopy=pivotCopy%(2**1)
                 firstValue=pivotCopy
-
-                possiblePivots.append(
-                    [currentItem.position[0]+firstValue*currentItem.xDim,
-                    currentItem.position[1]+secondValue*currentItem.yDim,
-                    currentItem.position[2]+thirdValue*currentItem.zDim]
-                )
+                newPivot=[currentItem.position[0]+firstValue*currentItem.xDim,currentItem.position[1]+secondValue*currentItem.yDim,currentItem.position[2]+thirdValue*currentItem.zDim]
+                if newPivot not in possiblePivots:
+                    possiblePivots.append(newPivot)
+                
 
 
         

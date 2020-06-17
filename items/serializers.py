@@ -11,8 +11,6 @@ class ItemSerializer(serializers.ModelSerializer):
                             'volume', 'xCenter', 'yCenter', 'zCenter']
 
     def create(self, validated_data):
-        validated_data.pop('id')
-
         item = Item.objects.create(**validated_data)
 
         item.volume = validated_data['xDim'] * \

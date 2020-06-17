@@ -16,17 +16,14 @@ class CustomItemPermutations():
         return returnItems
 # attempt to pack items into a single container
 
-def single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, timeout, rotationType,randomSearch):
+def single_pack_given_timing_and_rotations(container, itemList, printIteration, timeout, rotationType,randomSearch):
 
     endTime=None
     if timeout==None:
         endTime=math.inf
     else:
         endTime=time.time()+timeout  
-    # container volume greater then sum of items we are trying to fit
-    if volumeSafeGuard:
-        if container.volume< sum([item.volume for item in itemList]):
-            return None
+
     
 
     
@@ -134,17 +131,24 @@ def single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard,
 # whether to use the heuristic (and for how long)
 # how long to search each of these things
 def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,timeout=None):
+    # container volume greater then sum of items we are trying to fit
+    if volumeSafeGuard:
+        if container.volume< sum([item.volume for item in itemList]):
+            return None
+
+
+
     randomSearch=True
     if timeout==None:
-        res= single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, 30,RotationType.HEURISTIC,randomSearch)
+        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, 30,RotationType.HEURISTIC,randomSearch)
         if not(res==None):
             return res
-        return single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, timeout,RotationType.ALL,randomSearch)
+        return single_pack_given_timing_and_rotations(container, itemList, printIteration, timeout,RotationType.ALL,randomSearch)
     else:
-        res= single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, 30,RotationType.HEURISTIC,randomSearch)
+        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, 30,RotationType.HEURISTIC,randomSearch)
         if not(res==None):
             return res
-        return single_pack_given_timing_and_rotations(container, itemList, volumeSafeGuard, printIteration, timeout-30,RotationType.ALL,randomSearch)
+        return single_pack_given_timing_and_rotations(container, itemList, printIteration, timeout-30,RotationType.ALL,randomSearch)
 
 
 # next() returns one of the possible ways to mixup the Length Width Height of an item for each item in the permutation; obviously not just 6 because it is for

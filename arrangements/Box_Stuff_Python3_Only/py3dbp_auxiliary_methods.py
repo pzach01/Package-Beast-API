@@ -26,42 +26,9 @@ def strictly_outside(item1Min, item1Max, item2Min, item2Max):
     if (item1Min[1]>item2Max[1]) or (item2Min[1]>item1Max[1]):
         return True
 
-def intersect_lucas(item1,item2,containerX,containerY,containerZ):
-    '''
-    # dont think we need to do this because it is checked upon adding to bin
-    # check within bounds
-    if outside_container(item1, containerX,containerY,containerZ):
-        return True
-    if outside_container(item2, containerX,containerY,containerZ):
-        return True
-    '''
-    # we don't need to do this dynamically (could be stored)
-    # my old method
-    item1C=sorted([
-        [item1.position[0],item1.position[1],item1.position[2]],
-        [item1.position[0]+item1.get_dimension()[0],item1.position[1],item1.position[2]],
-        [item1.position[0],item1.position[1]+item1.get_dimension()[1],item1.position[2]],
-        [item1.position[0]+item1.get_dimension()[0],item1.position[1]+item1.get_dimension()[1],item1.position[2]],
-        [item1.position[0],item1.position[1],item1.position[2]+item1.get_dimension()[2]],
-        [item1.position[0]+item1.get_dimension()[0],item1.position[1],item1.position[2]+item1.get_dimension()[2]],
-        [item1.position[0],item1.position[1]+item1.get_dimension()[1],item1.position[2]+item1.get_dimension()[2]],
-        [item1.position[0]+item1.get_dimension()[0],item1.position[1]+item1.get_dimension()[1],item1.position[2]+item1.get_dimension()[2]],
-
-
-    ])
-
-    item2C=sorted([
-        [item2.position[0],item2.position[1],item2.position[2]],
-        [item2.position[0]+item2.get_dimension()[0],item2.position[1],item2.position[2]],
-        [item2.position[0],item2.position[1]+item2.get_dimension()[1],item2.position[2]],
-        [item2.position[0]+item2.get_dimension()[0],item2.position[1]+item2.get_dimension()[1],item2.position[2]],
-        [item2.position[0],item2.position[1],item2.position[2]+item2.get_dimension()[2]],
-        [item2.position[0]+item2.get_dimension()[0],item2.position[1],item2.position[2]+item2.get_dimension()[2]],
-        [item2.position[0],item2.position[1]+item2.get_dimension()[1],item2.position[2]+item2.get_dimension()[2]],
-        [item2.position[0]+item2.get_dimension()[0],item2.position[1]+item2.get_dimension()[1],item2.position[2]+item2.get_dimension()[2]],
-
-
-    ])
+def intersect_lucas(item1,item2,containerX,containerY,containerZ):    
+    item1C=item1.edgePoints
+    item2C=item2.edgePoints
     # same shape
     if item1C==item2C:
         return True

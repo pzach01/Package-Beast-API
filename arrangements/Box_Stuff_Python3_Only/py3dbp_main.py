@@ -21,6 +21,7 @@ class ItemPY3DBP:
         self.secondValue=1
         self.thirdValue=1
         self.dimension=None
+        self.edgePoints=[]
         # updates dimension
         self.set_rotation_type_and_dimension(self.rotation_type)
     def set_rotation_type_and_dimension(self, rotation_type):
@@ -43,9 +44,20 @@ class ItemPY3DBP:
             self.secondValue*self.yDim,
             self.thirdValue*self.zDim
         ]
+        
+        self.edgePoints=sorted([
+            [self.position[0],self.position[1],self.position[2]],
+            [self.position[0]+self.get_dimension()[0],self.position[1],self.position[2]],
+            [self.position[0],self.position[1]+self.get_dimension()[1],self.position[2]],
+            [self.position[0]+self.get_dimension()[0],self.position[1]+self.get_dimension()[1],self.position[2]],
+            [self.position[0],self.position[1],self.position[2]+self.get_dimension()[2]],
+            [self.position[0]+self.get_dimension()[0],self.position[1],self.position[2]+self.get_dimension()[2]],
+            [self.position[0],self.position[1]+self.get_dimension()[1],self.position[2]+self.get_dimension()[2]],
+            [self.position[0]+self.get_dimension()[0],self.position[1]+self.get_dimension()[1],self.position[2]+self.get_dimension()[2]],
 
 
-
+        ])
+        
     def string(self):
         return "%s(%fx%fx%f, weight: %s) pos(%f, %f, %f) rt(%s) vol(%s)" % (
             self.name, self.xDim, self.yDim, self.zDim, self.weight,
@@ -62,7 +74,6 @@ class ItemPY3DBP:
 
 
 
-        return dimension
 
 
 class ContainerPY3DBP:

@@ -43,13 +43,14 @@ class User(AbstractUser):
     """User model."""
 
     username = None
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+    objects = UserManager()
+    
     email = models.EmailField(_('email address'), unique=True)
     units = models.CharField(max_length=2, blank=False, default='in')
     dateTimeFormat = models.CharField(max_length=40, blank=False, default='MMM d, yyyy, h:mm aa')
 
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
 
-    objects = UserManager()
 

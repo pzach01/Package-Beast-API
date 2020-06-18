@@ -56,8 +56,9 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    arrangements = serializers.PrimaryKeyRelatedField(many=True, queryset=Arrangement.objects.all())
+    arrangements = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'arrangements']
+        fields = ['id', 'email', 'first_name', 'last_name', 'arrangements', 'units', 'dateTimeFormat']
+        read_only_fields = ['arrangements']

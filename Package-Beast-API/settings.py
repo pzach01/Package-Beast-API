@@ -63,8 +63,11 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 
-REST_AUTH_SERIALIZERS = {'LOGIN_SERIALIZER': 'users.serializers.LoginSerializer'}
+# REST_AUTH_SERIALIZERS = {'LOGIN_SERIALIZER': 'users.serializers.LoginSerializer'}
+# 6-18-20 PZ - CHANGED TO SUPPORT USER PREFERENCES
+REST_AUTH_SERIALIZERS = { 'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer'}
 REST_AUTH_REGISTER_SERIALIZERS = {'REGISTER_SERIALIZER': 'users.serializers.RegisterSerializer'}
+
 
 #Following is added to enable registration with email instead of username
 AUTHENTICATION_BACKENDS = (
@@ -100,7 +103,7 @@ SWAGGER_SETTINGS = {
         'in': 'header'
       }
    },
-   
+
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

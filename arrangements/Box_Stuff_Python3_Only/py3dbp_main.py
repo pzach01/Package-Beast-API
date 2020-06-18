@@ -198,7 +198,7 @@ class Packer:
         return False
     # returns true if you can place at a position
     def can_place_at_position(self, item):
-        render=True
+        render=False
         if render:
             from . import testing_underfitting
             from .testing_underfitting import render_something_that_failed

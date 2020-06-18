@@ -66,9 +66,13 @@ def test_3():
 def dz_test():
     container=ContainerPY3DBP('container', 1800,1800,2400)
     items=[]
+    import time
+    start=time.time()
     for i in range(0, 17):
         items.append(ItemPY3DBP(str(i),450,975,793))
     packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True)
+    end=time.time()
+    print(end-start)
     assert(not (packer==None))
     
 # iterationLimit (for each container)

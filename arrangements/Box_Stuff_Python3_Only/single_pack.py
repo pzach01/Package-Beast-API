@@ -18,32 +18,34 @@ class CustomItemPermutations():
         return returnItems
 # attempt to pack items into a single container
 
-def single_pack_given_timing_and_rotations(container, itemList, printIteration, timeout, rotationType,randomSearch):
+def single_pack_given_timing_and_rotations(container, itemList, printIteration, timeout, rotationType,randomSearch,useBigSetsInDimensionalMixups):
 
-    endTime=None
-    if timeout==None:
-        endTime=math.inf
-    else:
-        endTime=time.time()+timeout  
+
+    endTime=time.time()+timeout  
 
     
 
-    
-    
+    if len(itemList)==0:
+        p= Packer(rotationType)
+        p.items=[]
+        p.unfit_items=[]
+        p.set_container(container)
+        return p  
 
 
 
     if not randomSearch:
+        # sort so that larger items are first
+        itemList=list(reversed(sorted(itemList, key=lambda item: item.volume)))
         item_permutations=(itertools.permutations(itemList,len(itemList)))
         count=0
-        if len(itemList)==0:
-            p= Packer(rotationType)
-            p.items=[]
-            p.unfit_items=[]
-            p.set_container(container)
-            return p
+
         for item_permutation in item_permutations:
-            mixer=DimensionalMixupsGenerator(item_permutation)
+            mixer=None
+            if useBigSetsInDimensionalMixups:
+                mixer=DimensionalMixupBigSetsGenerator(item_permutation)
+            else:
+                mixer=DimensionalMixupsGenerator(item_permutation)
             count+=1
             
             innerIteration=0
@@ -83,12 +85,7 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
 
     if randomSearch:
         count=0
-        if len(itemList)==0:
-            p= Packer(rotationType)
-            p.items=[]
-            p.unfit_items=[]
-            p.set_container(container)
-            return p
+
         # generates random permutations
         item_permutations_generator=CustomItemPermutations()
         
@@ -98,8 +95,11 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
 
 
             item_permutation=item_permutations_generator.next(copy.deepcopy(itemList))
-            
-            mixer=DimensionalMixupsGenerator(item_permutation)
+            mixer=None
+            if useBigSetsInDimensionalMixups:
+                raise Exception("BigSets isn't supported for randomSearch")
+            else:
+                mixer=DimensionalMixupsGenerator(item_permutation)
             mixer.count=random.randint(0, 6**(len(itemList))-1)
             itemsMixedUp=mixer.next()
         
@@ -135,20 +135,33 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
     if volumeSafeGuard:
         if container.volume< sum([item.volume for item in itemList]):
             return None
+    
+    # new interface here
+    if timeout==None:
+        newTimeout=math.inf
+    else:
+        newTimeout=timeout
 
+    randomSearch=False
+    useBigSetsInDimensionalMixups=True
+    
+    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout,10),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+    if not (res==None):
+        return res
+    
 
 
     randomSearch=True
-    if timeout==None:
-        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, 30,RotationType.HEURISTIC,randomSearch)
-        if not(res==None):
-            return res
-        return single_pack_given_timing_and_rotations(container, itemList, printIteration, timeout,RotationType.ALL,randomSearch)
-    else:
-        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, 30,RotationType.HEURISTIC,randomSearch)
-        if not(res==None):
-            return res
-        return single_pack_given_timing_and_rotations(container, itemList, printIteration, timeout-30,RotationType.ALL,randomSearch)
+    useBigSetsInDimensionalMixups=False
+
+    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout-10,30),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+    if not(res==None):
+        return res
+    return single_pack_given_timing_and_rotations(container, itemList, printIteration, newTimeout-40,RotationType.ALL,randomSearch,useBigSetsInDimensionalMixups)
+
+
+
+
 
 
 # next() returns one of the possible ways to mixup the Length Width Height of an item for each item in the permutation; obviously not just 6 because it is for
@@ -161,6 +174,48 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
 # H x W x L
 # W x H x L
 # W x L x H
+
+class DimensionalMixupBigSetsGenerator():
+    def base_6_as_switches(self, number, n):
+        # want to throw a bug right away if something dumb happens
+        switches=[-1 for ele in range(0, n)]
+        for index in reversed(range(0, n)):
+            switches[index]=number%(6)
+            number=number//(6)
+        return switches
+
+    def __init__(self, item_permutation):
+        self.item_permutation=item_permutation
+        self.count=0
+        self.max=6**(len(item_permutation))
+    def next(self):
+        # have enumerated all permutations
+        if self.count==self.max:
+            raise StopIteration
+
+        newItems=[]
+        switches=self.base_6_as_switches(self.count, len(self.item_permutation))
+        
+        for index in range(0, len(self.item_permutation)):
+            if switches[index]==0:
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].xDim, self.item_permutation[index].yDim, self.item_permutation[index].zDim))
+            if switches[index]==1:
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].xDim, self.item_permutation[index].zDim, self.item_permutation[index].yDim))
+            if switches[index]==2:
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].yDim, self.item_permutation[index].xDim, self.item_permutation[index].zDim))
+            if switches[index]==3:
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].yDim, self.item_permutation[index].zDim, self.item_permutation[index].xDim))
+            if switches[index]==4:
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].zDim, self.item_permutation[index].xDim, self.item_permutation[index].yDim))
+            if switches[index]==5:
+                newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].zDim, self.item_permutation[index].yDim, self.item_permutation[index].xDim))
+
+
+        
+
+        self.count+=1
+        return newItems
+
 class DimensionalMixupsGenerator():
     def base_6_as_switches(self, number, n):
         # want to throw a bug right away if something dumb happens

@@ -45,16 +45,20 @@ class ItemPY3DBP:
             self.secondValue*self.yDim,
             self.thirdValue*self.zDim
         ]
-        
+
+        # we do this using the less verbose form for a computational speedup because this code gets hit so heavily
+        position1PlusDimension1=self.position[0]+self.get_dimension()[0]
+        position2PlusDimension2=self.position[1]+self.get_dimension()[1]
+        position3PlusDimension3=self.position[2]+self.get_dimension()[2]
         self.edgePoints=sorted([
             [self.position[0],self.position[1],self.position[2]],
-            [self.position[0]+self.get_dimension()[0],self.position[1],self.position[2]],
-            [self.position[0],self.position[1]+self.get_dimension()[1],self.position[2]],
-            [self.position[0]+self.get_dimension()[0],self.position[1]+self.get_dimension()[1],self.position[2]],
-            [self.position[0],self.position[1],self.position[2]+self.get_dimension()[2]],
-            [self.position[0]+self.get_dimension()[0],self.position[1],self.position[2]+self.get_dimension()[2]],
-            [self.position[0],self.position[1]+self.get_dimension()[1],self.position[2]+self.get_dimension()[2]],
-            [self.position[0]+self.get_dimension()[0],self.position[1]+self.get_dimension()[1],self.position[2]+self.get_dimension()[2]],
+            [position1PlusDimension1,self.position[1],self.position[2]],
+            [self.position[0],position2PlusDimension2,self.position[2]],
+            [position1PlusDimension1,position2PlusDimension2,self.position[2]],
+            [self.position[0],self.position[1],position3PlusDimension3],
+            [position1PlusDimension1,self.position[1],position3PlusDimension3],
+            [self.position[0],position2PlusDimension2,position3PlusDimension3],
+            [position1PlusDimension1,position2PlusDimension2,position3PlusDimension3],
 
 
         ])

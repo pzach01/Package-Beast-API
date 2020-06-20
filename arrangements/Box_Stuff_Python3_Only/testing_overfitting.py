@@ -155,9 +155,9 @@ def generate_bins_that_fit_2(iterationLimit):
             # to see why this makes sense, consider that a 1x1x1 container has volume 1, but 8 points
 
             newItem=ItemPY3DBP(str(count), int(maxTuple[0]-minTuple[0]), int(maxTuple[1]-minTuple[1]), int(maxTuple[2]-minTuple[2]))
-            coordinates[sorted(item)[0]]=(newItem.xDim, newItem.yDim, newItem.depth)
+            coordinates[sorted(item)[0]]=(newItem.xDim, newItem.yDim, newItem.zDim)
 
-            assert((newItem.depth+1)*(newItem.yDim+1)*(newItem.xDim+1)==len(item))
+            assert((newItem.zDim+1)*(newItem.yDim+1)*(newItem.xDim+1)==len(item))
             returnItems.append(newItem)
     return container, returnItems,coordinates
 # key invariant, if we can't expand, just return the shapes with no modification

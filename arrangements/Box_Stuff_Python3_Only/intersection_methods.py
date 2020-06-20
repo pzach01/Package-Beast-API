@@ -43,12 +43,10 @@ def objects_intersect(item1, item2):
         # check if its splits em
         for axis in axises:
             split=True
-            seen=False
             # the index here doesn't matter at all, could both be random
             firstPointItem1=item1[0]
             firstPointItem2=item2[0]
             if (firstPointItem1[dimension]<=axis<=firstPointItem2[dimension]):
-                seen=True
                 for point in item1:
                     if axis<point[dimension]:
                         split=False
@@ -60,14 +58,12 @@ def objects_intersect(item1, item2):
                         split=False
                         break
 
-            if split and seen:
-                return False
+                if split:
+                    return False
 
         for axis in axises:
             split=True
-            seen=False
             if (firstPointItem2[dimension]<=axis<=firstPointItem1[dimension]):
-                seen=True
                 for point in item1:
                     if axis>point[dimension]:
                         split=False
@@ -78,7 +74,7 @@ def objects_intersect(item1, item2):
                     if axis<point[dimension]:
                         split=False
                         break
-            if split and seen:
-                return False
+                if split:
+                    return False
     return True
     # if we can find an axis that splits the cubes  (view in 2d) then they don't intersect

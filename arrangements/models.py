@@ -8,6 +8,8 @@ class Arrangement(models.Model):
     owner = models.ForeignKey(
         'users.User', related_name='arrangements', on_delete=models.CASCADE)
     multiBinPack = models.BooleanField(default=False)
+    arrangementPossible = models.BooleanField(default=False)
+    timeout = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['created']

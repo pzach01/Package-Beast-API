@@ -18,7 +18,10 @@ class Item(models.Model):
     volume = models.FloatField(default=0.0)
     units = models.CharField(max_length=2, blank=False, default='in')
     cost = models.FloatField(default=0.0)
-
+    # We could do it like this but we just need a reference to the item id
+    # This reduces db calls in arrangements serializer
+    # masterItem = models.ForeignKey('items.Item', related_name="items", on_delete=models.CASCADE, blank=True, null=True)
+    masterItemId = models.IntegerField(blank=True, null=True, default='1')
     container = models.ForeignKey(
         Container, related_name='items', on_delete=models.CASCADE, blank=True, null=True)
     arrangement = models.ForeignKey(

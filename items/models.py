@@ -21,7 +21,7 @@ class Item(models.Model):
     # We could do it like this but we just need a reference to the item id
     # This reduces db calls in arrangements serializer
     # masterItem = models.ForeignKey('items.Item', related_name="items", on_delete=models.CASCADE, blank=True, null=True)
-    masterItemId = models.IntegerField(blank=True, null=True, default='1')
+    masterItemId = models.IntegerField(blank=True, null=True, default=0)
     container = models.ForeignKey(
         Container, related_name='items', on_delete=models.CASCADE, blank=True, null=True)
     arrangement = models.ForeignKey(

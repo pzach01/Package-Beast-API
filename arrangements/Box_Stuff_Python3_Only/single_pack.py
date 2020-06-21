@@ -51,7 +51,8 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
             innerIteration=0
             while(True):
                 try:
-                    print("           innerIteration: "+str(innerIteration))
+                    if printIteration:
+                        print("           innerIteration: "+str(innerIteration))
                     innerIteration+=1
                     render=False
                     itemsMixedUp=mixer.next()
@@ -144,8 +145,8 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
 
     randomSearch=False
     useBigSetsInDimensionalMixups=True
-    
-    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout,10),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+
+    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout,20),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
     if not (res==None):
         return res
     
@@ -154,7 +155,7 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
     randomSearch=True
     useBigSetsInDimensionalMixups=False
 
-    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout-10,30),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout-20,30),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
     if not(res==None):
         return res
     return single_pack_given_timing_and_rotations(container, itemList, printIteration, newTimeout-40,RotationType.ALL,randomSearch,useBigSetsInDimensionalMixups)
@@ -184,32 +185,73 @@ class DimensionalMixupBigSetsGenerator():
             number=number//(6)
         return switches
 
+
+    def increment_partion_count(self):
+        if self.partitionArrangment[0]==len(self.item_permutation):
+            raise StopIteration
+        if self.partitionArrangment[1]==0:
+            self.partitionArrangment=(0,self.partitionArrangment[0]+1,self.partitionArrangment[2]-1)
+        else:
+            self.partitionArrangment=(self.partitionArrangment[0]+1, self.partitionArrangment[1]-1, self.partitionArrangment[2])
+
+
+    # returns the switches (0-5) for each item (3 in total)
+    def get_item_arrangment(self,count):
+        return self.base_6_as_switches(count, 3)
+    # this is a special case of the general; but we chose 3 partitions because we don't have the speed 
+    # to enumerate pase this for large n, and for small n it will be found by the random algorithm
+    def get_switches_3_partition(self,count,n):
+        if self.count==6**3:
+            self.increment_partion_count()
+            self.count=0
+        switches=[-1 for ele in range(0, n)]
+
+        currentIndex=0
+        self.itemArrangment=self.get_item_arrangment(count)
+        for index in range(0, self.partitionArrangment[0]):
+            switches[currentIndex]=self.itemArrangment[0]
+            currentIndex+=1
+        for index in range(0, self.partitionArrangment[1]):
+            switches[currentIndex]=self.itemArrangment[1]
+            currentIndex+=1
+        for index in range(0, self.partitionArrangment[2]):
+            switches[currentIndex]=self.itemArrangment[2]
+            currentIndex+=1
+
+        return switches
+
     def __init__(self, item_permutation):
         self.item_permutation=item_permutation
+        for item in item_permutation:
+            # default to xDim>=yDim>=zDim
+            item.xDim,item.yDim,item.zDim=list(reversed(sorted([item.xDim,item.yDim,item.zDim])))
         self.count=0
-        self.max=6**(len(item_permutation))
+        self.max=6**3*(len(item_permutation)**3)
+        self.partitionArrangment=(0,0,len(item_permutation))
     def next(self):
         # have enumerated all permutations
         if self.count==self.max:
             raise StopIteration
 
         newItems=[]
-        switches=self.base_6_as_switches(self.count, len(self.item_permutation))
+        switches=self.get_switches_3_partition(self.count,len(self.item_permutation))
         
         for index in range(0, len(self.item_permutation)):
             if switches[index]==0:
                 newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].xDim, self.item_permutation[index].yDim, self.item_permutation[index].zDim))
-            if switches[index]==1:
+            elif switches[index]==1:
                 newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].xDim, self.item_permutation[index].zDim, self.item_permutation[index].yDim))
-            if switches[index]==2:
+            elif switches[index]==2:
                 newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].yDim, self.item_permutation[index].xDim, self.item_permutation[index].zDim))
-            if switches[index]==3:
+            elif switches[index]==3:
                 newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].yDim, self.item_permutation[index].zDim, self.item_permutation[index].xDim))
-            if switches[index]==4:
+            elif switches[index]==4:
                 newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].zDim, self.item_permutation[index].xDim, self.item_permutation[index].yDim))
-            if switches[index]==5:
+            elif switches[index]==5:
                 newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].zDim, self.item_permutation[index].yDim, self.item_permutation[index].xDim))
-
+            else:
+                print(switches)
+                raise Exception("bug in BigSets generator")
 
         
 

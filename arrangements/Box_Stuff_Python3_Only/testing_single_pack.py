@@ -63,6 +63,21 @@ def test_3():
 # the test that broke pyshipping :)
 #bin=p.Package('1800x1800x2400')
 #box=p.Package('450x975x793') # 17 of these
+
+
+# Kleenex
+
+def kleenex_test():
+    container=ContainerPY3DBP('container', 21.6875,15,6.125)
+    items=[]
+    import time
+    start=time.time()
+    for i in range(0, 9):
+        items.append(ItemPY3DBP(str(i),8.9375,3.5625,4.75))
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True)
+    end=time.time()
+    print(end-start)
+    assert(not (packer==None))
 def dz_test():
     container=ContainerPY3DBP('container', 1800,1800,2400)
     items=[]
@@ -74,7 +89,7 @@ def dz_test():
     end=time.time()
     print(end-start)
     assert(not (packer==None))
-    
+
 # iterationLimit (for each container)
 def test_for_double_fit(packer, iterationLimit):
     sumCubesPoint=0
@@ -139,6 +154,7 @@ def test_doublefitting_raises_exception():
 #test_1()
 #test_2()
 #test_3()
+#kleenex_test()
 #dz_test()
 #test_doublefitting_raises_exception()
 #test_not_multibinpack()

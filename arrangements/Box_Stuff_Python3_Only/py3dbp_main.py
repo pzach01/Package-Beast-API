@@ -15,7 +15,7 @@ class ItemPY3DBP:
         self.xDim = xDim
         self.yDim = yDim
         self.zDim = zDim
-        self.rotation_type = 0
+        self.rotation_type = [1,1,1]
         self.position = START_POSITION
         self.volume = self.get_volume()
         self.firstValue=1
@@ -28,16 +28,7 @@ class ItemPY3DBP:
     def set_rotation_type_and_dimension(self, rotation_type):
         self.rotation_type=rotation_type
 
-        axisCopy=self.rotation_type%(8**1)
-        
-        firstBit=axisCopy//(2**2)
-        axisCopy=axisCopy%(2**2)
-        secondBit=axisCopy//(2**1)
-        axisCopy=axisCopy%(2**1)
-        thirdBit=axisCopy
-        self.firstValue=1 if firstBit==0 else -1
-        self.secondValue=1 if secondBit==0 else -1
-        self.thirdValue=1 if thirdBit==0 else -1
+        self.firstValue,self.secondValue,self.thirdValue=rotation_type[0],rotation_type[1],rotation_type[2]
 
 
         self.dimension=[

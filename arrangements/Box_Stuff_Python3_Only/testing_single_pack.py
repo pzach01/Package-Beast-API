@@ -137,8 +137,8 @@ def test_doublefitting_raises_exception():
     item2=ItemPY3DBP('id=2',10,10,10)
     container=ContainerPY3DBP('id=Container',20,20,20)
     # had to do this to avoid a stupid import structure
-    rotationType=[0,1,2,3,4,5,6,7]
-    packer=Packer(rotationType)
+    ALL=[[1,1,1],[1,1,-1],[1,-1,1],[1,-1,-1],[-1,1,1],[-1,1,-1],[-1,-1,1],[-1,-1,-1]]
+    packer=Packer(ALL)
     packer.bins=[container]
     item1.position=[0,0,0]
     item2.position=[0,0,0]

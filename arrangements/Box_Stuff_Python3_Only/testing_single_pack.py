@@ -154,7 +154,7 @@ def test_doublefitting_raises_exception():
 #test_1()
 #test_2()
 #test_3()
-#kleenex_test()
+kleenex_test()
 #dz_test()
 #test_doublefitting_raises_exception()
 #test_not_multibinpack()

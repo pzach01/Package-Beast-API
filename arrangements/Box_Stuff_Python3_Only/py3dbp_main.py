@@ -165,12 +165,7 @@ class Packer:
             for pivotPoint in Axis.ALL:
 
                 # update the pivot; this should proably be hid behind a 'get_pivot' method
-                pivotCopy=pivotPoint
-                thirdValue=pivotCopy//(2**2)
-                pivotCopy=pivotCopy%(2**2)
-                secondValue=pivotCopy//(2**1)
-                pivotCopy=pivotCopy%(2**1)
-                firstValue=pivotCopy
+                firstValue,secondValue,thirdValue=pivotPoint[0],pivotPoint[1],pivotPoint[2]
                 newPivot=[currentItem.position[0]+firstValue*currentItem.xDim,currentItem.position[1]+secondValue*currentItem.yDim,currentItem.position[2]+thirdValue*currentItem.zDim]
                 if newPivot not in possiblePivots:
                     possiblePivots.append(newPivot)

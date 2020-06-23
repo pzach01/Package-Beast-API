@@ -60,5 +60,5 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name', 'arrangements', 'units', 'dateTimeFormat']
+        fields = ['id', 'email', 'first_name', 'last_name', 'arrangements', 'units', 'dateTimeFormat', 'multiBinPack', 'disableFillContainerAnimation', 'disablePreviousNextItemAnimation']
         read_only_fields = ['arrangements', 'email']

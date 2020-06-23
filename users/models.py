@@ -50,6 +50,9 @@ class User(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
     units = models.CharField(max_length=2, blank=False, default='in')
     dateTimeFormat = models.CharField(max_length=40, blank=False, default='MMM d, yyyy, h:mm aa')
+    multiBinPack = models.BooleanField(default=False)
+    disableFillContainerAnimation = models.BooleanField(default=False)
+    disablePreviousNextItemAnimation = models.BooleanField(default=False)
 
 
 

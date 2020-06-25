@@ -27,7 +27,6 @@ class ArrangementSerializer(serializers.ModelSerializer):
         arrangement = Arrangement.objects.create(**validated_data)
         multiBinPack = arrangement.multiBinPack
 
-
         # this string formatting will be replaced with something less stupid
         containerStrings = []
         itemStrings = []
@@ -35,17 +34,22 @@ class ArrangementSerializer(serializers.ModelSerializer):
             l, w, h = container['xDim'], container['yDim'], container['zDim']
             containerStrings.append(str(l)+'x'+str(w)+'x'+str(h))
         for item in items:
+            item['xDim'] = item['height']
+            item['yDim'] = item['length']
+            item['zDim'] = item['width']
+            
             l, w, h = item['xDim'], item['yDim'], item['zDim']
             itemStrings.append(str(l)+'x'+str(w)+'x'+str(h))
-
+            
         from .Box_Stuff_Python3_Only import box_stuff2 as bp
         timeout = 0
         apiObjects = bp.master_calculate_optimal_solution(
             containerStrings, itemStrings, timeout,multiBinPack)
-
+        
+        
         arrangement.timeout = False
         arrangement.arrangementPossible = True
-        # print(apiObjects[0].to_string())
+        print(apiObjects[0].to_string())
 
         # This is where we can call calculate optimal soution, passing in items and containers.
         # Note, items and containers are both ordered dictionary lists now, not strings.
@@ -76,13 +80,17 @@ class ArrangementSerializer(serializers.ModelSerializer):
                 xCenter = item.x
                 yCenter = item.y
                 zCenter = item.z
+
+                height = items[index]['height']
+                width = items[index]['width']
+                length = items[index]['length']
                 
                 itemId = items[index]['id']
                 sku = items[index]['sku']
                 description = items[index]['description']
                 units = items[index]['units']
                 Item.objects.create(xDim=xDim, yDim=yDim, zDim=zDim, volume=volume, container=containerList[container.id], arrangement=arrangement,
-                                    owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units, masterItemId=itemId)
+                                    owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units, masterItemId=itemId, width=width, length=length, height=height)
                 index += 1
         return arrangement
 

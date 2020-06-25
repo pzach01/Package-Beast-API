@@ -53,7 +53,4 @@ class User(AbstractUser):
     multiBinPack = models.BooleanField(default=False)
     disableFillContainerAnimation = models.BooleanField(default=False)
     disablePreviousNextItemAnimation = models.BooleanField(default=False)
-
-
-
-
+    animationSpeed = (models.IntegerField(default=50))

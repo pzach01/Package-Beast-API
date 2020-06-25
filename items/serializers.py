@@ -5,16 +5,16 @@ from items.models import Item
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ['id', 'container', 'arrangement', 'sku', 'description', 'xDim',
+        fields = ['id', 'container', 'arrangement', 'sku', 'description', 'length', 'width', 'height', 'xDim',
                   'yDim', 'zDim', 'volume', 'xCenter', 'yCenter', 'zCenter', 'units', 'masterItemId']
         read_only_fields = ['container', 'arrangement',
-                            'volume', 'xCenter', 'yCenter', 'zCenter', 'masterItemId']
+                            'volume', 'xCenter', 'yCenter', 'zCenter', 'xDim', 'yDim', 'zDim', 'masterItemId']
 
     def create(self, validated_data):
         item = Item.objects.create(**validated_data)
 
-        item.volume = validated_data['xDim'] * \
-            validated_data['yDim']*validated_data['zDim']
+        item.volume = validated_data['length'] * \
+            validated_data['width']*validated_data['height']
         item.masterItemId = item.id
         item.save()
         return item
@@ -23,10 +23,10 @@ class ItemSerializer(serializers.ModelSerializer):
         instance.sku = validated_data.get('sku', instance.sku)
         instance.description = validated_data.get(
             'description', instance.description)
-        instance.xDim = validated_data.get('xDim', instance.xDim)
-        instance.yDim = validated_data.get('yDim', instance.yDim)
-        instance.zDim = validated_data.get('zDim', instance.zDim)
-        instance.volume = instance.xDim * instance.yDim * instance.zDim
+        instance.length = validated_data.get('length', instance.length)
+        instance.width = validated_data.get('width', instance.width)
+        instance.height = validated_data.get('height', instance.height)
+        instance.volume = instance.length * instance.width * instance.height
         instance.save()
         return instance
 

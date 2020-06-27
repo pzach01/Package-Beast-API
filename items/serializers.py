@@ -27,6 +27,7 @@ class ItemSerializer(serializers.ModelSerializer):
         instance.width = validated_data.get('width', instance.width)
         instance.height = validated_data.get('height', instance.height)
         instance.volume = instance.length * instance.width * instance.height
+        instance.units = validated_data.get('units', instance.units)
         instance.save()
         return instance
 

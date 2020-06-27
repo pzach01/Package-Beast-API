@@ -24,5 +24,6 @@ class ContainerSerializer(serializers.ModelSerializer):
         instance.yDim = validated_data.get('yDim', instance.yDim)
         instance.zDim = validated_data.get('zDim', instance.zDim)
         instance.volume = instance.xDim * instance.yDim * instance.zDim
+        instance.units = validated_data.get('units', instance.units)
         instance.save()
         return instance

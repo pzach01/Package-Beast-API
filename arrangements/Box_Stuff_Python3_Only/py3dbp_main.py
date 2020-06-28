@@ -139,15 +139,16 @@ class Packer:
                     # true by default item.position=[0,0,0]
                     if self.can_place_at_position(item):
                         # then do it
-                        self.items.append(item)
-                        self.unfit_items.remove(item)
+                        oldItem=self.unfit_items.pop(0)
+                        self.items.append(oldItem)
+                        
                         if self.unfit_items==[]:
                             return True
                         elif self.try_to_place_an_item(self.unfit_items[0]):
                             return True
                         else:
-                            self.items.remove(item)
-                            self.unfit_items.append(item)
+                            oldItem=self.items.pop(len(self.items)-1)
+                            self.unfit_items.insert(0,oldItem)
                 # couldn't find an arrangment
                 return False
         possiblePivots=[]
@@ -173,8 +174,8 @@ class Packer:
 
                 if self.can_place_at_position(item):
                     # then do it
-                    self.items.append(item)
-                    self.unfit_items.remove(item)
+                    oldItem=self.unfit_items.pop(0)
+                    self.items.append(oldItem)
                     self.cache=[]
                     if self.unfit_items==[]:
                         return True
@@ -182,8 +183,8 @@ class Packer:
                         return True
                     else:
                         self.cache=[]
-                        self.items.remove(item)
-                        self.unfit_items.append(item)
+                        oldItem=self.items.pop(len(self.items)-1)
+                        self.unfit_items.insert(0,oldItem)
 
         return False
     # returns true if you can place at a position

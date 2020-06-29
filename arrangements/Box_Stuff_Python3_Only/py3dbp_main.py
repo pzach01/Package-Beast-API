@@ -5,7 +5,7 @@ from .py3dbp_auxiliary_methods import intersect_lucas,outside_container
 import copy
 import time
 
-START_POSITION = [0, 0, 0]
+START_POSITION = (0, 0, 0)
 
 
 

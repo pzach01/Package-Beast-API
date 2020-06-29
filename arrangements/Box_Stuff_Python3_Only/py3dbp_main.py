@@ -162,11 +162,10 @@ class Packer:
                         
                         if self.unfit_items==[]:
                             return True
-                        elif self.try_to_place_an_item():
+                        if self.try_to_place_an_item():
                             return True
-                        else:
-                            oldItem=self.items.pop(len(self.items)-1)
-                            self.unfit_items.insert(0,oldItem)
+                        oldItem=self.items.pop(len(self.items)-1)
+                        self.unfit_items.insert(0,oldItem)
                 # couldn't find an arrangment
                 return False
         possiblePivots=set()
@@ -195,12 +194,11 @@ class Packer:
                     self.cache=[]
                     if self.unfit_items==[]:
                         return True
-                    elif self.try_to_place_an_item():
+                    if self.try_to_place_an_item():
                         return True
-                    else:
-                        self.cache=[]
-                        oldItem=self.items.pop(len(self.items)-1)
-                        self.unfit_items.insert(0,oldItem)
+                    self.cache=[]
+                    oldItem=self.items.pop(len(self.items)-1)
+                    self.unfit_items.insert(0,oldItem)
             if time.time()>self.timeout:
                 raise TimeoutError('couldnt pack item in time')
         return False

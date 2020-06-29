@@ -28,6 +28,7 @@ class ItemPY3DBP:
         self.set_rotation_type_and_dimension(self.rotation_type)
         self.depth=None
         self.pivotSets=None
+        self.nextSmallestItemDepth=None
     def initialize_pivot_sets(self,numberOfSets):
         self.pivotSets=[set() for count in range(0, numberOfSets)]
     def set_depth(self, depth):
@@ -135,6 +136,12 @@ class Packer:
             item.set_depth(depthCount)
             item.initialize_pivot_sets(len(self.unfit_items))
             depthCount+=1
+        for upperItem in self.unfit_items:
+            for lowerItem in self.unfit_items:
+                if upperItem.xDim>=lowerItem.xDim:
+                    if upperItem.yDim>=lowerItem.yDim:
+                        if upperItem.zDim>=lowerItem.zDim:
+                            upperItem.nextSmallestItemDepth=lowerItem.depth
         # recursive calls
         # add the origin as a valid first point to try to the first item
         if self.try_to_place_an_item():
@@ -205,9 +212,9 @@ class Packer:
             for point in pivotSet:
                 newPivots.add(point)
         assert(newPivots==possiblePivots)        
-
-        for pivot in possiblePivots:
-            itemToTryToPlace.position=pivot
+        possiblePivots=list(possiblePivots)
+        for pivotIndex in range(0, len(possiblePivots)):
+            itemToTryToPlace.position=possiblePivots[pivotIndex]
             for dimensionalRotation in self.rotationTypes:
                 itemToTryToPlace.set_rotation_type_and_dimension(dimensionalRotation)
 
@@ -219,14 +226,14 @@ class Packer:
                     if self.unfit_items==[]:
                         return True
                     # send the new pivots down the line
-                    for p in possiblePivots:
-                        self.unfit_items[0].pivotSets[itemToTryToPlace.depth].add(p)
+                    for p in range(0, len(possiblePivots)):
+                        self.unfit_items[0].pivotSets[itemToTryToPlace.depth].add(possiblePivots[p])
                     #self.unfit_items[0].pivotSets[itemToTryToPlace.depth]=copy.deepcopy(possiblePivots)
                     if self.try_to_place_an_item():
                         return True
                     # clear any sideeffects
-                    for p in possiblePivots:
-                        self.unfit_items[0].pivotSets[itemToTryToPlace.depth].remove(p)
+                    for p in range(0, len(possiblePivots)):
+                        self.unfit_items[0].pivotSets[itemToTryToPlace.depth].remove(possiblePivots[p])
                     #self.unfit_items[0].pivotSets[itemToTryToPlace.depth]=set()
 
                     self.cache=[]

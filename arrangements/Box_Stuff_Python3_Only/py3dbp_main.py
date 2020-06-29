@@ -124,7 +124,7 @@ class Packer:
         self.unfit_items=copy.deepcopy(self.items)
         self.items=[]
         # recursive calls
-        if self.try_to_place_an_item(self.unfit_items[0]):
+        if self.try_to_place_an_item():
 
             return True
         else:
@@ -132,8 +132,8 @@ class Packer:
 
                 
     # returns True if item can be placed here, False otherwise
-    def try_to_place_an_item(self,item):
-    
+    def try_to_place_an_item(self):
+        item=self.unfit_items[0]
         # remember this is the entry point
 
         if self.items==[]:
@@ -148,7 +148,7 @@ class Packer:
                         
                         if self.unfit_items==[]:
                             return True
-                        elif self.try_to_place_an_item(self.unfit_items[0]):
+                        elif self.try_to_place_an_item():
                             return True
                         else:
                             oldItem=self.items.pop(len(self.items)-1)
@@ -183,7 +183,7 @@ class Packer:
                     self.cache=[]
                     if self.unfit_items==[]:
                         return True
-                    elif self.try_to_place_an_item(self.unfit_items[0]):
+                    elif self.try_to_place_an_item():
                         return True
                     else:
                         self.cache=[]

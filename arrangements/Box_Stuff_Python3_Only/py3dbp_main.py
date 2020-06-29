@@ -114,7 +114,7 @@ class Packer:
         self.rotationTypes=rotationTypes
         # default 10 minute timeout
 
-        self.timeout=time.time()+10
+        self.timeout=time.time()+30
 
 
     def set_container(self, container):
@@ -170,7 +170,7 @@ class Packer:
                         self.unfit_items[0].pivotSets[itemToTryToPlace.depth]=set()
                         oldItem=self.items.pop(len(self.items)-1)
                         self.unfit_items.insert(0,oldItem)
-                # couldn't find an arrangment
+                # couldn't find an arrangment; no need to remove sideffects
                 return False
 
 
@@ -219,15 +219,15 @@ class Packer:
                     if self.unfit_items==[]:
                         return True
                     # send the new pivots down the line
-                    #for p in possiblePivots:
-                    #    self.unfit_items[0].pivotSets[itemToTryToPlace.depth].add(p)
-                    self.unfit_items[0].pivotSets[itemToTryToPlace.depth]=copy.deepcopy(possiblePivots)
+                    for p in possiblePivots:
+                        self.unfit_items[0].pivotSets[itemToTryToPlace.depth].add(p)
+                    #self.unfit_items[0].pivotSets[itemToTryToPlace.depth]=copy.deepcopy(possiblePivots)
                     if self.try_to_place_an_item():
                         return True
                     # clear any sideeffects
-                    #for p in possiblePivots:
-                    #    self.unfit_items[0].pivotSets[itemToTryToPlace.depth].remove(p)
-                    self.unfit_items[0].pivotSets[itemToTryToPlace.depth]=set()
+                    for p in possiblePivots:
+                        self.unfit_items[0].pivotSets[itemToTryToPlace.depth].remove(p)
+                    #self.unfit_items[0].pivotSets[itemToTryToPlace.depth]=set()
 
                     self.cache=[]
                     oldItem=self.items.pop(len(self.items)-1)

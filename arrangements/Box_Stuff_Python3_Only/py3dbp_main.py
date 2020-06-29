@@ -137,7 +137,6 @@ class Packer:
             depthCount+=1
         # recursive calls
         # add the origin as a valid first point to try to the first item
-        self.unfit_items[0].pivotSets[0].add((0,0,0))
         if self.try_to_place_an_item():
 
             return True
@@ -147,27 +146,35 @@ class Packer:
                 
     # returns True if item can be placed here, False otherwise
     def try_to_place_an_item(self):
-        item=self.unfit_items[0]
+        itemToTryToPlace=self.unfit_items[0]
         # remember this is the entry point
 
         if self.items==[]:
             # try to place it at the origin
                 for dimensionalRotation in self.rotationTypes:
-                    item.set_rotation_type_and_dimension(dimensionalRotation)
+                    itemToTryToPlace.set_rotation_type_and_dimension(dimensionalRotation)
                     # true by default item.position=[0,0,0]
-                    if self.can_place_at_position(item):
+                    if self.can_place_at_position(itemToTryToPlace):
                         # then do it
                         oldItem=self.unfit_items.pop(0)
                         self.items.append(oldItem)
                         
                         if self.unfit_items==[]:
                             return True
+                        # send the new pivots down the line
+                        self.unfit_items[0].pivotSets[itemToTryToPlace.depth].add((0,0,0))
+
                         if self.try_to_place_an_item():
                             return True
+                        # get rid of any sideeffects
+                        self.unfit_items[0].pivotSets[itemToTryToPlace.depth]=set()
                         oldItem=self.items.pop(len(self.items)-1)
                         self.unfit_items.insert(0,oldItem)
                 # couldn't find an arrangment
                 return False
+
+
+        # old way of getting pivots
         possiblePivots=set()
         for currentItem in self.items:
             # 8 pivot points
@@ -180,27 +187,56 @@ class Packer:
                 
 
 
+
+
+        # the new way of doing things
+        newPivots=set()
+        # TODO
+        # get the new pivots (as the result of using the last item); a little odd to not update immediately
+        for pivotPoint in Axis.ALL:
         
+            # update the pivot; this should proably be hid behind a 'get_pivot' method
+            firstValue,secondValue,thirdValue=pivotPoint[0],pivotPoint[1],pivotPoint[2]
+            previousItem=self.items[len(self.items)-1]
+            newPivot=(previousItem.position[0]+firstValue*previousItem.xDim,previousItem.position[1]+secondValue*previousItem.yDim,previousItem.position[2]+thirdValue*previousItem.zDim)
+            newPivots.add(newPivot)
+
+        for pivotSet in itemToTryToPlace.pivotSets:
+            for point in pivotSet:
+                newPivots.add(point)
+        assert(newPivots==possiblePivots)        
 
         for pivot in possiblePivots:
-            item.position=pivot
+            itemToTryToPlace.position=pivot
             for dimensionalRotation in self.rotationTypes:
-                item.set_rotation_type_and_dimension(dimensionalRotation)
+                itemToTryToPlace.set_rotation_type_and_dimension(dimensionalRotation)
 
-                if self.can_place_at_position(item):
+                if self.can_place_at_position(itemToTryToPlace):
                     # then do it
                     oldItem=self.unfit_items.pop(0)
                     self.items.append(oldItem)
                     self.cache=[]
                     if self.unfit_items==[]:
                         return True
+                    # send the new pivots down the line
+                    #for p in possiblePivots:
+                    #    self.unfit_items[0].pivotSets[itemToTryToPlace.depth].add(p)
+                    self.unfit_items[0].pivotSets[itemToTryToPlace.depth]=copy.deepcopy(possiblePivots)
                     if self.try_to_place_an_item():
                         return True
+                    # clear any sideeffects
+                    #for p in possiblePivots:
+                    #    self.unfit_items[0].pivotSets[itemToTryToPlace.depth].remove(p)
+                    self.unfit_items[0].pivotSets[itemToTryToPlace.depth]=set()
+
                     self.cache=[]
                     oldItem=self.items.pop(len(self.items)-1)
                     self.unfit_items.insert(0,oldItem)
             if time.time()>self.timeout:
                 raise TimeoutError('couldnt pack item in time')
+        # reset sideffects caused by single point adding (not necessary yet) for all lower items and this item
+        for lowerItem in self.unfit_items:
+            lowerItem.pivotSets[itemToTryToPlace.depth]=set()
         return False
     # returns true if you can place at a position
     def can_place_at_position(self, item):

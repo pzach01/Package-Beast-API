@@ -64,10 +64,12 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
                     packer.set_container(copy.deepcopy(container))
                     for item in itemsMixedUp:
                         packer.add_item(item)
-                    
-                    res=packer.pack(render)
-                    if res:
-                        return packer
+                    try:
+                        res=packer.pack(render)
+                        if res:
+                            return packer
+                    except TimeoutError:
+                        pass
                     # timeout
                     if time.time()>endTime:
                         return None
@@ -111,10 +113,12 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
             packer.set_container(copy.deepcopy(container))
             for item in itemsMixedUp:
                 packer.add_item(item)
-            
-            res=packer.pack(render)
-            if res:
-                return packer
+            try:
+                res=packer.pack(render)
+                if res:
+                    return packer
+            except TimeoutError:
+                pass
             if time.time()>endTime:
                 return None
 

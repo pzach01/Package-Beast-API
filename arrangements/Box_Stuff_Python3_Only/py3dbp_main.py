@@ -3,6 +3,7 @@ from .py3dbp_constants import RotationType,Axis
 from . import py3dbp_auxiliary_methods
 from .py3dbp_auxiliary_methods import intersect_lucas,outside_container
 import copy
+import time
 
 START_POSITION = [0, 0, 0]
 
@@ -105,6 +106,9 @@ class Packer:
         self.total_items = 0
         self.cache=[]
         self.rotationTypes=rotationTypes
+        # default 10 minute timeout
+
+        self.timeout=time.time()+10
 
 
     def set_container(self, container):
@@ -185,7 +189,8 @@ class Packer:
                         self.cache=[]
                         oldItem=self.items.pop(len(self.items)-1)
                         self.unfit_items.insert(0,oldItem)
-
+            if time.time()>self.timeout:
+                raise TimeoutError('couldnt pack item in time')
         return False
     # returns true if you can place at a position
     def can_place_at_position(self, item):

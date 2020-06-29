@@ -26,6 +26,12 @@ class ItemPY3DBP:
         self.edgePoints=[]
         # updates dimension
         self.set_rotation_type_and_dimension(self.rotation_type)
+        self.depth=None
+        self.pivotSets=None
+    def initialize_pivot_sets(self,numberOfSets):
+        self.pivotSets=[set() for count in range(0, numberOfSets)]
+    def set_depth(self, depth):
+        self.depth=depth
     def set_rotation_type_and_dimension(self, rotation_type):
         self.rotation_type=rotation_type
 
@@ -123,7 +129,15 @@ class Packer:
     def pack(self,render=False, bigger_first=False, distribute_items=False):
         self.unfit_items=copy.deepcopy(self.items)
         self.items=[]
+        # stuff that is useful in disqualifying bad pivots
+        depthCount=0
+        for item in self.unfit_items:
+            item.set_depth(depthCount)
+            item.initialize_pivot_sets(len(self.unfit_items))
+            depthCount+=1
         # recursive calls
+        # add the origin as a valid first point to try to the first item
+        self.unfit_items[0].pivotSets[0].add((0,0,0))
         if self.try_to_place_an_item():
 
             return True
@@ -155,21 +169,19 @@ class Packer:
                             self.unfit_items.insert(0,oldItem)
                 # couldn't find an arrangment
                 return False
-        possiblePivots=[]
+        possiblePivots=set()
         for currentItem in self.items:
             # 8 pivot points
             for pivotPoint in Axis.ALL:
 
                 # update the pivot; this should proably be hid behind a 'get_pivot' method
                 firstValue,secondValue,thirdValue=pivotPoint[0],pivotPoint[1],pivotPoint[2]
-                newPivot=[currentItem.position[0]+firstValue*currentItem.xDim,currentItem.position[1]+secondValue*currentItem.yDim,currentItem.position[2]+thirdValue*currentItem.zDim]
-                if newPivot not in possiblePivots:
-                    possiblePivots.append(newPivot)
+                newPivot=(currentItem.position[0]+firstValue*currentItem.xDim,currentItem.position[1]+secondValue*currentItem.yDim,currentItem.position[2]+thirdValue*currentItem.zDim)
+                possiblePivots.add(newPivot)
                 
 
 
         
-        possiblePivots=sorted(possiblePivots)
 
         for pivot in possiblePivots:
             item.position=pivot

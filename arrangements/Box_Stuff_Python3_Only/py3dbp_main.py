@@ -182,6 +182,7 @@ class Packer:
 
 
         # old way of getting pivots
+        '''
         possiblePivots=set()
         for currentItem in self.items:
             # 8 pivot points
@@ -192,7 +193,7 @@ class Packer:
                 newPivot=(currentItem.position[0]+firstValue*currentItem.xDim,currentItem.position[1]+secondValue*currentItem.yDim,currentItem.position[2]+thirdValue*currentItem.zDim)
                 possiblePivots.add(newPivot)
                 
-
+        '''
 
 
 
@@ -207,12 +208,15 @@ class Packer:
             previousItem=self.items[len(self.items)-1]
             newPivot=(previousItem.position[0]+firstValue*previousItem.xDim,previousItem.position[1]+secondValue*previousItem.yDim,previousItem.position[2]+thirdValue*previousItem.zDim)
             newPivots.add(newPivot)
-
+        
         for pivotSet in itemToTryToPlace.pivotSets:
             for point in pivotSet:
                 newPivots.add(point)
-        assert(newPivots==possiblePivots)        
-        possiblePivots=list(possiblePivots)
+        #assert(newPivots==possiblePivots)        
+        #possiblePivots=sorted(list(possiblePivots))
+
+        # this is essential to getting new pivots to work nicely
+        possiblePivots=sorted(list(newPivots))
         for pivotIndex in range(0, len(possiblePivots)):
             itemToTryToPlace.position=possiblePivots[pivotIndex]
             for dimensionalRotation in self.rotationTypes:
@@ -241,6 +245,7 @@ class Packer:
                     self.unfit_items.insert(0,oldItem)
             if time.time()>self.timeout:
                 raise TimeoutError('couldnt pack item in time')
+            #add the pivot to a lower location
         # reset sideffects caused by single point adding (not necessary yet) for all lower items and this item
         for lowerItem in self.unfit_items:
             lowerItem.pivotSets[itemToTryToPlace.depth]=set()

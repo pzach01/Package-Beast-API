@@ -25,7 +25,7 @@ SECRET_KEY = '05^q)gef3f(*a^u3-e2b4of@5uh^^#i@roi*54^c2kft*r+*sq'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'api.packagebeast.com']
 
 # Application definition
 

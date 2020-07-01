@@ -8,6 +8,7 @@ import math
 import copy
 
 random.seed(1)
+
 # same as item permutations but randomly iterates and using this generator can yield the same permutation twice
 class CustomItemPermutations():
     def next(self,itemList):
@@ -49,6 +50,8 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
             count+=1
             
             innerIteration=0
+            if printIteration:
+                print("     Iteration: "+str(count))
             while(True):
                 try:
                     if printIteration:
@@ -77,8 +80,7 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
                 except StopIteration:
 
                     break
-            if printIteration:
-                print("     Iteration: "+str(count))
+
 
 
                 #
@@ -87,6 +89,9 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
 
 
     if randomSearch:
+
+        if printIteration:
+            print("     Iteration: "+str(count))
         count=0
 
         # generates random permutations
@@ -122,8 +127,7 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
             if time.time()>endTime:
                 return None
 
-            if printIteration:
-                print("     Iteration: "+str(count))
+
             count+=1
 
 
@@ -146,11 +150,16 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
         newTimeout=math.inf
     else:
         newTimeout=timeout
+    
+    # temporary default timeout
+    newTimeout=300
 
+    
     randomSearch=False
     useBigSetsInDimensionalMixups=True
-
     res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout,20),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+
+    #res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout,20),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
     if not (res==None):
         return res
     

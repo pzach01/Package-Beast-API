@@ -83,7 +83,7 @@ def dz_test():
     items=[]
     import time
     start=time.time()
-    for i in range(0, 18):
+    for i in range(0, 17):
         items.append(ItemPY3DBP(str(i),450,975,793))
     packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True)
     end=time.time()
@@ -155,6 +155,6 @@ def test_doublefitting_raises_exception():
 #test_2()
 #test_3()
 #kleenex_test()
-#dz_test()
+dz_test()
 #test_doublefitting_raises_exception()
 #test_not_multibinpack()

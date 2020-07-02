@@ -90,10 +90,10 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
 
     if randomSearch:
 
+
+        count=0
         if printIteration:
             print("     Iteration: "+str(count))
-        count=0
-
         # generates random permutations
         item_permutations_generator=CustomItemPermutations()
         

@@ -107,11 +107,10 @@ def render_test():
     bin_height = 1800
     bin_depth = 2400
     import math
-    bin_weight_capacity = math.inf
-    container=ContainerPY3DBP('very-very-large-box', bin_width, bin_height, bin_depth, bin_weight_capacity)
+    container=ContainerPY3DBP('very-very-large-box', bin_width, bin_height, bin_depth)
 
     items = [
-        ItemPY3DBP(str(ele), 450, 793, 975, 2) for ele in range(0, 17)
+        ItemPY3DBP(str(ele), 450, 793, 975) for ele in range(0, 17)
 
 
 
@@ -191,5 +190,5 @@ def recursive_bug():
     assert (not (packer==None))
     testing_single_pack.test_for_double_fit(packer, 10000)
 recursive_bug()
-#render_test()
+render_test()
 render_test2()

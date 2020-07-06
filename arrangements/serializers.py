@@ -30,6 +30,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
         # this string formatting will be replaced with something less stupid
         containerStrings = []
         itemStrings = []
+        itemIds=[]
         for container in containers:
             l, w, h = container['xDim'], container['yDim'], container['zDim']
             containerStrings.append(str(l)+'x'+str(w)+'x'+str(h))
@@ -40,11 +41,11 @@ class ArrangementSerializer(serializers.ModelSerializer):
             
             l, w, h = item['xDim'], item['yDim'], item['zDim']
             itemStrings.append(str(l)+'x'+str(w)+'x'+str(h))
-            
+            itemIds.append(item['id'])
         from .Box_Stuff_Python3_Only import box_stuff2 as bp
         timeout = 0
         apiObjects = bp.master_calculate_optimal_solution(
-            containerStrings, itemStrings, timeout,multiBinPack)
+            containerStrings, itemStrings, timeout,multiBinPack,itemIds)
         
         
         arrangement.timeout = False
@@ -85,7 +86,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
                 width = items[index]['width']
                 length = items[index]['length']
                 
-                itemId = items[index]['id']
+                itemId = item.id
                 sku = items[index]['sku']
                 description = items[index]['description']
                 units = items[index]['units']

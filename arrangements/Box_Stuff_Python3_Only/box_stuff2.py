@@ -171,7 +171,7 @@ def string_wrapper_for_container_class(itemString):
     l,w,h=float(itemString.split('x')[0]),float(itemString.split('x')[1]),float(itemString.split('x')[2])
     return ContainerPY3DBP('',l,w,h)
 # bin weights must be in same order, same for box weights
-def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,costList=None,binWeightCapacitys=None, boxWeights=None):
+def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,itemsIds=[],costList=None,binWeightCapacitys=None, boxWeights=None):
     # metaparameter, expose to API at some point
     if not multibinpack:
         return fit_all(bins1, boxs1, timeout, costList, binWeightCapacitys, boxWeights)
@@ -198,6 +198,9 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,c
     
     # string intiliaztion
     boxs1=[string_wrapper_for_item_class(box) for box in boxs1]
+    # initialize the itemIds
+    for idIndex in range(0, len(itemsIds)):
+        boxs1[idIndex].name=itemsIds[idIndex]
     bins1=[string_wrapper_for_container_class(bin) for bin in bins1] 
     
     assert((binWeightCapacitys==None and boxWeights==None) or (binWeightCapacitys!=None and binWeightCapacitys!=None))
@@ -308,7 +311,8 @@ class BinAPI():
 
 
 class BoxAPI():
-    def __init__(self,xDim, yDim, zDim,volume,weight):
+    def __init__(self,id, xDim, yDim, zDim,volume,weight):
+        self.id=id
         self.xDim=float(xDim)
         self.yDim=float(yDim)
 
@@ -362,7 +366,7 @@ def convert_to_api_form(arrangments,costList, binWeightCapacitys,timedOut):
         for item in arrangments[containerIndex].items:
             x,y,z=item.position[0]+(item.get_dimension()[0]/2), item.position[1]+(item.get_dimension()[1]/2), item.position[2]+(item.get_dimension()[2]/2)
             # weight unitilized here
-            newBox=BoxAPI(item.xDim,item.yDim,item.zDim, item.volume,0)
+            newBox=BoxAPI(item.name, item.xDim,item.yDim,item.zDim, item.volume,0)
             newBox.set_center((x,y,z))
             (containerObjects[containerIndex]).add_box(newBox)
 

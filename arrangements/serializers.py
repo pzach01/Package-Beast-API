@@ -81,15 +81,21 @@ class ArrangementSerializer(serializers.ModelSerializer):
                 xCenter = item.x
                 yCenter = item.y
                 zCenter = item.z
-
-                height = items[index]['height']
-                width = items[index]['width']
-                length = items[index]['length']
-                
+                # fields we don't want to expose to optimization code are reinitialized here
                 itemId = item.id
-                sku = items[index]['sku']
-                description = items[index]['description']
-                units = items[index]['units']
+
+                foundItem=None
+                for lowerItem in items:
+                    if lowerItem['id']==itemId:
+                        foundItem=lowerItem
+                        break
+                
+                height = foundItem['height']
+                width = foundItem['width']
+                length = foundItem['length']
+                sku = foundItem['sku']
+                description = foundItem['description']
+                units = foundItem['units']
                 Item.objects.create(xDim=xDim, yDim=yDim, zDim=zDim, volume=volume, container=containerList[container.id], arrangement=arrangement,
                                     owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units, masterItemId=itemId, width=width, length=length, height=height)
                 index += 1

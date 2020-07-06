@@ -18,12 +18,16 @@ def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeigh
     timedOut=False
     minCost=float('inf')
     arrangment=None
+    # list of packers that correspond to each container
+    bestRenderingList=[None for ele in range(0, len(binMasterList))]
     while(True):
         try:
             if(time.time()>endTime):
                 timedOut=True
                 break
-            combination=generator.get_next_arrangment()        
+            combination=generator.get_next_arrangment()     
+            tempRenderingList=[]
+   
             cost=calculate_cost(costList, combination)
             if(cost<minCost):        
                 valid=True
@@ -36,8 +40,9 @@ def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeigh
                     ### uses one box with nothing leftover
                     if(len(boxes)!=0):
                         # make this less stupid later
-                        binpackResult=box_stuff1.binpack(boxes,bin,60)
-                        if (binpackResult==None):
+                        rendering=box_stuff1.binpack(boxes,bin,60)
+                        tempRenderingList.append(rendering)
+                        if (rendering==None):
                             
                             valid=False
                             break
@@ -49,9 +54,10 @@ def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeigh
                     minCost=cost
                     generator.updateMinCost(minCost)
                     arrangment=combination
+                    bestRenderingList=tempRenderingList
         except StopIteration:
             break
-    return arrangment, minCost,timedOut
+    return arrangment, minCost,timedOut,bestRenderingList
                 
 # bin can hold boxes without going over weight limit
 def weight_is_ok(binIndex, boxIndexes, binWeightCapacitys, boxWeights):
@@ -208,7 +214,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,c
 
     
     ## find the index arrangment of the cheapest combination (actual computation)
-    minArrangment, minCost,timedOut=bruteforce(generator,bins1, boxs1,endTimeComputation,costList,binWeightCapacitys,boxWeights)
+    minArrangment, minCost,timedOut,renderingList=bruteforce(generator,bins1, boxs1,endTimeComputation,costList,binWeightCapacitys,boxWeights)
     if(minCost==float('inf')):
         raise NotImplementedError("no arrangment possible")
 
@@ -219,12 +225,13 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,c
     ### these should be equal in length
 
     # this is duplicate work; actually could be computationally intensive too
-    arrangments=get_xyz_of_optimal_solution(minArrangment, bins1, boxs1,endTimeRendering)
+    # OLD OLD OLD OLD 
+    #arrangments=get_xyz_of_optimal_solution(minArrangment, bins1, boxs1,endTimeRendering)
     
     #return binList,packageList
     
     # new stuff, last two things are only for debugging if necessary
-    apiFormat=convert_to_api_form(arrangments,costList, binWeightCapacitys, timedOut)
+    apiFormat=convert_to_api_form(renderingList,costList, binWeightCapacitys, timedOut)
     ### now that minimum arrangment indices have been found, actually find the coordinates of such bins
 
     return apiFormat

@@ -89,7 +89,8 @@ class ArrangementSerializer(serializers.ModelSerializer):
                     if lowerItem['id']==itemId:
                         foundItem=lowerItem
                         break
-                
+                if foundItem==None:
+                    raise Exception("clearly a bug")
                 height = foundItem['height']
                 width = foundItem['width']
                 length = foundItem['length']

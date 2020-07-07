@@ -154,7 +154,6 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
         newTimeout=timeout
     
     # temporary default timeout
-    newTimeout=300
 
     
     randomSearch=False

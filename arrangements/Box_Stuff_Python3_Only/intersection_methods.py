@@ -1,18 +1,35 @@
 
 
 # returns True if a shape has a vertex within the other
-def vertices_inside(item1, item2):
+def vertices_inside(minItem1,maxItem1, item2):
     ## all extreme points are within bounds
-    min1, max1=item1[0],item1[7]
     for point in item2:
-        if min1[0]<point[0]<max1[0]:
-            if min1[1]<point[1]<max1[1]:
-                if min1[2]<point[2]<max1[2]:
+        if minItem1[0]<point[0]<maxItem1[0]:
+            if minItem1[1]<point[1]<maxItem1[1]:
+                if minItem1[2]<point[2]<maxItem1[2]:
                     return True
     return False
 
 
+def objects_intersect_fast(item1Min, item1Max, item2Min, item2Max):
+    for dimension in range(0,3):
+        #axises=[min1[dimension],max1[dimension],min2[dimension],max2[dimension]]
+        # generate axises so it is unique
+        axises=[item1Min[dimension]]
+        if item1Max[dimension] not in axises:
+            axises.append(item1Max[dimension])
+        if item2Min[dimension] not in axises:
+            axises.append(item2Min[dimension])
+        if item2Max[dimension] not in axises:
+            axises.append(item2Max[dimension])
 
+        # check if its splits em
+        for axis in axises:
+            if (item1Max[dimension]<=axis<=item2Min[dimension]):
+                return False
+            if (item2Max[dimension]<=axis<=item1Min[dimension]):
+                return False
+    return True
 
 
 
@@ -20,11 +37,10 @@ def vertices_inside(item1, item2):
 # use PAT instead of being a retard and wasting 2 months of your life
 def objects_intersect(item1, item2):
     # can't have points nested within each other
-    if(vertices_inside(item1, item2) or vertices_inside(item2, item1)):
-        return True
+
     # already sorted here
-    min1, max1=item1[0],item1[7]
-    min2, max2=item1[0],item2[7]
+    minItem1, maxItem1=item1[0],item1[7]
+    minItem2, maxItem2=item1[0],item2[7]
     # NEED TO CHECK item2's axises as well 
 
 
@@ -32,13 +48,13 @@ def objects_intersect(item1, item2):
     for dimension in range(0,3):
         #axises=[min1[dimension],max1[dimension],min2[dimension],max2[dimension]]
         # generate axises so it is unique
-        axises=[min1[dimension]]
-        if max1[dimension] not in axises:
-            axises.append(max1[dimension])
-        if min2[dimension] not in axises:
-            axises.append(min2[dimension])
-        if max2[dimension] not in axises:
-            axises.append(max2[dimension])
+        axises=[minItem1[dimension]]
+        if maxItem1[dimension] not in axises:
+            axises.append(maxItem1[dimension])
+        if minItem2[dimension] not in axises:
+            axises.append(minItem2[dimension])
+        if maxItem2[dimension] not in axises:
+            axises.append(maxItem2[dimension])
 
         # check if its splits em
         for axis in axises:

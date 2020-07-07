@@ -1,4 +1,4 @@
-from .intersection_methods import objects_intersect
+from .intersection_methods import objects_intersect,vertices_inside,objects_intersect_fast
 
 
 def outside_container(item, containerX,containerY,containerZ):
@@ -27,12 +27,18 @@ def strictly_outside(item1Min, item1Max, item2Min, item2Max):
         return True
 
 def intersect_lucas(item1,item2,containerX,containerY,containerZ):    
-    item1C=item1.edgePoints
-    item2C=item2.edgePoints
     # same shape
-    if item1C==item2C:
-        return True
+    if item1.minTuple==item2.minTuple:
+        if item1.maxTuple==item2.maxTuple:
+            return True
     # consider experimental
-    if strictly_outside(item1C[0], item1C[7], item2C[0], item2C[7]):
+
+
+    if strictly_outside(item1.minTuple, item1.maxTuple, item2.minTuple, item2.maxTuple):
         return False
-    return objects_intersect(item1C, item2C)
+    if(vertices_inside(item1.minTuple, item1.maxTuple, item2.edgePoints) or vertices_inside(item2.minTuple, item2.maxTuple, item1.edgePoints)):
+        return True
+    fastRes=objects_intersect_fast(item1.minTuple, item1.maxTuple, item2.minTuple, item2.maxTuple)
+    slowRes= objects_intersect(item1.edgePoints, item2.edgePoints)
+    assert(fastRes==slowRes)
+    return slowRes

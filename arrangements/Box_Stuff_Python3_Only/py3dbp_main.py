@@ -24,6 +24,8 @@ class ItemPY3DBP:
         self.thirdValue=1
         self.dimension=None
         self.edgePoints=[]
+        self.minTuple=None
+        self.maxTuple=None
         # updates dimension
         self.set_rotation_type_and_dimension(self.rotation_type)
         self.depth=None
@@ -61,6 +63,8 @@ class ItemPY3DBP:
 
 
         ])
+        self.minTuple=min(self.edgePoints)
+        self.maxTuple=max(self.edgePoints)
         
     def string(self):
         return "%s(%fx%fx%f, weight: %s) pos(%f, %f, %f) rt(%s) vol(%s)" % (

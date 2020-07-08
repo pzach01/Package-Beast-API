@@ -152,7 +152,7 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
         newTimeout=math.inf
     else:
         newTimeout=timeout
-    
+    newTimeout=300
     # temporary default timeout
 
     

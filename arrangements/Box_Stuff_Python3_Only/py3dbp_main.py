@@ -119,7 +119,7 @@ class Packer:
         self.rotationTypes=rotationTypes
         # default 10 minute timeout
 
-        self.timeout=time.time()+10
+        self.timeout=time.time()+.01
 
 
     def set_container(self, container):

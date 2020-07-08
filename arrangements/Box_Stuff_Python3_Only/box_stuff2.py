@@ -114,7 +114,7 @@ def hypothetical_binpack(numBins, boxs1, timeout=0, costList=None, binWeightCapa
     
 # attempt to fill all boxes in one of the bins
 # Note to self: the backend code actually uses the API here 
-def fit_all(bins1, boxs1, timeout=0, costList=None, binWeightCapacitys=None, boxWeights=None):
+def fit_all(bins1, boxs1, timeout=0, itemIds=[], costList=None, binWeightCapacitys=None, boxWeights=None):
     import math
     minCost=math.inf
     minArrangment=None
@@ -138,7 +138,7 @@ def fit_all(bins1, boxs1, timeout=0, costList=None, binWeightCapacitys=None, box
                 miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
                 # call master_calculate_optimal_solution with just one bin
     
-                apiFormat=master_calculate_optimal_solution([bins1[ele]], boxs1,timeout,True, miniCostList, miniBinWeightCapacitys, boxWeights)
+                apiFormat=master_calculate_optimal_solution([bins1[ele]], boxs1,timeout,True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights)
                 
                 # no error, update to better solution
                 minArrangment=apiFormat
@@ -157,7 +157,8 @@ def fit_all(bins1, boxs1, timeout=0, costList=None, binWeightCapacitys=None, box
     else:
         for ele in range(0, len(bins1)):
             if ele==indexUsed:
-                containersUsed.append(apiFormat[0])
+                assert(len(minArrangment)==1)
+                containersUsed.append(minArrangment[0])
             else:
                 x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])
                 containersUsed.append(BinAPI(ele,x,y,z,costList[ele],0,False))
@@ -174,7 +175,7 @@ def string_wrapper_for_container_class(itemString):
 def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,itemsIds=[],costList=None,binWeightCapacitys=None, boxWeights=None):
     # metaparameter, expose to API at some point
     if not multibinpack:
-        return fit_all(bins1, boxs1, timeout, costList, binWeightCapacitys, boxWeights)
+        return fit_all(bins1, boxs1, timeout,itemsIds, costList, binWeightCapacitys, boxWeights)
 
 
     renderingPercentageOfComputation=.5

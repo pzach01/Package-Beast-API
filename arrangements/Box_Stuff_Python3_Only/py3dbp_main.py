@@ -51,7 +51,7 @@ class ItemPY3DBP:
         position1PlusDimension1=self.position[0]+self.get_dimension()[0]
         position2PlusDimension2=self.position[1]+self.get_dimension()[1]
         position3PlusDimension3=self.position[2]+self.get_dimension()[2]
-        self.edgePoints=sorted([
+        self.edgePoints=([
             [self.position[0],self.position[1],self.position[2]],
             [position1PlusDimension1,self.position[1],self.position[2]],
             [self.position[0],position2PlusDimension2,self.position[2]],
@@ -63,8 +63,8 @@ class ItemPY3DBP:
 
 
         ])
-        self.minTuple=min(self.edgePoints)
-        self.maxTuple=max(self.edgePoints)
+        self.minTuple=min([self.position[0],self.position[1],self.position[2]],[position1PlusDimension1,position2PlusDimension2,position3PlusDimension3])
+        self.maxTuple=max([self.position[0],self.position[1],self.position[2]],[position1PlusDimension1,position2PlusDimension2,position3PlusDimension3])
         
     def string(self):
         return "%s(%fx%fx%f, weight: %s) pos(%f, %f, %f) rt(%s) vol(%s)" % (

@@ -39,6 +39,4 @@ def intersect_lucas(item1,item2,containerX,containerY,containerZ):
     if(vertices_inside(item1.minTuple, item1.maxTuple, item2.edgePoints) or vertices_inside(item2.minTuple, item2.maxTuple, item1.edgePoints)):
         return True
     fastRes=objects_intersect_fast(item1.minTuple, item1.maxTuple, item2.minTuple, item2.maxTuple)
-    slowRes= objects_intersect(item1.edgePoints, item2.edgePoints)
-    assert(fastRes==slowRes)
-    return slowRes
+    return fastRes

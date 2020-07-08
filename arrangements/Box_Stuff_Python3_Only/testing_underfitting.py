@@ -1,3 +1,6 @@
+
+import copy
+
 def draw_bin(ax,bin_width, bin_height, bin_depth, bin_edge_color='black'):
     ax.plot3D([0,bin_width], [0,0], [0, 0], bin_edge_color)
     ax.plot3D([0, 0], [0,bin_height], [0, 0], bin_edge_color)
@@ -292,7 +295,6 @@ def render_something_that_failed(container, items,coordinates,rotationTypes):
 def test_underfits():
     specialContainer, specialItems=None,None
     failedAt1000Iterations=0
-    import copy
     for ele in range(0, 1000000):
         print(ele)
         packer=None

@@ -27,9 +27,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com', 'api.packagebeast.com']
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -45,8 +48,7 @@ INSTALLED_APPS = [
     'rest_auth.registration', #New-PZ
     'django.contrib.sites', #New-PZ
     # 'rest_framework_swagger', #2-7-20 New PZ
-    'drf_yasg', #2-7-20 New PZ
-    'corsheaders',
+    'drf_yasg', #2-7-20 New PZ 
     'items',
     'containers',
     'arrangements',
@@ -76,8 +78,6 @@ AUTHENTICATION_BACKENDS = (
  # `allauth` specific authentication methods, such as login by e-mail
  "allauth.account.auth_backends.AuthenticationBackend",
 )
-
-CORS_ORIGIN_ALLOW_ALL = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -112,14 +112,15 @@ LOGIN_REDIRECT_URL = '/swagger/'
 LOGOUT_URL = '/accounts/logout/'
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'Package-Beast-API.urls'

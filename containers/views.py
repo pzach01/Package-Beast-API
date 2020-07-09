@@ -17,6 +17,7 @@ class ContainerList(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         return Container.objects.filter(owner=user, arrangement__isnull=True)
+
     serializer_class = ContainerSerializer
 
     def perform_create(self, serializer):

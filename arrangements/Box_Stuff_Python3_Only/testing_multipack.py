@@ -1,6 +1,29 @@
 from . import testing_imports
 from .testing_imports import *
 
+def test_ids_only_pack_one_container():
+    items=['4x4x4','5x5x5']
+    containers=['4x4x4','4x4x4','10x5x5']
+    containerList=box_stuff2.master_calculate_optimal_solution(containers,items,60, False,[0,1])
+    usableContainers=([container for container in containerList if len(container.boxes)>0])    
+    assert(len(usableContainers)==1)
+    if usableContainers[0].boxes[0].xDim==4:
+        assert(usableContainers[0].boxes[0].id==0)
+    else:
+        assert(usableContainers[0].boxes[0].id==1)
+
+    if usableContainers[0].boxes[1].xDim==4:
+        assert(usableContainers[0].boxes[1].id==0)
+    else:
+        assert(usableContainers[0].boxes[1].id==1)
+
+
+def test_only_pack_one_container():
+    items=['4x4x4','4x4x4']
+    containers=['4x4x4','4x4x4','10x5x5']
+    containerList=box_stuff2.master_calculate_optimal_solution(containers,items,60, False)    
+    usedContainers=len([container for container in containerList if len(container.boxes)>0])
+    assert(usedContainers==1)
 
 
 def test_4():
@@ -90,12 +113,12 @@ def weight_testing():
     usedVolume=sum([bin.volume for bin in containerList if len(bin.boxes) is not 0 ])
     assert(usedVolume==10**3) 
     
-    
-
-#weight_testing()
-#test_1()
-#test_2()
-#test_3()
-#test_4()
-#print('passed test 1-4')
-#cost_testing()
+test_ids_only_pack_one_container()
+test_only_pack_one_container()
+weight_testing()
+test_1()
+test_2()
+test_3()
+test_4()
+print('passed test 1-4')
+cost_testing()

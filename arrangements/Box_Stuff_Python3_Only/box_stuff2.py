@@ -18,12 +18,16 @@ def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeigh
     timedOut=False
     minCost=float('inf')
     arrangment=None
+    # list of packers that correspond to each container
+    bestRenderingList=[None for ele in range(0, len(binMasterList))]
     while(True):
         try:
             if(time.time()>endTime):
                 timedOut=True
                 break
-            combination=generator.get_next_arrangment()        
+            combination=generator.get_next_arrangment()     
+            tempRenderingList=[]
+   
             cost=calculate_cost(costList, combination)
             if(cost<minCost):        
                 valid=True
@@ -36,8 +40,9 @@ def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeigh
                     ### uses one box with nothing leftover
                     if(len(boxes)!=0):
                         # make this less stupid later
-                        binpackResult=box_stuff1.binpack(boxes,bin,60)
-                        if (binpackResult==None):
+                        rendering=box_stuff1.binpack(boxes,bin,60)
+                        tempRenderingList.append(rendering)
+                        if (rendering==None):
                             
                             valid=False
                             break
@@ -49,9 +54,10 @@ def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeigh
                     minCost=cost
                     generator.updateMinCost(minCost)
                     arrangment=combination
+                    bestRenderingList=tempRenderingList
         except StopIteration:
             break
-    return arrangment, minCost,timedOut
+    return arrangment, minCost,timedOut,bestRenderingList
                 
 # bin can hold boxes without going over weight limit
 def weight_is_ok(binIndex, boxIndexes, binWeightCapacitys, boxWeights):
@@ -108,7 +114,7 @@ def hypothetical_binpack(numBins, boxs1, timeout=0, costList=None, binWeightCapa
     
 # attempt to fill all boxes in one of the bins
 # Note to self: the backend code actually uses the API here 
-def fit_all(bins1, boxs1, timeout=0, costList=None, binWeightCapacitys=None, boxWeights=None):
+def fit_all(bins1, boxs1, timeout=0, itemIds=[], costList=None, binWeightCapacitys=None, boxWeights=None):
     import math
     minCost=math.inf
     minArrangment=None
@@ -132,7 +138,7 @@ def fit_all(bins1, boxs1, timeout=0, costList=None, binWeightCapacitys=None, box
                 miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
                 # call master_calculate_optimal_solution with just one bin
     
-                apiFormat=master_calculate_optimal_solution([bins1[ele]], boxs1,timeout,True, miniCostList, miniBinWeightCapacitys, boxWeights)
+                apiFormat=master_calculate_optimal_solution([bins1[ele]], boxs1,timeout,True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights)
                 
                 # no error, update to better solution
                 minArrangment=apiFormat
@@ -151,7 +157,8 @@ def fit_all(bins1, boxs1, timeout=0, costList=None, binWeightCapacitys=None, box
     else:
         for ele in range(0, len(bins1)):
             if ele==indexUsed:
-                containersUsed.append(apiFormat[0])
+                assert(len(minArrangment)==1)
+                containersUsed.append(minArrangment[0])
             else:
                 x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])
                 containersUsed.append(BinAPI(ele,x,y,z,costList[ele],0,False))
@@ -165,10 +172,10 @@ def string_wrapper_for_container_class(itemString):
     l,w,h=float(itemString.split('x')[0]),float(itemString.split('x')[1]),float(itemString.split('x')[2])
     return ContainerPY3DBP('',l,w,h)
 # bin weights must be in same order, same for box weights
-def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,costList=None,binWeightCapacitys=None, boxWeights=None):
+def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,itemsIds=[],costList=None,binWeightCapacitys=None, boxWeights=None):
     # metaparameter, expose to API at some point
     if not multibinpack:
-        return fit_all(bins1, boxs1, timeout, costList, binWeightCapacitys, boxWeights)
+        return fit_all(bins1, boxs1, timeout,itemsIds, costList, binWeightCapacitys, boxWeights)
 
 
     renderingPercentageOfComputation=.5
@@ -192,6 +199,9 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,c
     
     # string intiliaztion
     boxs1=[string_wrapper_for_item_class(box) for box in boxs1]
+    # initialize the itemIds
+    for idIndex in range(0, len(itemsIds)):
+        boxs1[idIndex].name=itemsIds[idIndex]
     bins1=[string_wrapper_for_container_class(bin) for bin in bins1] 
     
     assert((binWeightCapacitys==None and boxWeights==None) or (binWeightCapacitys!=None and binWeightCapacitys!=None))
@@ -208,7 +218,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,c
 
     
     ## find the index arrangment of the cheapest combination (actual computation)
-    minArrangment, minCost,timedOut=bruteforce(generator,bins1, boxs1,endTimeComputation,costList,binWeightCapacitys,boxWeights)
+    minArrangment, minCost,timedOut,renderingList=bruteforce(generator,bins1, boxs1,endTimeComputation,costList,binWeightCapacitys,boxWeights)
     if(minCost==float('inf')):
         raise NotImplementedError("no arrangment possible")
 
@@ -219,12 +229,13 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,c
     ### these should be equal in length
 
     # this is duplicate work; actually could be computationally intensive too
-    arrangments=get_xyz_of_optimal_solution(minArrangment, bins1, boxs1,endTimeRendering)
+    # OLD OLD OLD OLD 
+    #arrangments=get_xyz_of_optimal_solution(minArrangment, bins1, boxs1,endTimeRendering)
     
     #return binList,packageList
     
     # new stuff, last two things are only for debugging if necessary
-    apiFormat=convert_to_api_form(arrangments,costList, binWeightCapacitys, timedOut)
+    apiFormat=convert_to_api_form(renderingList,costList, binWeightCapacitys, timedOut)
     ### now that minimum arrangment indices have been found, actually find the coordinates of such bins
 
     return apiFormat
@@ -301,7 +312,8 @@ class BinAPI():
 
 
 class BoxAPI():
-    def __init__(self,xDim, yDim, zDim,volume,weight):
+    def __init__(self,id, xDim, yDim, zDim,volume,weight):
+        self.id=id
         self.xDim=float(xDim)
         self.yDim=float(yDim)
 
@@ -355,7 +367,7 @@ def convert_to_api_form(arrangments,costList, binWeightCapacitys,timedOut):
         for item in arrangments[containerIndex].items:
             x,y,z=item.position[0]+(item.get_dimension()[0]/2), item.position[1]+(item.get_dimension()[1]/2), item.position[2]+(item.get_dimension()[2]/2)
             # weight unitilized here
-            newBox=BoxAPI(item.xDim,item.yDim,item.zDim, item.volume,0)
+            newBox=BoxAPI(item.name, item.xDim,item.yDim,item.zDim, item.volume,0)
             newBox.set_center((x,y,z))
             (containerObjects[containerIndex]).add_box(newBox)
 

@@ -42,6 +42,8 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
         count=0
 
         for item_permutation in item_permutations:
+            if printIteration:
+                print("     Iteration: "+str(count))
             mixer=None
             if useBigSetsInDimensionalMixups:
                 mixer=DimensionalMixupBigSetsGenerator(item_permutation)
@@ -50,8 +52,7 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
             count+=1
             
             innerIteration=0
-            if printIteration:
-                print("     Iteration: "+str(count))
+
             while(True):
                 try:
                     if printIteration:
@@ -90,8 +91,7 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
 
     if randomSearch:
 
-        if printIteration:
-            print("     Iteration: "+str(count))
+
         count=0
 
         # generates random permutations
@@ -99,6 +99,8 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
         
 
         while(True):
+            if printIteration:
+                print("     Iteration: "+str(count))
             render=False
 
 
@@ -150,9 +152,8 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
         newTimeout=math.inf
     else:
         newTimeout=timeout
-    
-    # temporary default timeout
     newTimeout=300
+    # temporary default timeout
 
     
     randomSearch=False

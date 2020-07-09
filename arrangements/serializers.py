@@ -30,6 +30,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
         # this string formatting will be replaced with something less stupid
         containerStrings = []
         itemStrings = []
+        itemIds=[]
         for container in containers:
             l, w, h = container['xDim'], container['yDim'], container['zDim']
             containerStrings.append(str(l)+'x'+str(w)+'x'+str(h))
@@ -40,11 +41,11 @@ class ArrangementSerializer(serializers.ModelSerializer):
             
             l, w, h = item['xDim'], item['yDim'], item['zDim']
             itemStrings.append(str(l)+'x'+str(w)+'x'+str(h))
-            
+            itemIds.append(item['id'])
         from .Box_Stuff_Python3_Only import box_stuff2 as bp
         timeout = 0
         apiObjects = bp.master_calculate_optimal_solution(
-            containerStrings, itemStrings, timeout,multiBinPack)
+            containerStrings, itemStrings, timeout,multiBinPack,itemIds)
         
         
         arrangement.timeout = False
@@ -80,15 +81,22 @@ class ArrangementSerializer(serializers.ModelSerializer):
                 xCenter = item.x
                 yCenter = item.y
                 zCenter = item.z
+                # fields we don't want to expose to optimization code are reinitialized here
+                itemId = item.id
 
-                height = items[index]['height']
-                width = items[index]['width']
-                length = items[index]['length']
-                
-                itemId = items[index]['id']
-                sku = items[index]['sku']
-                description = items[index]['description']
-                units = items[index]['units']
+                foundItem=None
+                for lowerItem in items:
+                    if lowerItem['id']==itemId:
+                        foundItem=lowerItem
+                        break
+                if foundItem==None:
+                    raise Exception("clearly a bug")
+                height = foundItem['height']
+                width = foundItem['width']
+                length = foundItem['length']
+                sku = foundItem['sku']
+                description = foundItem['description']
+                units = foundItem['units']
                 Item.objects.create(xDim=xDim, yDim=yDim, zDim=zDim, volume=volume, container=containerList[container.id], arrangement=arrangement,
                                     owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units, masterItemId=itemId, width=width, length=length, height=height)
                 index += 1

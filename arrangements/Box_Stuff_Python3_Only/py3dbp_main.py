@@ -24,6 +24,8 @@ class ItemPY3DBP:
         self.thirdValue=1
         self.dimension=None
         self.edgePoints=[]
+        self.minTuple=None
+        self.maxTuple=None
         # updates dimension
         self.set_rotation_type_and_dimension(self.rotation_type)
         self.depth=None
@@ -49,7 +51,7 @@ class ItemPY3DBP:
         position1PlusDimension1=self.position[0]+self.get_dimension()[0]
         position2PlusDimension2=self.position[1]+self.get_dimension()[1]
         position3PlusDimension3=self.position[2]+self.get_dimension()[2]
-        self.edgePoints=sorted([
+        self.edgePoints=([
             [self.position[0],self.position[1],self.position[2]],
             [position1PlusDimension1,self.position[1],self.position[2]],
             [self.position[0],position2PlusDimension2,self.position[2]],
@@ -61,6 +63,8 @@ class ItemPY3DBP:
 
 
         ])
+        self.minTuple=min([self.position[0],self.position[1],self.position[2]],[position1PlusDimension1,position2PlusDimension2,position3PlusDimension3])
+        self.maxTuple=max([self.position[0],self.position[1],self.position[2]],[position1PlusDimension1,position2PlusDimension2,position3PlusDimension3])
         
     def string(self):
         return "%s(%fx%fx%f, weight: %s) pos(%f, %f, %f) rt(%s) vol(%s)" % (
@@ -115,7 +119,7 @@ class Packer:
         self.rotationTypes=rotationTypes
         # default 10 minute timeout
 
-        self.timeout=time.time()+10
+        self.timeout=time.time()+.01
 
 
     def set_container(self, container):

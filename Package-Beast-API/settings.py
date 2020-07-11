@@ -147,10 +147,21 @@ WSGI_APPLICATION = 'Package-Beast-API.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'ebdb',
+        'USER': 'packageBeastDB',
+        'PASSWORD': 'peanutbutter!',
+        'HOST': 'aa1v4xof18ve31u.cg1crfkuftt1.us-east-1.rds.amazonaws.com',
+        'PORT': '5432'                 # set to empty string for default
     }
 }
 

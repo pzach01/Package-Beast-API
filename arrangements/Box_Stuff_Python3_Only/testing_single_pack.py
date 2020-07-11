@@ -83,9 +83,11 @@ def dz_test():
     items=[]
     import time
     start=time.time()
-    for i in range(0, 17):
+    for i in range(0, 18):
         items.append(ItemPY3DBP(str(i),450,975,793))
     packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True)
+    test_for_double_fit(packer, 10000)
+
     end=time.time()
     print(end-start)
     assert(not (packer==None))
@@ -113,9 +115,9 @@ def test_for_double_fit(packer, iterationLimit):
         cubesPointIsIn=0
         for item in packer.items:
             # this is dumb; requiring us to reference the bins field by a different name then the items, why not just bin.depth?
-            lowerWidth, upperWidth=item.position[0], item.position[0]+item.get_dimension()[0]
-            lowerDepth, upperDepth=item.position[1], item.position[1]+item.get_dimension()[1]
-            lowerHeight, upperHeight=item.position[2], item.position[2]+item.get_dimension()[2]
+            lowerWidth, upperWidth=min(item.position[0], item.position[0]+item.get_dimension()[0]),max(item.position[0], item.position[0]+item.get_dimension()[0])
+            lowerDepth, upperDepth=min(item.position[1], item.position[1]+item.get_dimension()[1]),max(item.position[1], item.position[1]+item.get_dimension()[1])
+            lowerHeight, upperHeight=min(item.position[2], item.position[2]+item.get_dimension()[2]),max(item.position[2], item.position[2]+item.get_dimension()[2])
             if(lowerWidth < pointWidth < upperWidth):
                 if(lowerDepth < pointDepth < upperDepth):
                     if(lowerHeight < pointHeight <upperHeight):
@@ -155,6 +157,6 @@ def test_doublefitting_raises_exception():
 #test_2()
 #test_3()
 #kleenex_test()
-#dz_test()
+dz_test()
 #test_doublefitting_raises_exception()
 #test_not_multibinpack()

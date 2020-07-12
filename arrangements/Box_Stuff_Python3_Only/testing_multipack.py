@@ -97,7 +97,7 @@ def multibinpack_test_1():
     bothContainers=['18x18x24','21.688x15x6.125']
     containerList3=box_stuff2.master_calculate_optimal_solution(container2,items)
     usedVolume3=sum([bin.volume for bin in containerList3 if len(bin.boxes) is not 0 ])
-    assert(1992<usedVolume2<1993)
+    assert(1992<usedVolume3<1993)
 
 
 def weight_testing():    

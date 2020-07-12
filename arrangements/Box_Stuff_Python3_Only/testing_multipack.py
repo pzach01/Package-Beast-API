@@ -81,9 +81,23 @@ def cost_testing():
     containerList=box_stuff2.master_calculate_optimal_solution(bins,boxes,costList=[100, 1,1.50,1])    
     usedVolume=sum([bin.volume for bin in containerList if len(bin.boxes) is not 0 ])
     assert(usedVolume==855)
-    
-    
-    
+
+# from DZ
+def multibinpack_test_1():
+    items=['8.938x5.563x4.75']
+    container1=['18x18x24']
+    container2=['21.688x15x6.125']
+    containerList1=box_stuff2.master_calculate_optimal_solution(container1,items)
+    usedVolume1=sum([bin.volume for bin in containerList1 if len(bin.boxes) is not 0 ])
+    assert(usedVolume1==7776)
+    containerList2=box_stuff2.master_calculate_optimal_solution(container2,items)
+    usedVolume2=sum([bin.volume for bin in containerList2 if len(bin.boxes) is not 0 ])
+    assert(1992 <usedVolume2<1993)
+
+    bothContainers=['18x18x24','21.688x15x6.125']
+    containerList3=box_stuff2.master_calculate_optimal_solution(container2,items)
+    usedVolume3=sum([bin.volume for bin in containerList3 if len(bin.boxes) is not 0 ])
+    assert(1992<usedVolume2<1993)
 
 
 def weight_testing():    
@@ -112,7 +126,8 @@ def weight_testing():
     containerList=box_stuff2.master_calculate_optimal_solution(bins,boxes,costList=None, binWeightCapacitys=binWeights, boxWeights=boxWeights)   
     usedVolume=sum([bin.volume for bin in containerList if len(bin.boxes) is not 0 ])
     assert(usedVolume==10**3) 
-    
+
+multibinpack_test_1()
 #test_ids_only_pack_one_container()
 #test_only_pack_one_container()
 #weight_testing()

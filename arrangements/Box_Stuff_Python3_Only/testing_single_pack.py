@@ -104,7 +104,22 @@ def dz_test():
     end=time.time()
     print(end-start)
     assert(not (packer==None))
+def dz_test_overfit():
+    container=ContainerPY3DBP('container', 1800,1800,2400)
+    items=[]
+    import time
+    start=time.time()
+    for i in range(0, 19):
+        items.append(ItemPY3DBP(str(i),450,975,793))
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False)
 
+    end=time.time()
+    print(end-start)
+    if packer==None:
+        pass
+    else:
+        print('found a 19 arrangment')
+        test_for_double_fit(packer,100000)
 # iterationLimit (for each container)
 def test_for_double_fit(packer, iterationLimit):
     sumCubesPoint=0
@@ -171,6 +186,9 @@ def test_doublefitting_raises_exception():
 #test_3()
 #kleenex_test()
 #dz_test()
+### some render some dont
+#for ele in range(0, 10):
+#    dz_test_overfit()
 #kleenex_test_overfitting()
 #test_doublefitting_raises_exception()
 #test_not_multibinpack()

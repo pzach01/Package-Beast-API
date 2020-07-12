@@ -152,13 +152,13 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
         newTimeout=math.inf
     else:
         newTimeout=timeout
-    newTimeout=300
+    newTimeout=30
     # temporary default timeout
 
     
     randomSearch=False
     useBigSetsInDimensionalMixups=True
-    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout,20),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout,10),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
 
     #res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout,20),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
     if not (res==None):
@@ -169,10 +169,10 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
     randomSearch=True
     useBigSetsInDimensionalMixups=False
 
-    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout-20,30),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout-10,10),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
     if not(res==None):
         return res
-    return single_pack_given_timing_and_rotations(container, itemList, printIteration, newTimeout-40,RotationType.ALL,randomSearch,useBigSetsInDimensionalMixups)
+    return single_pack_given_timing_and_rotations(container, itemList, printIteration, newTimeout-20,RotationType.ALL,randomSearch,useBigSetsInDimensionalMixups)
 
 
 

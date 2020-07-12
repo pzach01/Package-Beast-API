@@ -78,6 +78,19 @@ def kleenex_test():
     end=time.time()
     print(end-start)
     assert(not (packer==None))
+def kleenex_test_overfitting():
+    container=ContainerPY3DBP('container', 21.6875,15,6.125)
+    items=[]
+    import time
+    start=time.time()
+    for i in range(0, 10):
+        items.append(ItemPY3DBP(str(i),8.9375,3.5625,4.75))
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True)
+    end=time.time()
+    print(end-start)
+    assert((packer==None))
+
+
 def dz_test():
     container=ContainerPY3DBP('container', 1800,1800,2400)
     items=[]
@@ -157,6 +170,7 @@ def test_doublefitting_raises_exception():
 #test_2()
 #test_3()
 #kleenex_test()
-dz_test()
+#dz_test()
+#kleenex_test_overfitting()
 #test_doublefitting_raises_exception()
 #test_not_multibinpack()

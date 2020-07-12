@@ -63,8 +63,11 @@ class ItemPY3DBP:
 
 
         ])
-        self.minTuple=min([self.position[0],self.position[1],self.position[2]],[position1PlusDimension1,position2PlusDimension2,position3PlusDimension3])
-        self.maxTuple=max([self.position[0],self.position[1],self.position[2]],[position1PlusDimension1,position2PlusDimension2,position3PlusDimension3])
+        self.minTuple=[min(self.position[0],position1PlusDimension1),min(self.position[1],position2PlusDimension2),min(self.position[2],position3PlusDimension3)]
+        self.maxTuple=[max(self.position[0],position1PlusDimension1),max(self.position[1],position2PlusDimension2),max(self.position[2],position3PlusDimension3)]
+
+        #self.minTuple=min([self.position[0],self.position[1],self.position[2]],[position1PlusDimension1,position2PlusDimension2,position3PlusDimension3])
+        #self.maxTuple=max([self.position[0],self.position[1],self.position[2]],[position1PlusDimension1,position2PlusDimension2,position3PlusDimension3])
         
     def string(self):
         return "%s(%fx%fx%f, weight: %s) pos(%f, %f, %f) rt(%s) vol(%s)" % (

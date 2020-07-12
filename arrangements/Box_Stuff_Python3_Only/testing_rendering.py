@@ -110,7 +110,7 @@ def render_test():
     container=ContainerPY3DBP('very-very-large-box', bin_width, bin_height, bin_depth)
 
     items = [
-        ItemPY3DBP(str(ele), 450, 793, 975) for ele in range(0, 17)
+        ItemPY3DBP(str(ele), 450, 793, 975) for ele in range(0, 18)
 
 
 

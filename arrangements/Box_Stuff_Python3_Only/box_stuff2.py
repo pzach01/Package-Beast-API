@@ -40,7 +40,7 @@ def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeigh
                     ### uses one box with nothing leftover
                     if(len(boxes)!=0):
                         # make this less stupid later
-                        rendering=box_stuff1.binpack(boxes,bin,60)
+                        rendering=box_stuff1.binpack(boxes,bin,30)
                         tempRenderingList.append(rendering)
                         if (rendering==None):
                             
@@ -114,7 +114,7 @@ def hypothetical_binpack(numBins, boxs1, timeout=0, costList=None, binWeightCapa
     
 # attempt to fill all boxes in one of the bins
 # Note to self: the backend code actually uses the API here 
-def fit_all(bins1, boxs1, timeout=0, itemIds=[], costList=None, binWeightCapacitys=None, boxWeights=None):
+def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys=None, boxWeights=None):
     import math
     minCost=math.inf
     minArrangment=None
@@ -172,18 +172,14 @@ def string_wrapper_for_container_class(itemString):
     l,w,h=float(itemString.split('x')[0]),float(itemString.split('x')[1]),float(itemString.split('x')[2])
     return ContainerPY3DBP('',l,w,h)
 # bin weights must be in same order, same for box weights
-def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,itemsIds=[],costList=None,binWeightCapacitys=None, boxWeights=None):
+def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,itemsIds=[],costList=None,binWeightCapacitys=None, boxWeights=None):
     # metaparameter, expose to API at some point
     if not multibinpack:
         return fit_all(bins1, boxs1, timeout,itemsIds, costList, binWeightCapacitys, boxWeights)
 
 
-    renderingPercentageOfComputation=.5
     
-    computationTimeout=timeout*(1-renderingPercentageOfComputation)
-    renderingTimeout=timeout*(renderingPercentageOfComputation)
     
-    assert(computationTimeout+renderingTimeout==timeout)
     import math
     import time
     
@@ -194,8 +190,6 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,i
         raise TimeoutError("this is too big for the current algorithm, reduce number of bins or boxes")
     
     # if we reach this time trigger a timeout error
-    endTimeComputation=math.inf if timeout==0 else time.time()+computationTimeout
-    endTimeRendering=endTimeComputation+renderingTimeout
     
     # string intiliaztion
     boxs1=[string_wrapper_for_item_class(box) for box in boxs1]
@@ -218,7 +212,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=0,multibinpack=True,i
 
     
     ## find the index arrangment of the cheapest combination (actual computation)
-    minArrangment, minCost,timedOut,renderingList=bruteforce(generator,bins1, boxs1,endTimeComputation,costList,binWeightCapacitys,boxWeights)
+    minArrangment, minCost,timedOut,renderingList=bruteforce(generator,bins1, boxs1,time.time()+timeout,costList,binWeightCapacitys,boxWeights)
     if(minCost==float('inf')):
         raise NotImplementedError("no arrangment possible")
 

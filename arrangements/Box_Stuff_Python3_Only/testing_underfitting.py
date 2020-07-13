@@ -1,5 +1,6 @@
 
 import copy
+import math
 
 def draw_bin(ax,bin_width, bin_height, bin_depth, bin_edge_color='black'):
     ax.plot3D([0,bin_width], [0,0], [0, 0], bin_edge_color)
@@ -210,7 +211,7 @@ def test_one_underfit(ele):
 
 
     container=ContainerPY3DBP('Container',container.xDim, container.yDim, container.zDim)
-    packer=single_pack.single_pack(container, items,True, True)
+    packer=single_pack.single_pack(container, items,True, True,math.inf)
     assert(len(packer.items)==len(items))
     if packer==None:
         #packer=single_pack.single_pack(container, itemList,1000)        

@@ -127,7 +127,7 @@ def weight_testing():
     usedVolume=sum([bin.volume for bin in containerList if len(bin.boxes) is not 0 ])
     assert(usedVolume==10**3) 
 
-multibinpack_test_1()
+#multibinpack_test_1()
 #test_ids_only_pack_one_container()
 #test_only_pack_one_container()
 #weight_testing()

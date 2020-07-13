@@ -141,24 +141,18 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
 # whether to search randomly or bruteforce
 # whether to use the heuristic (and for how long)
 # how long to search each of these things
-def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,timeout=None):
+def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,timeout=30):
     # container volume greater then sum of items we are trying to fit
     if volumeSafeGuard:
         if container.volume< sum([item.volume for item in itemList]):
             return None
     
-    # new interface here
-    if timeout==None:
-        newTimeout=math.inf
-    else:
-        newTimeout=timeout
-    newTimeout=30
-    # temporary default timeout
+
 
     
     randomSearch=False
     useBigSetsInDimensionalMixups=True
-    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout,10),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,10),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
 
     #res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout,20),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
     if not (res==None):
@@ -169,10 +163,10 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
     randomSearch=True
     useBigSetsInDimensionalMixups=False
 
-    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout-10,10),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout-10,10),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
     if not(res==None):
         return res
-    return single_pack_given_timing_and_rotations(container, itemList, printIteration, newTimeout-20,RotationType.ALL,randomSearch,useBigSetsInDimensionalMixups)
+    return single_pack_given_timing_and_rotations(container, itemList, printIteration, timeout-20,RotationType.ALL,randomSearch,useBigSetsInDimensionalMixups)
 
 
 

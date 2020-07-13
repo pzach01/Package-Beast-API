@@ -98,7 +98,7 @@ def dz_test():
     start=time.time()
     for i in range(0, 18):
         items.append(ItemPY3DBP(str(i),450,975,793))
-    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True)
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True,timeout=1000)
     test_for_double_fit(packer, 10000)
 
     end=time.time()

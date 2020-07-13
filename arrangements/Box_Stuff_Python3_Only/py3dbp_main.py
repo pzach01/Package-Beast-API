@@ -113,7 +113,7 @@ class ContainerPY3DBP:
         
 class Packer:
     # default initilization of rotation types to all rotations (-,-,-) to (+,+,+); all 8
-    def __init__(self,rotationTypes):
+    def __init__(self,rotationTypes,timeout):
         self.container = None
         self.items = []
         self.unfit_items = []
@@ -122,7 +122,7 @@ class Packer:
         self.rotationTypes=rotationTypes
         # default 10 minute timeout
 
-        self.timeout=time.time()+.01
+        self.timeout=time.time()+timeout
 
 
     def set_container(self, container):

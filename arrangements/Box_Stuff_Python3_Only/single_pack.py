@@ -19,15 +19,15 @@ class CustomItemPermutations():
         return returnItems
 # attempt to pack items into a single container
 
-def single_pack_given_timing_and_rotations(container, itemList, printIteration, timeout, rotationType,randomSearch,useBigSetsInDimensionalMixups):
+def single_pack_given_timing_and_rotations(container, itemList, printIteration, globalTimeout,recursiveTimeout, rotationType,randomSearch,useBigSetsInDimensionalMixups):
 
 
-    endTime=time.time()+timeout  
+    endTime=time.time()+globalTimeout  
 
     
 
     if len(itemList)==0:
-        p= Packer(rotationType)
+        p= Packer(rotationType,recursiveTimeout)
         p.items=[]
         p.unfit_items=[]
         p.set_container(container)
@@ -64,7 +64,8 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
 
 
 
-                    packer =Packer(rotationType)
+                    packer =Packer(rotationType,recursiveTimeout)
+                    
                     packer.set_container(copy.deepcopy(container))
                     for item in itemsMixedUp:
                         packer.add_item(item)
@@ -116,7 +117,7 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
 
 
 
-            packer =Packer(rotationType)
+            packer =Packer(rotationType,recursiveTimeout)
             packer.set_container(copy.deepcopy(container))
             for item in itemsMixedUp:
                 packer.add_item(item)
@@ -147,27 +148,38 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
         if container.volume< sum([item.volume for item in itemList]):
             return None
     
+    recursiveTimeout=.01
+    batchMultiplier=1
+    timePerIterationType=10
+    # heuristic: 30 second batches that gradually get larger
+    while(timeout>0):
+        # 1 percent growth in timeouts
+        batchMultiplier*=1.01
+        recursiveTimeout=recursiveTimeout*batchMultiplier
+        timePerIterationType=timePerIterationType*batchMultiplier
+
+        randomSearch=False
+        useBigSetsInDimensionalMixups=True
+        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,timePerIterationType),recursiveTimeout,RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+        timeout-=timePerIterationType
+        if not (res==None):
+            return res
+        
 
 
-    
-    randomSearch=False
-    useBigSetsInDimensionalMixups=True
-    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,10),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+        randomSearch=True
+        useBigSetsInDimensionalMixups=False
+        
+        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,timePerIterationType),recursiveTimeout,RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+        timeout-=10  
+        if not(res==None):
+            return res
 
-    #res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(newTimeout,20),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
-    if not (res==None):
-        return res
-    
-
-
-    randomSearch=True
-    useBigSetsInDimensionalMixups=False
-
-    res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout-10,10),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
-    if not(res==None):
-        return res
-    return single_pack_given_timing_and_rotations(container, itemList, printIteration, timeout-20,RotationType.ALL,randomSearch,useBigSetsInDimensionalMixups)
-
+        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,timePerIterationType),recursiveTimeout,RotationType.ALL,randomSearch,useBigSetsInDimensionalMixups)
+        timeout-=timePerIterationType
+        if not(res==None):
+            return res
+        
 
 
 

@@ -110,7 +110,7 @@ def render_test():
     container=ContainerPY3DBP('very-very-large-box', bin_width, bin_height, bin_depth)
 
     items = [
-        ItemPY3DBP(str(ele), 450, 793, 975) for ele in range(0, 18)
+        ItemPY3DBP(str(ele), 450, 793, 975) for ele in range(0, 19)
 
 
 
@@ -155,7 +155,7 @@ def render_test2():
     render_something_that_failed(container,items,coordinates)
     '''
 
-    packer=single_pack.single_pack(container, items)
+    packer=single_pack.single_pack(container, items,1000)
     render(packer, container.xDim, container.yDim, container.zDim)
 
 
@@ -185,7 +185,7 @@ def recursive_bug():
         
     ]
 
-    packer=single_pack.single_pack(container, items,True, True)
+    packer=single_pack.single_pack(container, items,True, True,1000)
     render(packer,container.xDim, container.yDim,container.zDim)
     assert (not (packer==None))
     testing_single_pack.test_for_double_fit(packer, 10000)

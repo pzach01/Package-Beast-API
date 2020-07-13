@@ -91,6 +91,9 @@ class ArrangementSerializer(serializers.ModelSerializer):
                         break
                 if foundItem==None:
                     raise Exception("clearly a bug")
+                assert(itemId==foundItem['id'])
+
+                masterItemId=foundItem['id']
                 height = foundItem['height']
                 width = foundItem['width']
                 length = foundItem['length']
@@ -98,7 +101,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
                 description = foundItem['description']
                 units = foundItem['units']
                 Item.objects.create(xDim=xDim, yDim=yDim, zDim=zDim, volume=volume, container=containerList[container.id], arrangement=arrangement,
-                                    owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units, masterItemId=itemId, width=width, length=length, height=height)
+                                    owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units, masterItemId=masterItemId, width=width, length=length, height=height)
                 index += 1
         return arrangement
 

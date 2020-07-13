@@ -43,7 +43,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
             itemStrings.append(str(l)+'x'+str(w)+'x'+str(h))
             itemIds.append(item['id'])
         from .Box_Stuff_Python3_Only import box_stuff2 as bp
-        timeout = 0
+        timeout = 30
         apiObjects = bp.master_calculate_optimal_solution(
             containerStrings, itemStrings, timeout,multiBinPack,itemIds)
         

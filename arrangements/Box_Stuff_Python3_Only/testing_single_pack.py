@@ -165,7 +165,20 @@ def test_doublefitting_raises_exception():
         exceptionRaised=True
     if not exceptionRaised:
         raise Exception('double fit didnt raise an exception')
+def dumbest_test_case_ever():
+    container=ContainerPY3DBP('container', 20,20,20)
+    items=[]
+    import time
+    start=time.time()
+    for i in range(0, 1):
+        items.append(ItemPY3DBP(str(i),2,2,2))
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True,timeout=1000)
+    test_for_double_fit(packer, 10000)
 
+    end=time.time()
+    print(end-start)
+    assert(not (packer==None))
+#dumbest_test_case_ever()
 #test_1()
 #test_2()
 #test_3()

@@ -230,7 +230,7 @@ def test_one_underfit(ele):
         # failed
         return packer, container, items, coordinates
     else:
-        testing_single_pack.test_for_double_fit(packer, 1000)
+        test_for_double_fit(packer, 1000)
         for item in packer.items:
             if outside_container(item, container.xDim,container.yDim,container.zDim):
                 raise Exception("rendered outside container")

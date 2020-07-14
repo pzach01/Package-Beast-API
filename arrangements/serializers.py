@@ -15,15 +15,17 @@ class ArrangementSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     containers = ContainerSerializer(many=True)
     items = ItemSerializerWithId(many=True)
+    timeoutDuration = serializers.IntegerField(write_only=True, min_value=1, max_value=55)
 
     class Meta:
         model = Arrangement
-        fields = ['id', 'created', 'owner', 'arrangementPossible', 'timeout', 'multiBinPack', 'containers', 'items']
+        fields = ['id', 'created', 'owner', 'arrangementPossible', 'timeout', 'multiBinPack', 'timeoutDuration', 'containers', 'items']
         read_only_fields = ['arrangementPossible', 'timeout']       
 
     def create(self, validated_data):
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')
+        timeoutDuration = validated_data.pop('timeoutDuration')
         arrangement = Arrangement.objects.create(**validated_data)
         multiBinPack = arrangement.multiBinPack
 
@@ -43,9 +45,8 @@ class ArrangementSerializer(serializers.ModelSerializer):
             itemStrings.append(str(l)+'x'+str(w)+'x'+str(h))
             itemIds.append(item['id'])
         from .Box_Stuff_Python3_Only import box_stuff2 as bp
-        timeout = 30
         apiObjects,timedout,arrangementPossible = bp.master_calculate_optimal_solution(
-            containerStrings, itemStrings, timeout,multiBinPack,itemIds)
+            containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
         
         
         arrangement.timeout = timedout

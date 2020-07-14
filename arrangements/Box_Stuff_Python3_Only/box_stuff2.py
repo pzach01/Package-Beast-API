@@ -130,6 +130,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
             costList.append(volume)
     # end replication of bruteforce code
     indexUsed=None
+    anyArrangmentPossible=False
     for ele in range(0, len(bins1)):
         try:
             if(costList[ele]<minCost):
@@ -138,12 +139,14 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                 miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
                 # call master_calculate_optimal_solution with just one bin
     
-                apiFormat=master_calculate_optimal_solution([bins1[ele]], boxs1,timeout,True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights)
-                
+                apiFormat,timedOut,arrangmentPossible=master_calculate_optimal_solution([bins1[ele]], boxs1,timeout,True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights)
+                if arrangmentPossible:
+                    anyArrangmentPossible=True
                 # no error, update to better solution
-                minArrangment=apiFormat
-                minCost=costList[ele]
-                indexUsed=ele
+                if not(timedOut) and arrangmentPossible:
+                    minArrangment=apiFormat
+                    minCost=costList[ele]
+                    indexUsed=ele
         # ran out of time
         except TimeoutError:
             pass
@@ -153,7 +156,8 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     # we have to jankily reformat the API to add a bunch of empty containers
     containersUsed=[]
     if indexUsed==None:
-        raise Exception("no arrangment possible")
+        # no arrangment, timedout, unable to decide if arrangment is possible
+        return None, True, anyArrangmentPossible
     else:
         for ele in range(0, len(bins1)):
             if ele==indexUsed:
@@ -162,7 +166,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
             else:
                 x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])
                 containersUsed.append(BinAPI(ele,x,y,z,costList[ele],0,False))
-    return containersUsed
+    return containersUsed,False,True
 
 # wrapper for the ItemPY3DBP class
 def string_wrapper_for_item_class(itemString):
@@ -187,7 +191,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,
     # half a billion
     maxMemorySize=500000000
     if(partitionListSize > maxMemorySize):
-        raise TimeoutError("this is too big for the current algorithm, reduce number of bins or boxes")
+        return None, False, None
     
     # if we reach this time trigger a timeout error
     
@@ -214,7 +218,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,
     ## find the index arrangment of the cheapest combination (actual computation)
     minArrangment, minCost,timedOut,renderingList=bruteforce(generator,bins1, boxs1,time.time()+timeout,costList,binWeightCapacitys,boxWeights)
     if(minCost==float('inf')):
-        raise NotImplementedError("no arrangment possible")
+        return None, timedOut, max(costList)>generator.cheapestPossible
 
     
     
@@ -232,7 +236,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,
     apiFormat=convert_to_api_form(renderingList,costList, binWeightCapacitys, timedOut)
     ### now that minimum arrangment indices have been found, actually find the coordinates of such bins
 
-    return apiFormat
+    return apiFormat,False, True
 
 
 class BinAPI():

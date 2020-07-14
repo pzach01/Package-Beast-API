@@ -44,12 +44,12 @@ class ArrangementSerializer(serializers.ModelSerializer):
             itemIds.append(item['id'])
         from .Box_Stuff_Python3_Only import box_stuff2 as bp
         timeout = 30
-        apiObjects = bp.master_calculate_optimal_solution(
+        apiObjects,timedout,arrangementPossible = bp.master_calculate_optimal_solution(
             containerStrings, itemStrings, timeout,multiBinPack,itemIds)
         
         
-        arrangement.timeout = False
-        arrangement.arrangementPossible = True
+        arrangement.timeout = timedout
+        arrangement.arrangementPossible = arrangementPossible
         print(apiObjects[0].to_string())
 
         # This is where we can call calculate optimal soution, passing in items and containers.

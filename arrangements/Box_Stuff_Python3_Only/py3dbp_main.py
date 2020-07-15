@@ -74,7 +74,8 @@ class ItemPY3DBP:
             self.name, self.xDim, self.yDim, self.zDim, self.weight,
             self.position[0], self.position[1], self.position[2], self.rotation_type, self.volume
         )
-
+    def get_dimension_string(self):
+        return str(self.xDim)+'x'+str(self.yDim)+'x'+str(self.zDim)
     def get_volume(self):
         return abs(self.xDim * self.yDim * self.zDim)
 
@@ -106,7 +107,8 @@ class ContainerPY3DBP:
     def get_volume(self):
         return abs(self.xDim * self.yDim * self.zDim)
 
-
+    def get_dimension_string(self):
+        return str(self.xDim)+'x'+str(self.yDim)+'x'+str(self.zDim)
 
 
 

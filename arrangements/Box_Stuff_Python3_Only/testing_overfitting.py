@@ -4,8 +4,42 @@
 from . import testing_imports
 from .testing_imports import *
 import math
+from .box_stuff2 import master_calculate_optimal_solution
+import time
+def test_for_overfits_both_types_api():
+    iterations=10000
+    timeout=60
+    for i in range(0, iterations):
+        print(i)
+        if i%2:
+            container, items=generate_an_overfit_arrangment_type_a()
+            containerList=[container.get_dimension_string()]
+            itemList=[item.get_dimension_string() for item in items]
+            assert(sum([item.volume for item in items])>container.volume)
+            start=time.time()
+            apiObjects,timedOut, arrangmentPossible=master_calculate_optimal_solution(containerList, itemList,timeout,False)
+            end=time.time()
+            # 1 second grace period for timeouts
+            print(end-start)
 
+            assert(end-start-1<timeout)
 
+            assert(timedOut or not(arrangmentPossible))
+            assert(apiObjects==None)
+
+        else:
+            container, items=generate_an_overfit_arrangment_type_b()
+            containerList=[container.get_dimension_string()]
+            itemList=[item.get_dimension_string() for item in items]
+            start=time.time()
+            apiObjects,timedOut,arrangmentPossible=master_calculate_optimal_solution(containerList, itemList,timeout,False)
+            end=time.time()
+            # 1 second grace period for timeouts
+            print(end-start)
+
+            assert(end-start-1<timeout)
+            assert(timedOut or not(arrangmentPossible))
+            assert(apiObjects==None)
 def test_for_overfits_both_types():
     iterations=10000
     timeout=60
@@ -207,8 +241,5 @@ def try_to_expand_in_one_direction_2(existingShape, interiorPoints, directionToE
         interiorPoints.remove(point)
         existingShape.append(point)
     return interiorPoints, existingShape
-
-test_for_overfits_both_types()
-#test_for_overfits_type_a()
-
-#test_for_overfits_type_b()
+test_for_overfits_both_types_api()
+#test_for_overfits_both_types()

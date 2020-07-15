@@ -6,6 +6,20 @@ from .testing_imports import *
 import math
 
 
+def test_for_overfits_both_types():
+    iterations=10000
+    timeout=60
+    for i in range(0, iterations):
+        print(i)
+        if i%2:
+            container, items=generate_an_overfit_arrangment_type_a()
+            assert(sum([item.volume for item in items])>container.volume)
+            packer=single_pack.single_pack(container, items,False,False,timeout)
+            assert(packer==None)
+        else:
+            container, items=generate_an_overfit_arrangment_type_b()
+            packer=single_pack.single_pack(container, items,False,False, timeout)
+            assert(packer==None)
 
 # volume overfit
 def test_for_overfits_type_a():
@@ -64,20 +78,20 @@ def generate_an_overfit_arrangment_type_b():
     desiredObjectVolume=container.volume-itemVolume
     firstDim,secondDim=1,1
     import math
-    thirdDim=max(max(container.xDim,container.yDim),container.depth)+1
+    thirdDim=max(max(container.xDim,container.yDim),container.zDim)+1
     dimensionalOrder=random.randint(0,5)
     if dimensionalOrder==0:
-        items.append(ItemPY3DBP(str('itemCausingFailure'),firstDim,secondDim,thirdDim,1))
+        items.append(ItemPY3DBP(str('itemCausingFailure'),firstDim,secondDim,thirdDim))
     if dimensionalOrder==1:
-        items.append(ItemPY3DBP(str('itemCausingFailure'),firstDim, thirdDim,secondDim,1))
+        items.append(ItemPY3DBP(str('itemCausingFailure'),firstDim, thirdDim,secondDim))
     if dimensionalOrder==2:
-        items.append(ItemPY3DBP(str('itemCausingFailure'),secondDim,firstDim,thirdDim,1))
+        items.append(ItemPY3DBP(str('itemCausingFailure'),secondDim,firstDim,thirdDim))
     if dimensionalOrder==3:
-        items.append(ItemPY3DBP(str('itemCausingFailure'),secondDim,thirdDim,firstDim,1))
+        items.append(ItemPY3DBP(str('itemCausingFailure'),secondDim,thirdDim,firstDim))
     if dimensionalOrder==4:
-        items.append(ItemPY3DBP(str('itemCausingFailure'),thirdDim,secondDim,firstDim,1))
+        items.append(ItemPY3DBP(str('itemCausingFailure'),thirdDim,secondDim,firstDim))
     if dimensionalOrder==5:
-        items.append(ItemPY3DBP(str('itemCausingFailure'),thirdDim,firstDim,secondDim,1))
+        items.append(ItemPY3DBP(str('itemCausingFailure'),thirdDim,firstDim,secondDim))
     return container, items
 
 
@@ -194,7 +208,7 @@ def try_to_expand_in_one_direction_2(existingShape, interiorPoints, directionToE
         existingShape.append(point)
     return interiorPoints, existingShape
 
-
-test_for_overfits_type_a()
+test_for_overfits_both_types()
+#test_for_overfits_type_a()
 
 #test_for_overfits_type_b()

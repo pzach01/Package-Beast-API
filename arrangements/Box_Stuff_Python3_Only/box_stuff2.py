@@ -39,8 +39,7 @@ def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeigh
                         boxes.append((boxMasterList[boxIndex]))
                     ### uses one box with nothing leftover
                     if(len(boxes)!=0):
-                        # make this less stupid later
-                        rendering=box_stuff1.binpack(boxes,bin,30)
+                        rendering=box_stuff1.binpack(boxes,bin,min(endTime-time.time(),30))
                         tempRenderingList.append(rendering)
                         if (rendering==None):
                             
@@ -178,6 +177,8 @@ def string_wrapper_for_container_class(itemString):
 # bin weights must be in same order, same for box weights
 def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,itemsIds=[],costList=None,binWeightCapacitys=None, boxWeights=None):
     # metaparameter, expose to API at some point
+    if len(boxs1)==0:
+        raise Exception("cant try with no items")
     if not multibinpack:
         return fit_all(bins1, boxs1, timeout,itemsIds, costList, binWeightCapacitys, boxWeights)
 

@@ -177,6 +177,8 @@ def string_wrapper_for_container_class(itemString):
 # bin weights must be in same order, same for box weights
 def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,itemsIds=[],costList=None,binWeightCapacitys=None, boxWeights=None):
     # metaparameter, expose to API at some point
+    if len(boxs1)==0:
+        raise Exception("cant try with no items")
     if not multibinpack:
         return fit_all(bins1, boxs1, timeout,itemsIds, costList, binWeightCapacitys, boxWeights)
 

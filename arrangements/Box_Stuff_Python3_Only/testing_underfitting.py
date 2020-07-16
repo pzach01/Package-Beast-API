@@ -205,7 +205,11 @@ def test_one_underfit_api(ele):
     timeout=60
     numContainers=random.randint(1,10)
     container, items,coordinates=generate_bins_that_fit(numContainers)
+    if len(items)==0:
+        return 
+
     # one container as a list
+
     containers=[container.get_dimension_string()]
     items=[item.get_dimension_string() for item in items]
     start=time.time()

@@ -1,7 +1,8 @@
 
 import copy
 import math
-
+from . import testing_imports
+from .testing_imports import *
 def draw_bin(ax,bin_width, bin_height, bin_depth, bin_edge_color='black'):
     ax.plot3D([0,bin_width], [0,0], [0, 0], bin_edge_color)
     ax.plot3D([0, 0], [0,bin_height], [0, 0], bin_edge_color)
@@ -64,8 +65,7 @@ def draw_boxes(ax,x_vals, y_vals, z_vals, widths, heights, depths):
 # obviously a ton of room to adjust the 'hardness' of the problem here by controlling n, range of boxes (nearly rectangular/square or both mixed together) 
 # and distance from max volume
 
-from . import testing_imports
-from .testing_imports import *
+
 # generates arrangment that can be fit if algorithm is optimal. may be too hard or too easy
 
 def generate_bins_that_fit(iterationLimit):
@@ -201,8 +201,23 @@ def try_to_expand_in_one_direction(existingShape, interiorPoints, directionToExp
     return interiorPoints, existingShape
 
 
-
-
+def test_one_underfit_api(ele):
+    timeout=60
+    numContainers=random.randint(1,10)
+    container, items,coordinates=generate_bins_that_fit(numContainers)
+    # one container as a list
+    containers=[container.get_dimension_string()]
+    items=[item.get_dimension_string() for item in items]
+    start=time.time()
+    apiObjects, timedOut, arrangmentPossible=master_calculate_optimal_solution(containers,items,timeout,False)
+    end=time.time()
+    if end-start<timeout:
+        assert(arrangmentPossible)
+        assert(not timedOut)
+        test_for_double_fit_api_version(apiObjects,1000)
+        test_for_outside_container_api(apiObjects)
+    else:
+        assert(timedOut)
 
 def test_one_underfit(ele):
 
@@ -311,6 +326,10 @@ def test_underfits():
             render_something_that_failed(container, items, coordinates)
             raise Exception
 
-
-test_underfits()
+def test_underfits_api():
+    for ele in range(0, 100000):
+        print(ele)
+        test_one_underfit_api(ele)
+test_underfits_api()
+#test_underfits()
 

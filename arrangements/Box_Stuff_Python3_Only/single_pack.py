@@ -148,7 +148,7 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
         if container.volume< sum([item.volume for item in itemList]):
             return None
     
-    recursiveTimeout=.0001*((len(itemList)*(len(itemList)+1))/2)
+    recursiveTimeout=.00005*((len(itemList)*(len(itemList)+1))/2)
     batchMultiplier=1
     timePerIterationType=10
     # heuristic: 30 second batches that gradually get larger

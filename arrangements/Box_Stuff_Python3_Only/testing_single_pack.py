@@ -93,12 +93,25 @@ def kleenex_test_overfitting():
     assert((packer==None))
 
 
-def dz_test():
+def dz_test_19():
     container=ContainerPY3DBP('container', 1800,1800,2400)
     items=[]
     import time
     start=time.time()
     for i in range(0, 19):
+        items.append(ItemPY3DBP(str(i),450,975,793))
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True,timeout=1000)
+    test_for_double_fit(packer, 10000)
+
+    end=time.time()
+    print(end-start)
+    assert(not (packer==None))
+def dz_test_18():
+    container=ContainerPY3DBP('container', 1800,1800,2400)
+    items=[]
+    import time
+    start=time.time()
+    for i in range(0, 18):
         items.append(ItemPY3DBP(str(i),450,975,793))
     packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True,timeout=1000)
     test_for_double_fit(packer, 10000)
@@ -125,6 +138,25 @@ def test_doublefitting_raises_exception():
         exceptionRaised=True
     if not exceptionRaised:
         raise Exception('double fit didnt raise an exception')
+
+'''
+# ensure packer.timeout=math.inf
+def timing_testing():
+    container=ContainerPY3DBP('container', 5,5,250)
+    import time
+    for maxItems in range(1,900):
+        items=[]
+
+        start=time.time()
+
+        for i in range(0, maxItems):
+            items.append(ItemPY3DBP(str(i),5,1,1))
+        packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True,timeout=1000)
+        assert(not(packer==None))
+        end=time.time()
+        print(str(maxItems)+':'+str(end-start))
+'''
+
 def dumbest_test_case_ever():
     container=ContainerPY3DBP('container', 20,20,20)
     items=[]
@@ -143,7 +175,8 @@ test_1()
 test_2()
 test_3()
 kleenex_test()
-dz_test()
+dz_test_18()
+dz_test_19()
 kleenex_test_overfitting()
 test_doublefitting_raises_exception()
 test_not_multibinpack()

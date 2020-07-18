@@ -148,7 +148,7 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
         if container.volume< sum([item.volume for item in itemList]):
             return None
     
-    recursiveTimeout=.00005*((len(itemList)*(len(itemList)+1))/2)
+    recursiveTimeout=max(.00005*((len(itemList)*(len(itemList)+1))/2),.01)
     batchMultiplier=1
     timePerIterationType=10
     # heuristic: 30 second batches that gradually get larger
@@ -171,7 +171,7 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
         useBigSetsInDimensionalMixups=False
         
         res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,timePerIterationType),min(timePerIterationType,min(timeout,recursiveTimeout)),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
-        timeout-=10  
+        timeout-=timePerIterationType  
         if not(res==None):
             return res
 

@@ -100,12 +100,12 @@ def dz_test_19():
     start=time.time()
     for i in range(0, 19):
         items.append(ItemPY3DBP(str(i),450,975,793))
-    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True,timeout=1000)
-    test_for_double_fit(packer, 10000)
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False,timeout=1000)
+    assert(not (packer==None))
+
 
     end=time.time()
     print(end-start)
-    assert(not (packer==None))
 def dz_test_18():
     container=ContainerPY3DBP('container', 1800,1800,2400)
     items=[]
@@ -113,7 +113,7 @@ def dz_test_18():
     start=time.time()
     for i in range(0, 18):
         items.append(ItemPY3DBP(str(i),450,975,793))
-    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True,timeout=1000)
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False,timeout=1000)
     test_for_double_fit(packer, 10000)
 
     end=time.time()
@@ -170,6 +170,23 @@ def dumbest_test_case_ever():
     end=time.time()
     print(end-start)
     assert(not (packer==None))
+def timing_test_case():
+    container=ContainerPY3DBP('container', 20,20,20)
+    import time
+    startFinal=time.time()
+    for maxItems in range(1, 800):
+        start=time.time()
+        items=[]
+        for i in range(0, maxItems):
+            items.append(ItemPY3DBP(str(i),1,1,1))
+        packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True,timeout=1000)
+        end=time.time()
+        assert(not (packer==None))
+        print(str(i)+":"+str(end-start))
+    endFinal=time.time()
+    print("Final time: "+str(endFinal-startFinal))
+print('testing_single_pack.py')
+timing_test_case()
 dumbest_test_case_ever()
 test_1()
 test_2()

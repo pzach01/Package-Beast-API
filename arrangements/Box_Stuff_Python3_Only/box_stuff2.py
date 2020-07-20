@@ -239,8 +239,10 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,
     
     # new stuff, last two things are only for debugging if necessary
     apiFormat=convert_to_api_form(renderingList,costList, binWeightCapacitys, timedOut)
-    ### now that minimum arrangment indices have been found, actually find the coordinates of such bins
 
+    # sort by maxTuple 
+    for container in apiFormat:
+        container.boxes=sorted(container.boxes, key= lambda box:(box.x+(box.xDim/2),box.y+(box.yDim/2),box.z+(box.zDim/2)))
     return apiFormat,False, True
 
 

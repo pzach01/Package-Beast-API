@@ -213,12 +213,21 @@ def test_one_underfit_api(ele):
 
     containers=[container.get_dimension_string()]
     items=[item.get_dimension_string() for item in items]
+    ids=[ele for ele in range(0, len(items))]
     start=time.time()
-    apiObjects, timedOut, arrangmentPossible=master_calculate_optimal_solution(containers,items,timeout,False)
+    apiObjects, timedOut, arrangmentPossible=master_calculate_optimal_solution(containers,items,timeout,False,ids)
     end=time.time()
     if end-start<timeout:
         assert(arrangmentPossible)
         assert(not timedOut)
+        for objectIndex in range(0, len(apiObjects[0].boxes)):
+            if not(objectIndex==0):
+                lastObject=apiObjects[0].boxes[objectIndex-1]
+                thisObject=apiObjects[0].boxes[objectIndex]
+                if (lastObject.x+(lastObject.xDim/2))>(thisObject.x+(thisObject.xDim/2)):
+                    if (lastObject.y+(lastObject.yDim/2))>(thisObject.y+(thisObject.yDim/2)):
+                        if (lastObject.z+(lastObject.zDim/2))>(thisObject.z+(thisObject.zDim/2)):
+                            raise Exception("unsorted objects for stepthrough function")
         test_for_double_fit_api_version(apiObjects,1000)
         test_for_outside_container_api(apiObjects)
     else:

@@ -9,6 +9,7 @@ import random
 import copy
 import math
 import itertools
+import time
 
 def calculate_partion_list_size(binListSize, itemListSize):
     return math.factorial(binListSize+itemListSize-1)/(math.factorial(binListSize)*math.factorial(itemListSize-1))
@@ -39,7 +40,7 @@ def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeigh
                         boxes.append((boxMasterList[boxIndex]))
                     ### uses one box with nothing leftover
                     if(len(boxes)!=0):
-                        rendering=box_stuff1.binpack(boxes,bin,min(endTime-time.time(),30))
+                        rendering=box_stuff1.binpack(boxes,bin,endTime-time.time())
                         tempRenderingList.append(rendering)
                         if (rendering==None):
                             
@@ -137,8 +138,11 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                 miniCostList=None if costList==None else [costList[ele]]
                 miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
                 # call master_calculate_optimal_solution with just one bin
-    
-                apiFormat,timedOut,arrangmentPossible=master_calculate_optimal_solution([bins1[ele]], boxs1,timeout,True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights)
+                numRemaining=(len(bins1))-ele
+                start=time.time()
+                apiFormat,timedOut,arrangmentPossible=master_calculate_optimal_solution([bins1[ele]], boxs1,(timeout/numRemaining),True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights)
+                end=time.time()
+                timeout-=(end-start)
                 if arrangmentPossible:
                     anyArrangmentPossible=True
                 # no error, update to better solution

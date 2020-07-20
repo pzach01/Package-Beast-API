@@ -203,6 +203,7 @@ def try_to_expand_in_one_direction(existingShape, interiorPoints, directionToExp
 
 def test_one_underfit_api(ele):
     timeout=60
+    batchTime=30
     numContainers=random.randint(1,10)
     container, items,coordinates=generate_bins_that_fit(numContainers)
     if len(items)==0:

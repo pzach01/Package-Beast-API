@@ -142,7 +142,7 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
 # whether to search randomly or bruteforce
 # whether to use the heuristic (and for how long)
 # how long to search each of these things
-def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,timeout=30):
+def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,timeout=30,batchTime=30):
     # container volume greater then sum of items we are trying to fit
     if volumeSafeGuard:
         if container.volume< sum([item.volume for item in itemList]):
@@ -150,7 +150,9 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
     
     recursiveTimeout=max(.00005*((len(itemList)*(len(itemList)+1))/2),.01)
     batchMultiplier=1
-    timePerIterationType=10
+
+
+    timePerIterationType=batchTime/3
     # heuristic: 30 second batches that gradually get larger
     while(timeout>0):
         # 1 percent growth in timeouts

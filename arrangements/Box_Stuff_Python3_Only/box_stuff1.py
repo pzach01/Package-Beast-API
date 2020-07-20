@@ -182,15 +182,15 @@ def sort_points_we_can_add_to(pointsWeCanAddTo):
 
 
 
-def binpack(packages, bin=None,timeout=None):
+def binpack(packages, bin,timeout):
    
     
     from . import single_pack as sp
     # convert to single pack format
 
     from . import py3dbp_main as m
-
-    packer=sp.single_pack(bin, packages,True, False, timeout)
+    # setting bachTime=min(timeout,30) is a heuristic
+    packer=sp.single_pack(bin, packages,True, False, timeout,min(timeout,30))
 
 
 

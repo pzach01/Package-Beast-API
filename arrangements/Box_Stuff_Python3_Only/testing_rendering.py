@@ -189,6 +189,27 @@ def recursive_bug():
     render(packer,container.xDim, container.yDim,container.zDim)
     assert (not (packer==None))
     test_for_double_fit(packer, 10000)
+def render_antigravity():
+    # set packer timeout to .005
+    container=ContainerPY3DBP('very-very-large-box', 17.625, 14.25, 8.313)
+
+
+    items = [
+        ItemPY3DBP('1',8.938,4.75,3.5),
+        ItemPY3DBP('2',8.938,4.75,3.5),
+        ItemPY3DBP('3',8.938,4.75,3.5),
+        ItemPY3DBP('4',8.938,4.75,3.5),
+        ItemPY3DBP('5',8.938,4.75,3.5),
+        ItemPY3DBP('6',8.938,4.75,3.5),
+        ItemPY3DBP('7',8.938,4.75,3.5),
+        ItemPY3DBP('8',8.938,4.75,3.5),
+        ItemPY3DBP('9',8.938,4.75,3.5),
+
+    ]
+
+    packer=single_pack.single_pack(container, items,True, True,1000)
+    render(packer, container.xDim, container.yDim,container.zDim)
+render_antigravity()
 recursive_bug()
 render_test()
 render_test2()

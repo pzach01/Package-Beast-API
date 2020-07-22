@@ -58,7 +58,6 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
                     if printIteration:
                         print("           innerIteration: "+str(innerIteration))
                     innerIteration+=1
-                    render=False
                     itemsMixedUp=mixer.next()
                 
 
@@ -70,7 +69,7 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
                     for item in itemsMixedUp:
                         packer.add_item(item)
                     try:
-                        res=packer.pack(render)
+                        res=packer.pack()
                         if res:
                             return packer
                     except TimeoutError:
@@ -102,7 +101,6 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
         while(True):
             if printIteration:
                 print("     Iteration: "+str(count))
-            render=False
 
 
             item_permutation=item_permutations_generator.next(copy.deepcopy(itemList))
@@ -122,7 +120,7 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
             for item in itemsMixedUp:
                 packer.add_item(item)
             try:
-                res=packer.pack(render)
+                res=packer.pack()
                 if res:
                     return packer
             except TimeoutError:

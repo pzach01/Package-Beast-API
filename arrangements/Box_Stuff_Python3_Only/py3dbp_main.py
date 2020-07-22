@@ -125,7 +125,7 @@ class Packer:
         # default 10 minute timeout
 
         self.timeout=time.time()+timeout
-
+        self.render=False
 
     def set_container(self, container):
         self.container=container
@@ -137,6 +137,7 @@ class Packer:
     
 
     def pack(self,render=False, bigger_first=False, distribute_items=False):
+        self.render=render
         self.unfit_items=copy.deepcopy(self.items)
         self.items=[]
         # stuff that is useful in disqualifying bad pivots
@@ -274,8 +275,7 @@ class Packer:
         return False
     # returns true if you can place at a position
     def can_place_at_position(self, item):
-        render=False
-        if render:
+        if self.render:
             from . import testing_underfitting
             from .testing_underfitting import render_something_that_failed
             coordinates={}

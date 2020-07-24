@@ -54,3 +54,4 @@ class User(AbstractUser):
     disableFillContainerAnimation = models.BooleanField(default=False)
     disablePreviousNextItemAnimation = models.BooleanField(default=False)
     animationSpeed = (models.IntegerField(default=50))
+    subscriptionType = models.CharField(max_length=12, blank=False, default='standard')

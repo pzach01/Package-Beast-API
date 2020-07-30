@@ -71,7 +71,8 @@ class ArrangementSerializer(serializers.ModelSerializer):
             description = container['description']
             units = container['units']
             volume = xDim*yDim*zDim
-            containerList.append(Container.objects.create(arrangement=arrangement, xDim=xDim, yDim=yDim, zDim=zDim, volume=volume,
+            if multiBinPack or (not apiObjects[index].boxes==[]):
+                containerList.append(Container.objects.create(arrangement=arrangement, xDim=xDim, yDim=yDim, zDim=zDim, volume=volume,
                                                           owner=validated_data['owner'], sku=sku, description=description, units=units))
             index += 1
 

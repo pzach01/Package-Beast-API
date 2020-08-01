@@ -47,11 +47,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount', #New-PZ 2-9-20
     'rest_auth.registration', #New-PZ
     'django.contrib.sites', #New-PZ
-    # 'rest_framework_swagger', #2-7-20 New PZ
     'drf_yasg', #2-7-20 New PZ 
     'items',
     'containers',
     'arrangements',
+    'secret',
     'users'
 ]
 

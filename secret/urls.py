@@ -7,4 +7,5 @@ urlpatterns = [
     path('secret/standard/', views.standard),
     path('secret/premium/', views.premium),
     path('secret/beastmode/', views.beast_mode),
+    path('emailtest/', views.emailtest)
 ]

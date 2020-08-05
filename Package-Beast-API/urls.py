@@ -67,6 +67,6 @@ urlpatterns = [
     path('accounts/', include('rest_auth.urls')),
     path('accounts/registration/', include('rest_auth.registration.urls')),
     # re_path(r'^reset-password/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', PasswordResetView, name='password_reset_confirm'),
-    re_path(r'^reset-password/confirm(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', PasswordResetView, name='password_reset_confirm'),
+    re_path(r'^reset-password/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', PasswordResetView, name='password_reset_confirm'),
     re_path(r'^.*$', RedirectView.as_view(url = '/accounts/login/', permanent=False)),
 ]

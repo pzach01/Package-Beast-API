@@ -29,6 +29,8 @@ ALLOWED_HOSTS = ['127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanst
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+DEFAULT_FROM_EMAIL = 'no-reply@packagebeast.com'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -105,7 +107,8 @@ SWAGGER_SETTINGS = {
 
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django_amazon_ses.EmailBackend'
 
 LOGIN_REDIRECT_URL = '/swagger/'
 
@@ -128,7 +131,7 @@ ROOT_URLCONF = 'Package-Beast-API.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -27,6 +27,7 @@ from drf_yasg import openapi
 from django.conf.urls import url
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from django.contrib.auth.views import PasswordResetView
 # myapp/urls.py
 
 
@@ -63,9 +64,9 @@ urlpatterns = [
     path('', include('items.urls')),
     path('', include('users.urls')),
     path('', include('secret.urls')),
-    
     path('accounts/', include('rest_auth.urls')),
     path('accounts/registration/', include('rest_auth.registration.urls')),
+    # re_path(r'^reset-password/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', PasswordResetView, name='password_reset_confirm'),
+    re_path(r'^password-reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', PasswordResetView, name='password_reset_confirm'),
     re_path(r'^.*$', RedirectView.as_view(url = '/accounts/login/', permanent=False)),
-    
 ]

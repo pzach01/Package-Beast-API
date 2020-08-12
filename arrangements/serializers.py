@@ -65,8 +65,8 @@ class ArrangementSerializer(serializers.ModelSerializer):
                 zDim = apiObjects[index].zDim
             else:
                 xDim = container['xDim']
-                yDim = container['xDim']
-                zDim = container['xDim']
+                yDim = container['yDim']
+                zDim = container['zDim']
             sku = container['sku']
             description = container['description']
             units = container['units']

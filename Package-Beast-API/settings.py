@@ -25,7 +25,8 @@ SECRET_KEY = '05^q)gef3f(*a^u3-e2b4of@5uh^^#i@roi*54^c2kft*r+*sq'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com', 'api.packagebeast.com']
+ALLOWED_HOSTS = [
+    '127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com', 'api.packagebeast.com']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -42,14 +43,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken', #New-PZ
-    'rest_auth', #New-PZ
-    'allauth', #New-PZ
-    'allauth.account', #New-PZ
-    'allauth.socialaccount', #New-PZ 2-9-20
-    'rest_auth.registration', #New-PZ
-    'django.contrib.sites', #New-PZ
-    'drf_yasg', #2-7-20 New PZ 
+    'rest_framework.authtoken',  # New-PZ
+    'rest_auth',  # New-PZ
+    'allauth',  # New-PZ
+    'allauth.account',  # New-PZ
+    'allauth.socialaccount',  # New-PZ 2-9-20
+    'rest_auth.registration',  # New-PZ
+    'django.contrib.sites',  # New-PZ
+    'drf_yasg',  # 2-7-20 New PZ
     'items',
     'containers',
     'arrangements',
@@ -57,28 +58,31 @@ INSTALLED_APPS = [
     'users'
 ]
 
-#User registration errors out if you remove this. I think its used with django.contrib.sites
+# User registration errors out if you remove this. I think its used with django.contrib.sites
 SITE_ID = 1
 
-#auth settings to use email instead of username
+# auth settings to use email instead of username
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 
 # 6-18-20 PZ - CHANGED LINE BELOW TO SUPPORT USER PREFERENCES
-REST_AUTH_SERIALIZERS = { 'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer', 'LOGIN_SERIALIZER': 'users.serializers.LoginSerializer'}
-REST_AUTH_REGISTER_SERIALIZERS = {'REGISTER_SERIALIZER': 'users.serializers.RegisterSerializer'}
+REST_AUTH_SERIALIZERS = {'USER_DETAILS_SERIALIZER': 'users.serializers.UserSerializer',
+                         'LOGIN_SERIALIZER': 'users.serializers.LoginSerializer'}
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'users.serializers.RegisterSerializer'}
 
 
-#Following is added to enable registration with email instead of username
+# Following is added to enable registration with email instead of username
 AUTHENTICATION_BACKENDS = (
- # Needed to login by username in Django admin, regardless of `allauth`
- "django.contrib.auth.backends.ModelBackend",
+    # Needed to login by username in Django admin, regardless of `allauth`
+    "django.contrib.auth.backends.ModelBackend",
 
- # `allauth` specific authentication methods, such as login by e-mail
- "allauth.account.auth_backends.AuthenticationBackend",
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
 )
 
 REST_FRAMEWORK = {
@@ -95,19 +99,19 @@ REST_FRAMEWORK = {
 SWAGGER_SETTINGS = {
     # 'USE_SESSION_AUTH': False,
     'SECURITY_DEFINITIONS': {
-    #   'Basic': {
-    #         'type': 'basic'
-    #   },
-    'Token': {
-        'type': 'apiKey',
-        'name': 'Authorization',
-        'in': 'header'
-      }
-   },
+        #   'Basic': {
+        #         'type': 'basic'
+        #   },
+        'Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
 
 }
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = 'django_amazon_ses.EmailBackend'
 
 LOGIN_REDIRECT_URL = '/swagger/'
@@ -123,7 +127,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
+
 ]
 
 ROOT_URLCONF = 'Package-Beast-API.urls'
@@ -209,4 +213,3 @@ STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
 
 AUTH_USER_MODEL = 'users.User'
-

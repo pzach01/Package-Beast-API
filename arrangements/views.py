@@ -18,7 +18,6 @@ class ArrangementList(generics.ListCreateAPIView):
         user = self.request.user
         return Arrangement.objects.filter(owner=user)
     
-
     queryset = Arrangement.objects.all()
     serializer_class = ArrangementSerializer
     def perform_create(self, serializer):

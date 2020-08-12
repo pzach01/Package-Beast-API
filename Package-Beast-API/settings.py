@@ -111,8 +111,8 @@ SWAGGER_SETTINGS = {
 
 }
 
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_BACKEND = 'django_amazon_ses.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django_amazon_ses.EmailBackend'
 
 LOGIN_REDIRECT_URL = '/swagger/'
 

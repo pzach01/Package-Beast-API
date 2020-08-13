@@ -55,7 +55,10 @@ INSTALLED_APPS = [
     'containers',
     'arrangements',
     'secret',
-    'users'
+    'users',
+    'subscription',
+    'payment',
+
 ]
 
 # User registration errors out if you remove this. I think its used with django.contrib.sites

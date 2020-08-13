@@ -4,5 +4,5 @@ from payment import views
 
 
 urlpatterns = [
-    path('payment/stripeInvoice/', views.stripe_invoice),
+    path('payment/stripeInvoice/', views.my_webhook_view),
 ]

@@ -8,10 +8,12 @@ from rest_framework import status
 from django.shortcuts import render
 import json
 from django.http import HttpResponse
+from rest_framework.response import Response
 
 # Using Django
 @csrf_exempt
 def my_webhook_view(request):
+  Response({'howdy':'ho'})
   payload = request.body
   event = None
 

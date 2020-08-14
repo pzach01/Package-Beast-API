@@ -16,6 +16,7 @@ from rest_framework.decorators import api_view
 import stripe
 stripe.api_key = 'sk_test_51HB4dCJWFTMXIZUo5d1tlWus4t0NGBLPI6LqHVokCzOyXaYZ6f8rcBqAeWZUdtfdc6tl5EenjpUXWrpFsyRmAwgJ00fRuOxc8b'
 import os
+# dont know where this should be set
 os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_VtPsqS18E3v6S5vDeEgXg5FDlYZdSYHV"
 # spurious commit
 @csrf_exempt
@@ -24,7 +25,6 @@ def my_webhook_view(request):
   request_data = json.loads(request.body)
 
   if webhook_secret:
-      return HttpResponse('Webhook secret yo!')
 
       # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.
       signature = request.headers.get('stripe-signature')
@@ -36,6 +36,8 @@ def my_webhook_view(request):
           return e
       # Get the type of webhook event sent - used to check the status of PaymentIntents.
       event_type = event['type']
+      return HttpResponse('Webhook secret worked yo!')
+
   else:
       return HttpResponse('Not getting webhook secret yo!')
       data = request_data['data']

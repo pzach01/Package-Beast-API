@@ -9,9 +9,9 @@ from django.shortcuts import render
 import json
 from django.http import HttpResponse
 from rest_framework.response import Response
-
+from rest_framework.decorators import api_view
 # Using Django
-@csrf_exempt
+@api_view(['POST'])
 def my_webhook_view(request):
   res=Response({'howdy':'ho'})
   return res

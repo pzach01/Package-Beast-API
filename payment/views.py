@@ -15,7 +15,7 @@ from rest_framework.decorators import api_view
 # newest version
 import stripe
 stripe.api_key = 'sk_test_51HB4dCJWFTMXIZUo5d1tlWus4t0NGBLPI6LqHVokCzOyXaYZ6f8rcBqAeWZUdtfdc6tl5EenjpUXWrpFsyRmAwgJ00fRuOxc8b'
-
+import os
 @csrf_exempt
 def my_webhook_view(request):
   webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')

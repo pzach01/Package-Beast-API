@@ -24,6 +24,7 @@ os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_VtPsqS18E3v6S5vDeEgXg5FDlYZdSYHV"
 def my_webhook_view(request):
   webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
   request_data = request.data
+  return HttpResponse('Code deploy worked yo!')
 
   if webhook_secret:
 

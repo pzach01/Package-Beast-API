@@ -11,6 +11,8 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 # Using Django
+@require_POST
+
 @csrf_exempt
 def my_webhook_view(request):
   return HttpResponse('Howdy ho!')

@@ -13,7 +13,8 @@ from rest_framework.response import Response
 # Using Django
 @csrf_exempt
 def my_webhook_view(request):
-  Response({'howdy':'ho'})
+  res=Response({'howdy':'ho'})
+  return res
   payload = request.body
   event = None
 

@@ -24,7 +24,6 @@ os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_VtPsqS18E3v6S5vDeEgXg5FDlYZdSYHV"
 def my_webhook_view(request):
   webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
   request_data = request.body
-  webhook_secret=False
   if webhook_secret:
 
       # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.

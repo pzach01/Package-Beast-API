@@ -11,10 +11,10 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 # Using Django
-@api_view(['POST'])
+@csrf_exempt
 def my_webhook_view(request):
-  res=Response({'howdy':'ho'})
-  return res
+  return HttpResponse('Howdy ho!')
+  '''
   payload = request.body
   event = None
 
@@ -41,3 +41,4 @@ def my_webhook_view(request):
     return HttpResponse(status=400)
 
   return HttpResponse(status=200)
+  '''

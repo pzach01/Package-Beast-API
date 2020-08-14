@@ -23,7 +23,7 @@ os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_VtPsqS18E3v6S5vDeEgXg5FDlYZdSYHV"
 @api_view(['POST'])
 def my_webhook_view(request):
   webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
-  request_data = request.data
+  request_data = request.body
 
   if webhook_secret:
 
@@ -31,7 +31,7 @@ def my_webhook_view(request):
       signature= request.META['HTTP_STRIPE_SIGNATURE']
       try:
           event = stripe.Webhook.construct_event(
-              payload=request.body, sig_header=signature, secret=webhook_secret)
+              payload=request_data, sig_header=signature, secret=webhook_secret)
           data = event['data']
       except Exception as e:
           return e

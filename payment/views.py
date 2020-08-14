@@ -19,7 +19,7 @@ import os
 # spurious commit
 @csrf_exempt
 def my_webhook_view(request):
-  webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+  endpoint_secret ='whsec_VtPsqS18E3v6S5vDeEgXg5FDlYZdSYHV'
   request_data = json.loads(request.body)
 
   if webhook_secret:
@@ -29,7 +29,7 @@ def my_webhook_view(request):
       signature = request.headers.get('stripe-signature')
       try:
           event = stripe.Webhook.construct_event(
-              payload=request.data, sig_header=signature, secret=webhook_secret)
+              payload=request.data, sig_header=signature, secret=endpoint_secret)
           data = event['data']
       except Exception as e:
           return e

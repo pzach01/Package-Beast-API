@@ -34,16 +34,16 @@ def my_webhook_view(request):
               payload=request_data, sig_header=signature, secret=webhook_secret)
           data = event['data']
       except Exception as e:
-          return e
+        return HttpResponse('Couldnt authenticate payment credentials', status=400)
       # Get the type of webhook event sent - used to check the status of PaymentIntents.
       event_type = event['type']
       return HttpResponse('Webhook secret worked yo!')
 
   else:
-      data = request_data['data']
-      event_type = request_data['type']
+      data = request.data
+      event_type = request.method
       # couldnt authenticate
-      return HttpResponse('Couldnt authenticate payment credentials', status=401)
+      return HttpResponse('Couldnt authenticate payment credentials', status=400)
 
   data_object = data['object']
 

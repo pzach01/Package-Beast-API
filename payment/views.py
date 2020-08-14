@@ -22,7 +22,7 @@ def my_webhook_view(request):
   endpoint_secret ='whsec_VtPsqS18E3v6S5vDeEgXg5FDlYZdSYHV'
   request_data = json.loads(request.body)
 
-  if webhook_secret:
+  if endpoint_secret:
       return HttpResponse('Webhook secret yo!')
 
       # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.

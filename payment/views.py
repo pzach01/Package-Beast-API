@@ -36,7 +36,6 @@ def my_webhook_view(request):
         return HttpResponse('Couldnt authenticate payment credentials', status=400)
       # Get the type of webhook event sent - used to check the status of PaymentIntents.
       event_type = event['type']
-      return HttpResponse('Webhook secret worked yo!')
 
   else:
       data = request.data
@@ -51,14 +50,14 @@ def my_webhook_view(request):
       # The status of the invoice will show up as paid. Store the status in your
       # database to reference when a user accesses your service to avoid hitting rate
       # limits.
-      print(data)
+      return HttpResponse('Invoice paid yo!')
 
   if event_type == 'invoice.payment_failed':
       # If the payment fails or the customer does not have a valid payment method,
       # an invoice.payment_failed event is sent, the subscription becomes past_due.
       # Use this webhook to notify your user that their payment has
       # failed and to retrieve new card details.
-      print(data)
+      return HttpResponse('Payment failed yo!')
 
   if event_type == 'invoice.finalized':
       # If you want to manually send out invoices to your customers

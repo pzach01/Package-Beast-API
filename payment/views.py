@@ -19,7 +19,7 @@ import os
 @csrf_exempt
 def my_webhook_view(request):
   webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
-  request_data = json.loads(request.data)
+  request_data = json.loads(request.body)
 
   if webhook_secret:
       return HttpResponse('Webhook secret yo!')

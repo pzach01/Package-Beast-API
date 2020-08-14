@@ -16,20 +16,21 @@ from rest_framework.decorators import api_view
 import stripe
 stripe.api_key = 'sk_test_51HB4dCJWFTMXIZUo5d1tlWus4t0NGBLPI6LqHVokCzOyXaYZ6f8rcBqAeWZUdtfdc6tl5EenjpUXWrpFsyRmAwgJ00fRuOxc8b'
 import os
+os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_VtPsqS18E3v6S5vDeEgXg5FDlYZdSYHV"
 # spurious commit
 @csrf_exempt
 def my_webhook_view(request):
-  endpoint_secret ='whsec_VtPsqS18E3v6S5vDeEgXg5FDlYZdSYHV'
+  webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
   request_data = json.loads(request.body)
 
-  if endpoint_secret:
+  if webhook_secret:
       return HttpResponse('Webhook secret yo!')
 
       # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.
       signature = request.headers.get('stripe-signature')
       try:
           event = stripe.Webhook.construct_event(
-              payload=request.data, sig_header=signature, secret=endpoint_secret)
+              payload=request.data, sig_header=signature, secret=webhook_secret)
           data = event['data']
       except Exception as e:
           return e

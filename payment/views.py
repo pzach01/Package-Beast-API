@@ -13,13 +13,14 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 # Using Django
 # newest version
-import os
 @csrf_exempt
 def my_webhook_view(request):
   webhook_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
   request_data = json.loads(request.data)
 
   if webhook_secret:
+      return HttpResponse('Webhook secret yo!')
+
       # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.
       signature = request.headers.get('stripe-signature')
       try:
@@ -31,6 +32,7 @@ def my_webhook_view(request):
       # Get the type of webhook event sent - used to check the status of PaymentIntents.
       event_type = event['type']
   else:
+      return HttpResponse('Not getting webhook secret yo!')
       data = request_data['data']
       event_type = request_data['type']
 

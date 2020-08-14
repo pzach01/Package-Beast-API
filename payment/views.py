@@ -27,7 +27,7 @@ def my_webhook_view(request):
   if webhook_secret:
 
       # Retrieve the event by verifying the signature using the raw body and secret if webhook signing is configured.
-      signature = request.headers.get('stripe-signature')
+      signature = request.headers['stripe-signature']
       try:
           event = stripe.Webhook.construct_event(
               payload=request.data, sig_header=signature, secret=webhook_secret)

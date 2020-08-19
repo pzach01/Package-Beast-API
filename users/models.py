@@ -3,7 +3,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
+from subscription.models import Subscription
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
@@ -17,7 +17,11 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
+
         user.save()
+
+        Subscription.objects.create_subscription(user)
+
         return user
 
     def create_user(self, email, password=None, **extra_fields):
@@ -54,4 +58,3 @@ class User(AbstractUser):
     disableFillContainerAnimation = models.BooleanField(default=False)
     disablePreviousNextItemAnimation = models.BooleanField(default=False)
     animationSpeed = (models.IntegerField(default=50))
-    subscriptionType = models.CharField(max_length=12, blank=False, default='standard')

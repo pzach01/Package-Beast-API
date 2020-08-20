@@ -1,11 +1,18 @@
 from django.db import models
+import stripe
+stripe.api_key = 'sk_test_51HB4dCJWFTMXIZUo5d1tlWus4t0NGBLPI6LqHVokCzOyXaYZ6f8rcBqAeWZUdtfdc6tl5EenjpUXWrpFsyRmAwgJ00fRuOxc8b'
 
 # Create your models here.
 
 
 class SubscriptionManager(models.Manager):
     def create_subscription(self,user):
-        subscription=self.create(owner=user)
+        stripeCustomer = stripe.Customer.create(
+            email=user.email
+        )
+        subscription=self.create(owner=user,stripeId=stripeCustomer.id)
+
+
         # do something with the book
         return subscription
 
@@ -17,7 +24,7 @@ class Subscription(models.Model):
     owner = models.ForeignKey(
         'users.User', related_name='subscription', on_delete=models.CASCADE)
     created=models.DateTimeField(auto_now_add=True)
-
+    stripeId=models.CharField(max_length=20)
     '''
     subscriptionType=models.CharField(max_length=20)
     numRequestsLeft=models.IntegerField()

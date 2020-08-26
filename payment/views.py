@@ -89,11 +89,8 @@ class IsOwner(permissions.BasePermission):
 # in subscription, has different permissions (needs to be exposed to the nonuser that is webhook)
 
 
-class CreateOrUpdateStripeSubscription(generics.CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated, IsOwner]
-
-    def get_queryset(self):
-        user = self.request.user
+class CreateOrUpdateStripeSubscription(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         return JsonResponse('stripe post method yo', safe=False)

@@ -13,7 +13,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from subscription.models import Subscription
 # Using Django
@@ -90,44 +90,37 @@ class IsOwner(permissions.BasePermission):
 
 
 @api_view(['post'])
-def supBud(request):
-    return Response({"message": "Success"})
+@permission_classes([permissions.IsAuthenticated])
+def create_stripe_subscription(request):
+    
+    data = request.body
+    try:
+        # Attach the payment method to the customer
+        stripe.PaymentMethod.attach(
+            data['paymentMethodId'],
+            customer=data['customerId'],
+        )
+        # Set the default payment method on the customer
+        stripe.Customer.modify(
+            data['customerId'],
+            invoice_settings={
+                'default_payment_method': data['paymentMethodId'],
+            },
+        )
 
+        # Create the subscription
+        subscription = stripe.Subscription.create(
+            customer=data['customerId'],
+            items=[
+                {
+                    'price': data['priceId']
+                }
+            ],
+            expand=['latest_invoice.payment_intent'],
+        )
+        # need to store fields here; such as id, items.data.id,customer,currentPeriodEnd
 
-class CreateOrUpdateStripeSubscription(generics.CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        return JsonResponse('stripe post method yo', safe=False)
-        '''
-        data = request.body
-        try:
-            # Attach the payment method to the customer
-            stripe.PaymentMethod.attach(
-                data['paymentMethodId'],
-                customer=data['customerId'],
-            )
-            # Set the default payment method on the customer
-            stripe.Customer.modify(
-                data['customerId'],
-                invoice_settings={
-                    'default_payment_method': data['paymentMethodId'],
-                },
-            )
-
-            # Create the subscription
-            subscription = stripe.Subscription.create(
-                customer=data['customerId'],
-                items=[
-                    {
-                        'price': data['priceId']
-                    }
-                ],
-                expand=['latest_invoice.payment_intent'],
-            )
-            # need to store fields here; such as id, items.data.id,customer,currentPeriodEnd
-
-            return JsonResponse(subscription)
-        except Exception as e:
-            return JsonResponse("Error creating the stripe subscription",status=400,safe=False) 
-        '''
+        return JsonResponse(subscription)
+    except Exception as e:
+        return JsonResponse("Error creating the stripe subscription",status=400,safe=False) 
+    

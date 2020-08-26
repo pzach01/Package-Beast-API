@@ -84,12 +84,12 @@ class IsOwner(permissions.BasePermission):
         return obj.owner == request.user
 # note: this is not the same as updating subscription, stripe subscription is a field
 # in subscription, has different permissions (needs to be exposed to the nonuser that is webhook)
-
-class CreateOrUpdateStripeSubscription(APIView):
+class CreateOrUpdateStripeSubscription(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
 
     def post(self,request):
+        
         data = request.body
         try:
             # Attach the payment method to the customer
@@ -119,4 +119,5 @@ class CreateOrUpdateStripeSubscription(APIView):
 
             return JsonResponse(subscription)
         except Exception as e:
-            return JsonResponse("Error creating the stripe subscription",status=400,safe=False)
+            return JsonResponse("Error creating the stripe subscription",status=400,safe=False) 
+        

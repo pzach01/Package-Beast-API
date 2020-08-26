@@ -92,7 +92,7 @@ class IsOwner(permissions.BasePermission):
 class CreateOrUpdateStripeSubscription(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def perform_create(self, serializer):
+    def post(self, request):
         return JsonResponse('stripe post method yo', safe=False)
         '''
         data = request.body

@@ -37,7 +37,7 @@ def my_webhook_view(request):
               payload=request_data, sig_header=signature, secret=webhook_secret)
           data = event['data']
       except Exception as e:
-        return JsonResponse('Couldnt authenticate payment credentials', status=400)
+        return JsonResponse('Couldnt authenticate payment credentials', status=400,safe=False)
       # Get the type of webhook event sent - used to check the status of PaymentIntents.
       event_type = event['type']
 
@@ -45,7 +45,7 @@ def my_webhook_view(request):
       data = request.data
       event_type = request.method
       # couldnt authenticate
-      return JsonResponse('Couldnt authenticate payment credentials', status=400)
+      return JsonResponse('Couldnt authenticate payment credentials', status=400,safe=False)
 
   data_object = data['object']
 
@@ -54,14 +54,14 @@ def my_webhook_view(request):
       # The status of the invoice will show up as paid. Store the status in your
       # database to reference when a user accesses your service to avoid hitting rate
       # limits.
-      return JsonResponse('Invoice paid yo!')
+      return JsonResponse('Invoice paid yo!',safe=False)
 
   if event_type == 'invoice.payment_failed':
       # If the payment fails or the customer does not have a valid payment method,
       # an invoice.payment_failed event is sent, the subscription becomes past_due.
       # Use this webhook to notify your user that their payment has
       # failed and to retrieve new card details.
-      return JsonResponse('Payment failed yo!')
+      return JsonResponse('Payment failed yo!',safe=False)
 
   if event_type == 'invoice.finalized':
       # If you want to manually send out invoices to your customers
@@ -119,4 +119,4 @@ class CreateOrUpdateStripeSubscription(APIView):
 
             return JsonResponse(subscription)
         except Exception as e:
-            return JsonResponse("Error creating the stripe subscription",status=400)
+            return JsonResponse("Error creating the stripe subscription",status=400,safe=False)

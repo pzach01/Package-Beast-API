@@ -92,6 +92,9 @@ class IsOwner(permissions.BasePermission):
 class CreateOrUpdateStripeSubscription(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+
     def post(self, request):
         return JsonResponse('stripe post method yo', safe=False)
         '''

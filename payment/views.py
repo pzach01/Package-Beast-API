@@ -93,6 +93,7 @@ class IsOwner(permissions.BasePermission):
 @permission_classes([permissions.IsAuthenticated])
 def create_stripe_subscription(request):
     data = request.body
+    return JsonResponse({'customerId':data['customerId'], 'paymentMethodId':data['paymentMethodId'],'priceId':data['priceId']})
         # Attach the payment method to the customer
     stripe.PaymentMethod.attach(
         data['paymentMethodId'],

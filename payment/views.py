@@ -89,7 +89,8 @@ class CreateOrUpdateStripeSubscription(generics.CreateAPIView):
 
 
     def post(self,request):
-        
+        return JsonResponse('stripe post method yo', safe=False)
+        '''
         data = request.body
         try:
             # Attach the payment method to the customer
@@ -120,4 +121,5 @@ class CreateOrUpdateStripeSubscription(generics.CreateAPIView):
             return JsonResponse(subscription)
         except Exception as e:
             return JsonResponse("Error creating the stripe subscription",status=400,safe=False) 
+        '''
         

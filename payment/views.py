@@ -3,14 +3,16 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, permissions
 
-
+from rest_framework import generics
 from django.shortcuts import render
 import json
 from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
+from subscription.models import Subscription
 # Using Django
 # newest version
 import stripe
@@ -73,4 +75,46 @@ def my_webhook_view(request):
       # Send notification to your user that the trial will end
       print(data)
 
-  return jsonify({'status': 'success'})
+  return HttpResponse({'status': 'success'})
+
+class IsOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.owner == request.user
+# note: this is not the same as updating subscription, stripe subscription is a field
+# in subscription, has different permissions (needs to be exposed to the nonuser that is webhook)
+
+class CreateOrUpdateStripeSubscription(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+
+    def post(self,request):
+        data = request.body
+        try:
+            # Attach the payment method to the customer
+            stripe.PaymentMethod.attach(
+                data['paymentMethodId'],
+                customer=data['customerId'],
+            )
+            # Set the default payment method on the customer
+            stripe.Customer.modify(
+                data['customerId'],
+                invoice_settings={
+                    'default_payment_method': data['paymentMethodId'],
+                },
+            )
+
+            # Create the subscription
+            subscription = stripe.Subscription.create(
+                customer=data['customerId'],
+                items=[
+                    {
+                        'price': data['priceId']
+                    }
+                ],
+                expand=['latest_invoice.payment_intent'],
+            )
+            # need to store fields here; such as id, items.data.id,customer,currentPeriodEnd
+
+            return HttpResponse(subscription)
+        except Exception as e:
+            return HttpResponse("Error creating the stripe subscription",status=400)

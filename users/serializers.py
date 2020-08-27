@@ -54,6 +54,7 @@ class RegisterSerializer(serializers.Serializer):
 
 
         user.save()
+        Subscription.objects.create_subscription(user)
 
         return user
 

@@ -19,17 +19,15 @@ class UserManager(BaseUserManager):
         user.set_password(password)
 
         user.save()
-
+        
         return user
 
     def create_user(self, email, password=None, **extra_fields):
         """Create and save a regular User with the given email and password."""
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
-        result= self._create_user(email, password, **extra_fields)
-        Subscription.objects.create_subscription(user)
+        return self._create_user(email, password, **extra_fields)
 
-        return result
     def create_superuser(self, email, password, **extra_fields):
         """Create and save a SuperUser with the given email and password."""
         extra_fields.setdefault('is_staff', True)
@@ -40,10 +38,8 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        result= self._create_user(email, password, **extra_fields)
-        Subscription.objects.create_subscription(user)
+        return self._create_user(email, password, **extra_fields)
 
-        return result
 
 class User(AbstractUser):
     """User model."""

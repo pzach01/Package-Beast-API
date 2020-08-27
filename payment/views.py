@@ -16,6 +16,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from subscription.models import Subscription
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+
 # Using Django
 # newest version
 import stripe
@@ -89,13 +92,20 @@ class IsOwner(permissions.BasePermission):
 # in subscription, has different permissions (needs to be exposed to the nonuser that is webhook)
 
 
+@swagger_auto_schema(method='post', request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'paymentMethodId': openapi.Schema(type=openapi.TYPE_STRING),
+        'priceId': openapi.Schema(type=openapi.TYPE_STRING),
+    }
+))
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated])
 def create_stripe_subscription(request):
     from users.models import User
-    stripeId=Subscription.objects.filter(owner=request.user).stripeId
+    stripeId = Subscription.objects.filter(owner=request.user).stripeId
     data = request.data
-        # Attach the payment method to the customer
+    # Attach the payment method to the customer
     stripe.PaymentMethod.attach(
         data['paymentMethodId'],
         customer=stripeId,
@@ -121,4 +131,3 @@ def create_stripe_subscription(request):
     # need to store fields here; such as id, items.data.id,customer,currentPeriodEnd
 
     return JsonResponse(subscription)
-

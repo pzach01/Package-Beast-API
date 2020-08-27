@@ -103,7 +103,9 @@ class IsOwner(permissions.BasePermission):
 @permission_classes([permissions.IsAuthenticated])
 def create_stripe_subscription(request):
     from users.models import User
+    print(Subscription.objects.filter(owner=request.user))
     stripeId = Subscription.objects.filter(owner=request.user)[0].stripeId
+
     data = request.data
     # Attach the payment method to the customer
     stripe.PaymentMethod.attach(

@@ -128,6 +128,9 @@ def create_stripe_subscription(request):
         ],
         expand=['latest_invoice.payment_intent'],
     )
-    # need to store fields here; such as id, items.data.id,customer,currentPeriodEnd
-
+    # need to store fields here; such as id, items.data.price.id,customer,currentPeriodEnd
+    stripeSubscriptionId=subscription['id']
+    stripeSubscriptionItemDataPriceId=subscription['items']['data']['price']['id']
+    stripeSubscriptionCurrentPeriodEnd=subscription['current_period_end']
+    stripeSubscriptionCustomer=subscription['customer']
     return JsonResponse(subscription)

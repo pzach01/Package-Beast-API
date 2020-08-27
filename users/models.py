@@ -20,8 +20,6 @@ class UserManager(BaseUserManager):
 
         user.save()
 
-        subscription=Subscription.objects.create_subscription(user)
-        subscription.save()
         return user
 
     def create_user(self, email, password=None, **extra_fields):

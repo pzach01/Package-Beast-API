@@ -8,7 +8,7 @@ from arrangements.models import Arrangement
 from users.models import User
 from django.utils.translation import ugettext_lazy as _
 
-
+from subscription.models import Subscription
 
 class LoginSerializer(RestAuthLoginSerializer):
     username = None
@@ -54,6 +54,8 @@ class RegisterSerializer(serializers.Serializer):
 
 
         user.save()
+        Subscription.objects.create_subscription(user)
+
         return user
 
 

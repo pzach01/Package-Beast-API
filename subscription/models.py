@@ -25,6 +25,13 @@ class Subscription(models.Model):
         'users.User', related_name='subscription', on_delete=models.CASCADE)
     created=models.DateTimeField(auto_now_add=True)
     stripeId=models.CharField(max_length=20)
+
+
+    # fields we read during a post to stripe
+    stripeSubscriptionId=models.CharField(max_length=50)
+    stripeSubscriptionItemDataPriceId=models.CharField(max_length=50)
+    stripeSubscriptionCurrentPeriodEnd=models.CharField(max_length=50)
+    stripeSubscriptionCustomer=models.CharField(max_length=50)
     '''
     subscriptionType=models.CharField(max_length=20)
     numRequestsLeft=models.IntegerField()

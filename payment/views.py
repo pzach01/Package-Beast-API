@@ -104,8 +104,8 @@ class IsOwner(permissions.BasePermission):
 def create_stripe_subscription(request):
     from users.models import User
     print(Subscription.objects.filter(owner=request.user))
-    stripeId = Subscription.objects.filter(owner=request.user)[0].stripeId
-
+    sub = Subscription.objects.filter(owner=request.user)[0]
+    stripeId=sub.stripeId
     data = request.data
     # Attach the payment method to the customer
     stripe.PaymentMethod.attach(
@@ -132,9 +132,9 @@ def create_stripe_subscription(request):
     )
     # need to store fields here; such as id, items.data.price.id,customer,currentPeriodEnd
     
-    stripeSubscriptionId=subscription['id']
-    stripeSubscriptionItemDataPriceId=subscription['items']['data'][0]['price']['id']
-    stripeSubscriptionCurrentPeriodEnd=subscription['current_period_end']
-    stripeSubscriptionCustomer=subscription['customer']
-    
+    sub.stripeSubscriptionId=subscription['id']
+    sub.stripeSubscriptionItemDataPriceId=subscription['items']['data'][0]['price']['id']
+    sub.stripeSubscriptionCurrentPeriodEnd=subscription['current_period_end']
+    sub.stripeSubscriptionCustomer=subscription['customer']
+    sub.save()
     return JsonResponse(subscription)

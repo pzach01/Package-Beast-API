@@ -133,7 +133,7 @@ def create_stripe_subscription(request):
     # need to store fields here; such as id, items.data.price.id,customer,currentPeriodEnd
     
     stripeSubscriptionId=subscription['id']
-    stripeSubscriptionItemDataPriceId=subscription['items']['data']['price']['id']
+    stripeSubscriptionItemDataPriceId=subscription['items']['data'][0]['price']['id']
     stripeSubscriptionCurrentPeriodEnd=subscription['current_period_end']
     stripeSubscriptionCustomer=subscription['customer']
     

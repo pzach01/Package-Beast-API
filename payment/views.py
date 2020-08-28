@@ -102,8 +102,6 @@ class IsOwner(permissions.BasePermission):
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated])
 def create_stripe_subscription(request):
-    from users.models import User
-    print(Subscription.objects.filter(owner=request.user))
     sub = Subscription.objects.filter(owner=request.user)[0]
     stripeId=sub.stripeId
     data = request.data
@@ -139,3 +137,29 @@ def create_stripe_subscription(request):
     sub.stripeSubscriptionCustomer=subscription['customer']
     sub.save()
     return JsonResponse(subscription)
+
+@api_view(['post'])
+@permission_classes([permissions.IsAuthenticated])
+def retry_stripe_subscription(request):
+    sub = Subscription.objects.filter(owner=request.user)[0]
+    stripeId=sub.stripeId
+
+    data = request.data
+
+    stripe.PaymentMethod.attach(
+        data['paymentMethodId'],
+        customer=stripeId,
+    )
+    # Set the default payment method on the customer
+    stripe.Customer.modify(
+        stripeId,
+        invoice_settings={
+            'default_payment_method': data['paymentMethodId'],
+        },
+    )
+
+    invoice = stripe.Invoice.retrieve(
+        data['invoiceId'],
+        expand=['payment_intent'],
+    )
+    return JsonResponse(invoice)

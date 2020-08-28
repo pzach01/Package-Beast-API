@@ -135,6 +135,7 @@ def create_stripe_subscription(request):
     sub.stripeSubscriptionId=subscription['id']
     sub.stripeSubscriptionItemDataPriceId=subscription['items']['data'][0]['price']['id']
     sub.stripeSubscriptionCurrentPeriodEnd=subscription['current_period_end']
+    # note that this should be a duplicate of the owner.stripeId but we store it for safety
     sub.stripeSubscriptionCustomer=subscription['customer']
     sub.save()
     return JsonResponse(subscription)

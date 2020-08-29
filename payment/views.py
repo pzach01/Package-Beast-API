@@ -103,6 +103,8 @@ class IsOwner(permissions.BasePermission):
 @permission_classes([permissions.IsAuthenticated])
 def create_stripe_subscription(request):
     sub = Subscription.objects.filter(owner=request.user)[0]
+    if sub.stripeSubscriptionId is 'null':
+        return JsonResponse("You already have a subscription",safe=False, code=400)
     stripeId=sub.stripeId
     data = request.data
     # Attach the payment method to the customer

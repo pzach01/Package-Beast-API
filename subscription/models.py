@@ -28,7 +28,7 @@ class Subscription(models.Model):
 
 
     # fields we read during a post to stripe
-    stripeSubscriptionId=models.CharField(max_length=50)
+    stripeSubscriptionId=models.CharField(max_length=50,default="null")
     stripeSubscriptionItemDataPriceId=models.CharField(max_length=50)
     stripeSubscriptionCurrentPeriodEnd=models.CharField(max_length=50)
     stripeSubscriptionCustomer=models.CharField(max_length=50)

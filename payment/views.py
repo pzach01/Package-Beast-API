@@ -169,9 +169,21 @@ def retry_stripe_subscription(request):
             'default_payment_method': data['paymentMethodId'],
         },
     )
-
+    invoiceIdSplits=sub.stripeInvoiceIds.split(';')
+    foundInvoiceId=int(invoiceIdSplits[len(invoiceIdSplits)-1])
     invoice = stripe.Invoice.retrieve(
-        data['invoiceId'],
+        foundInvoiceId,
         expand=['payment_intent'],
     )
     return JsonResponse(invoice)
+
+
+@api_view(['get'])
+@permission_classes([permissions.IsAuthenticated])
+def user_has_stripe_subscription(request):
+    try:
+        sub=Subscription.objects.get(owner=request.user)
+        stripeSubIsNull=(str(sub.stripeSubscriptionId=='null'))
+        return JsonResponse({'subscriptionCreatedBefore':stripeSubIsNull})
+    except:
+        return JsonResponse('Error getting this info',safe=False)

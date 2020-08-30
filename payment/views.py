@@ -53,10 +53,17 @@ def my_webhook_view(request):
         return JsonResponse('Couldnt authenticate payment credentials', status=400, safe=False)
 
     data_object = data['object']
-
+    # this may eventually be too slow!!!!!!!
     if event_type == 'invoice.created':
         invoiceId=(data['object']['id'])
-        return JsonResponse('Invoice created yo !'+str(invoiceId),safe=False)
+        subId=(data['object']['subscription'])
+        try:
+            sub=Subscription.objects.get(stripeId=str(subId))
+            sub.stripeInvoiceIds+=invoiceId+str(';')
+            sub.save()
+            return JsonResponse('Invoice created yo !'+str(invoiceId),safe=False)
+        except:
+            return JsonResponse('Invoice created; too slow or couldnt find unique subscription')
     if event_type == 'invoice.paid':
         # Used to provision services after the trial has ended.
         # The status of the invoice will show up as paid. Store the status in your

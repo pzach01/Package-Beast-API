@@ -55,6 +55,8 @@ def my_webhook_view(request):
     data_object = data['object']
 
     if event_type == 'invoice.created':
+        data=request.data
+        assert(data['object']['object']=='invoice')
         return JsonResponse('Invoice created yo !',safe=False)
     if event_type == 'invoice.paid':
         # Used to provision services after the trial has ended.

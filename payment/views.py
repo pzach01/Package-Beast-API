@@ -55,8 +55,8 @@ def my_webhook_view(request):
     data_object = data['object']
 
     if event_type == 'invoice.created':
-        assert(request_data['data']['object']=='invoice')
-        return JsonResponse('Invoice created yo !'+str(request_data['data']['id']),safe=False)
+        assert(request_data['data']['object']['object']=='invoice')
+        return JsonResponse('Invoice created yo !'+str(request_data['data']['object']['id']),safe=False)
     if event_type == 'invoice.paid':
         # Used to provision services after the trial has ended.
         # The status of the invoice will show up as paid. Store the status in your

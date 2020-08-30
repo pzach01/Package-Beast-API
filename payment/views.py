@@ -58,8 +58,8 @@ def my_webhook_view(request):
         invoiceId=(data['object']['id'])
         subId=(data['object']['subscription'])
         try:
-            sub=Subscription.objects.get(stripeId=str(subId))
-            sub.stripeInvoiceIds+=invoiceId+str(';')
+            sub=Subscription.objects.get(stripeSubscriptionId=str(subId))
+            sub.stripeInvoiceIds+=str(invoiceId)+str(';')
             sub.save()
             return JsonResponse('Invoice created yo !'+str(invoiceId),safe=False)
         except:

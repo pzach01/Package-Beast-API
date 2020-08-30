@@ -32,7 +32,7 @@ class Subscription(models.Model):
     stripeSubscriptionItemDataPriceId=models.CharField(max_length=50)
     stripeSubscriptionCurrentPeriodEnd=models.CharField(max_length=50)
     stripeSubscriptionCustomer=models.CharField(max_length=50)
-    stripeInvoiceIds=models.CharField(default='')
+    stripeInvoiceIds=models.CharField(default='', max_length=250)
     '''
     subscriptionType=models.CharField(max_length=20)
     numRequestsLeft=models.IntegerField()

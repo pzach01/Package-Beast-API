@@ -187,7 +187,7 @@ def retry_stripe_subscription(request):
 def user_has_stripe_subscription(request):
     try:
         sub=Subscription.objects.get(owner=request.user)
-        stripeSubIsNull=(str(sub.stripeSubscriptionId=='null'))
+        stripeSubIsNull=(str(sub.stripeSubscriptionId!='null'))
         return JsonResponse({'subscriptionCreatedBefore':stripeSubIsNull})
     except:
         return JsonResponse('Error getting this info',safe=False)

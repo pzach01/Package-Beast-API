@@ -149,7 +149,12 @@ def create_stripe_subscription(request):
     sub.stripeSubscriptionCustomer=subscription['customer']
     sub.save()
     return JsonResponse(subscription)
-
+@swagger_auto_schema(method='post', request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'paymentMethodId': openapi.Schema(type=openapi.TYPE_STRING),
+    }
+))
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated])
 def retry_stripe_subscription(request):
@@ -177,7 +182,9 @@ def retry_stripe_subscription(request):
     )
     return JsonResponse(invoice)
 
-
+@swagger_auto_schema(method='get', request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+))
 @api_view(['get'])
 @permission_classes([permissions.IsAuthenticated])
 def user_has_stripe_subscription(request):

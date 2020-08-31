@@ -182,9 +182,6 @@ def retry_stripe_subscription(request):
     )
     return JsonResponse(invoice)
 
-@swagger_auto_schema(method='get', request_body=openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-))
 @api_view(['get'])
 @permission_classes([permissions.IsAuthenticated])
 def user_has_stripe_subscription(request):

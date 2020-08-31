@@ -15,7 +15,7 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
-from subscription.models import Subscription
+from subscription.models import Subscription, InvoiceId
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
@@ -59,8 +59,8 @@ def my_webhook_view(request):
         subId=(data['object']['subscription'])
         try:
             sub=Subscription.objects.get(stripeSubscriptionId=str(subId))
-            sub.stripeInvoiceIds+=str(invoiceId)+str(';')
-            sub.save()
+            invoiceIdObject=InvoiceId(subscription=sub, invoiceId=str(invoiceId))
+            invoiceIdObject.save()
             return JsonResponse('Invoice created yo !'+str(invoiceId),safe=False)
         except:
             return JsonResponse('Invoice created; too slow or couldnt find unique subscription',safe=False)
@@ -169,8 +169,8 @@ def retry_stripe_subscription(request):
             'default_payment_method': data['paymentMethodId'],
         },
     )
-    invoiceIdSplits=sub.stripeInvoiceIds.split(';')
-    foundInvoiceId=int(invoiceIdSplits[len(invoiceIdSplits)-1])
+    invoiceIdsSorted=InvoiceId.objects.filter(subscription=sub).order_by('-created_date')
+    foundInvoiceId=int(invoiceIdsSorted[0])
     invoice = stripe.Invoice.retrieve(
         foundInvoiceId,
         expand=['payment_intent'],

@@ -10,7 +10,7 @@ class SubscriptionManager(models.Manager):
         stripeCustomer = stripe.Customer.create(
             email=user.email
         )
-        subscription=self.create(owner=user,stripeId=stripeCustomer.id)
+        subscription=self.create(owner=user,stripeCustomerId=stripeCustomer.id)
 
 
         # do something with the book
@@ -24,7 +24,7 @@ class Subscription(models.Model):
     owner = models.ForeignKey(
         'users.User', related_name='subscription', on_delete=models.CASCADE)
     created=models.DateTimeField(auto_now_add=True)
-    stripeId=models.CharField(max_length=20)
+    stripeCustomerId=models.CharField(max_length=20)
 
 
     # fields we read during a post to stripe

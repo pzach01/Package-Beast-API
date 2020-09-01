@@ -175,7 +175,7 @@ def retry_stripe_subscription(request):
         },
     )
     invoiceIdsSorted=InvoiceId.objects.filter(subscription=sub).order_by('-created')
-    foundInvoiceId=int(invoiceIdsSorted[0].stripeInvoiceId)
+    foundInvoiceId=invoiceIdsSorted[0].stripeInvoiceId
     invoice = stripe.Invoice.retrieve(
         foundInvoiceId,
         expand=['payment_intent'],

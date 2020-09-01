@@ -24,7 +24,7 @@ class Subscription(models.Model):
     owner = models.ForeignKey(
         'users.User', related_name='subscription', on_delete=models.CASCADE)
     created=models.DateTimeField(auto_now_add=True)
-    stripeId=models.CharField(max_length=20)
+    stripeCustomerId=models.CharField(max_length=20)
 
 
     # fields we read during a post to stripe

@@ -115,16 +115,16 @@ def create_stripe_subscription(request):
     sub = Subscription.objects.filter(owner=request.user)[0]
     if sub.stripeSubscriptionId is 'null':
         return JsonResponse("You already have a subscription",safe=False, code=400)
-    stripeId=sub.stripeId
+    stripeCustomerId=sub.stripeCustomerId
     data = request.data
     # Attach the payment method to the customer
     stripe.PaymentMethod.attach(
         data['paymentMethodId'],
-        customer=stripeId,
+        customer=stripeCustomerId,
     )
     # Set the default payment method on the customer
     stripe.Customer.modify(
-        stripeId,
+        stripeCustomerId,
         invoice_settings={
             'default_payment_method': data['paymentMethodId'],
         },
@@ -132,7 +132,7 @@ def create_stripe_subscription(request):
 
     # Create the subscription
     subscription = stripe.Subscription.create(
-        customer=stripeId,
+        customer=stripeCustomerId,
         items=[
             {
                 'price': data['priceId']
@@ -159,7 +159,7 @@ def create_stripe_subscription(request):
 @permission_classes([permissions.IsAuthenticated])
 def retry_stripe_subscription(request):
     sub = Subscription.objects.filter(owner=request.user)[0]
-    stripeId=sub.stripeId
+    stripeCustomerId=sub.stripeId
 
     data = request.data
 

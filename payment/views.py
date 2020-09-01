@@ -159,17 +159,17 @@ def create_stripe_subscription(request):
 @permission_classes([permissions.IsAuthenticated])
 def retry_stripe_subscription(request):
     sub = Subscription.objects.filter(owner=request.user)[0]
-    stripeCustomerId=sub.stripeId
+    stripeCustomerId=sub.stripeCustomerId
 
     data = request.data
 
     stripe.PaymentMethod.attach(
         data['paymentMethodId'],
-        customer=stripeId,
+        customer=stripeCustomerId,
     )
     # Set the default payment method on the customer
     stripe.Customer.modify(
-        stripeId,
+        stripeCustomerId,
         invoice_settings={
             'default_payment_method': data['paymentMethodId'],
         },

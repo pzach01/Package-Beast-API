@@ -114,7 +114,7 @@ class IsOwner(permissions.BasePermission):
 def create_stripe_subscription(request):
     sub = Subscription.objects.get(owner=request.user)
     stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub).order_by('-created')
-    if len(StripeSubscriptions)>0:
+    if len(stripeSubscriptions)>0:
         return JsonResponse("You already have a subscription",safe=False, code=400)
     stripeCustomerId=sub.stripeCustomerId
     data = request.data

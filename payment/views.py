@@ -179,7 +179,7 @@ def retry_stripe_subscription(request):
     )
 
     stripeSubscription=StripeSubscription.objects.filter(subscription=sub).order_by('-created')[0]
-    invoiceIdsSorted=InvoiceId.objects.filter(subscription=stripeSubscription).order_by('-created')
+    invoiceIdsSorted=InvoiceId.objects.filter(stripeSubscription=stripeSubscription).order_by('-created')
     foundInvoiceId=invoiceIdsSorted[0].stripeInvoiceId
     invoice = stripe.Invoice.retrieve(
         foundInvoiceId,

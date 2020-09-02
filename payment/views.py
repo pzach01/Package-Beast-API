@@ -187,7 +187,29 @@ def retry_stripe_subscription(request):
 def user_has_stripe_subscription(request):
     try:
         sub=Subscription.objects.get(owner=request.user)
-        stripeSubIsNull=(str(sub.stripeSubscriptionId!='null'))
-        return JsonResponse({'subscriptionCreatedBefore':stripeSubIsNull})
+        stripeSubIsNull=(sub.stripeSubscriptionId=='null')
+        return JsonResponse({'subscriptionCreatedBefore': not stripeSubIsNull})
+    except:
+        return JsonResponse('Error getting this info',safe=False)
+
+
+@api_view(['get'])
+@permission_classes([permissions.IsAuthenticated])
+def user_subscription(request):
+    try:
+        sub=Subscription.objects.get(owner=request.user)
+        stripeSubIsNull=(sub.stripeSubscriptionId=='null')
+        print(stripeSubIsNull)
+
+        if stripeSubIsNull:
+            return JsonResponse({'id':stripeSubIsNull})
+        else:
+            # Create the subscription
+            subscription = stripe.Subscription.retrieve(
+                id=sub.stripeSubscriptionId,
+                expand=['latest_invoice.payment_intent'],
+            )
+            return JsonResponse(subscription)
+
     except:
         return JsonResponse('Error getting this info',safe=False)

@@ -192,7 +192,7 @@ def user_has_stripe_subscription(request):
     except:
         return JsonResponse('Error getting this info',safe=False)
 
-
+'''
 @api_view(['get'])
 @permission_classes([permissions.IsAuthenticated])
 def user_subscription(request):
@@ -213,3 +213,4 @@ def user_subscription(request):
 
     except:
         return JsonResponse('Error getting this info',safe=False)
+'''

@@ -145,7 +145,7 @@ def create_stripe_subscription(request):
     
 
     newStripeSubscription=StripeSubscription(subscription=sub
-    ,stripeSubcriptionId=subscription['id']
+    ,stripeSubscriptionId=subscription['id']
     ,stripeSubscriptionItemDataPriceId=subscription['items']['data'][0]['price']['id']
     ,stripeSubscriptionCustomer=subscription['customer'])
     newStripeSubscription.save()

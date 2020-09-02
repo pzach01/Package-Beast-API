@@ -15,7 +15,7 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
-from subscription.models import Subscription, InvoiceId
+from subscription.models import Subscription, InvoiceId,StripeSubscription
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
@@ -58,8 +58,8 @@ def my_webhook_view(request):
         invoiceId=(data['object']['id'])
         subId=(data['object']['subscription'])
         try:
-            sub=Subscription.objects.get(stripeSubscriptionId=str(subId))
-            invoiceIdObject=InvoiceId(subscription=sub, stripeInvoiceId=str(invoiceId))
+            stripeSub=StripeSubscription.objects.get(stripeSubscriptionId=str(subId))
+            invoiceIdObject=InvoiceId(subscription=stripeSub, stripeInvoiceId=str(invoiceId))
             invoiceIdObject.save()
             return JsonResponse('Invoice created yo !'+str(invoiceId),safe=False)
         except:
@@ -112,8 +112,9 @@ class IsOwner(permissions.BasePermission):
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated])
 def create_stripe_subscription(request):
-    sub = Subscription.objects.filter(owner=request.user)[0]
-    if sub.stripeSubscriptionId is 'null':
+    sub = Subscription.objects.get(owner=request.user)
+    stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub).order_by('-created')
+    if len(StripeSubscriptions)>0:
         return JsonResponse("You already have a subscription",safe=False, code=400)
     stripeCustomerId=sub.stripeCustomerId
     data = request.data
@@ -142,12 +143,13 @@ def create_stripe_subscription(request):
     )
     # need to store fields here; such as id, items.data.price.id,customer,currentPeriodEnd
     
-    sub.stripeSubscriptionId=subscription['id']
-    sub.stripeSubscriptionItemDataPriceId=subscription['items']['data'][0]['price']['id']
-    sub.stripeSubscriptionCurrentPeriodEnd=subscription['current_period_end']
-    # note that this should be a duplicate of the owner.stripeCustomerId but we store it for safety
-    sub.stripeSubscriptionCustomer=subscription['customer']
-    sub.save()
+
+    newStripeSubscription=StripeSubscription(subscription=sub
+    ,stripeSubcriptionId=subscription['id']
+    ,stripeSubscriptionItemDataPriceId=subscription['items']['data'][0]['price']['id']
+    ,stripeSubscriptionCustomer=subscription['customer'])
+    newStripeSubscription.save()
+
     return JsonResponse(subscription)
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT,
@@ -158,7 +160,8 @@ def create_stripe_subscription(request):
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated])
 def retry_stripe_subscription(request):
-    sub = Subscription.objects.filter(owner=request.user)[0]
+    sub = Subscription.objects.get(owner=request.user)
+    
     stripeCustomerId=sub.stripeCustomerId
 
     data = request.data
@@ -174,7 +177,9 @@ def retry_stripe_subscription(request):
             'default_payment_method': data['paymentMethodId'],
         },
     )
-    invoiceIdsSorted=InvoiceId.objects.filter(subscription=sub).order_by('-created')
+
+    stripeSubscription=StripeSubscription.objects.filter(subscription=sub).order_by('-created')[0]
+    invoiceIdsSorted=InvoiceId.objects.filter(subscription=stripeSubscription).order_by('-created')
     foundInvoiceId=invoiceIdsSorted[0].stripeInvoiceId
     invoice = stripe.Invoice.retrieve(
         foundInvoiceId,
@@ -187,8 +192,8 @@ def retry_stripe_subscription(request):
 def user_has_stripe_subscription(request):
     try:
         sub=Subscription.objects.get(owner=request.user)
-        stripeSubIsNull=(sub.stripeSubscriptionId=='null')
-        return JsonResponse({'subscriptionCreatedBefore': not stripeSubIsNull})
+        subscriptionCreatedBefore=(len(StripeSubscription.objects.filter(subscription=sub))>0)
+        return JsonResponse({'subscriptionCreatedBefore': subscriptionCreatedBefore})
     except:
         return JsonResponse('Error getting this info',safe=False)
 

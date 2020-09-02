@@ -27,11 +27,7 @@ class Subscription(models.Model):
     stripeCustomerId=models.CharField(max_length=20)
 
 
-    # fields we read during a post to stripe
-    stripeSubscriptionId=models.CharField(max_length=50,default="null")
-    stripeSubscriptionItemDataPriceId=models.CharField(max_length=50)
-    stripeSubscriptionCurrentPeriodEnd=models.CharField(max_length=50)
-    stripeSubscriptionCustomer=models.CharField(max_length=50)
+
     #stripeInvoiceIds=models.CharField(default='', max_length=250)
     '''
     subscriptionType=models.CharField(max_length=20)
@@ -67,7 +63,18 @@ class Subscription(models.Model):
 
 
 
-class InvoiceId(models.Model):
+
+
+class StripeSubscription(models.Model):
     created=models.DateTimeField(auto_now_add=True)
     subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
+    # fields we read during a post to stripe
+    stripeSubscriptionId=models.CharField(max_length=50,default="null")
+    stripeSubscriptionItemDataPriceId=models.CharField(max_length=50)
+    stripeSubscriptionCurrentPeriodEnd=models.CharField(max_length=50)
+    stripeSubscriptionCustomer=models.CharField(max_length=50)
+
+class InvoiceId(models.Model):
+    created=models.DateTimeField(auto_now_add=True)
+    stripeSubscription = models.ForeignKey(StripeSubscription, on_delete=models.CASCADE)
     stripeInvoiceId=models.CharField(max_length=50)

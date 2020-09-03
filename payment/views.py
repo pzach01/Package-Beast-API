@@ -58,7 +58,7 @@ def my_webhook_view(request):
         invoiceId=(data['object']['id'])
         subId=(data['object']['subscription'])
         try:
-            stripeSub=StripeSubscription.objects.filter(stripeSubscriptionId=str(subId)).order_by('-created')[0]
+            stripeSub=StripeSubscription.objects.get(stripeSubscriptionId=str(subId))
             invoiceIdObject=InvoiceId(stripeSubscription=stripeSub, stripeInvoiceId=str(invoiceId))
             invoiceIdObject.save()
             return JsonResponse('Invoice created yo !'+str(invoiceId),safe=False)
@@ -115,7 +115,8 @@ def create_stripe_subscription(request):
     sub = Subscription.objects.get(owner=request.user)
     stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub).order_by('-created')
     if len(stripeSubscriptions)>0:
-        return JsonResponse("You already have a subscription",safe=False, code=400)
+        if stripeSubscriptions[0].deleted==False:
+            return JsonResponse("You already have a subscription",safe=False, code=400)
     stripeCustomerId=sub.stripeCustomerId
     data = request.data
     # Attach the payment method to the customer
@@ -179,6 +180,7 @@ def retry_stripe_subscription(request):
     )
 
     stripeSubscription=StripeSubscription.objects.filter(subscription=sub).order_by('-created')[0]
+    #TODO: fix possibility to bug out here
     invoiceIdsSorted=InvoiceId.objects.filter(stripeSubscription=stripeSubscription).order_by('-created')
     foundInvoiceId=invoiceIdsSorted[0].stripeInvoiceId
     invoice = stripe.Invoice.retrieve(
@@ -192,11 +194,31 @@ def retry_stripe_subscription(request):
 def user_has_stripe_subscription(request):
     try:
         sub=Subscription.objects.get(owner=request.user)
-        subscriptionCreatedBefore=(len(StripeSubscription.objects.filter(subscription=sub))>0)
-        return JsonResponse({'subscriptionCreatedBefore': subscriptionCreatedBefore})
+        stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub)
+
+        subscriptionActive=False
+        if len(stripeSubscriptions)>0:
+            if stripeSubscriptions.order_by('-created')[0].deleted==False:
+                subscriptionActive=True
+
+        return JsonResponse({'subscriptionActive': subscriptionActive})
     except:
         return JsonResponse('Error getting this info',safe=False)
 
+
+@api_view(['delete'])
+@permission_classes([permissions.IsAuthenticated])
+def cancel_subscription(request):
+    try:
+        sub=Subscription.objects.get(owner=request.user)
+        stripeSub=StripeSubscription.objects.filter(subscription=sub).order_by('-created')[0]
+         # Cancel the subscription by deleting it
+        deletedSubscriptionData = stripe.Subscription.delete(stripeSub.stripeSubscriptionId)
+        stripeSub.deleted=True
+        stripeSub.save()
+        return JsonResponse(deletedSubscriptionData)
+    except Exception as e:
+        return JsonResponse(str(e),code=403, safe=False)
 '''
 @api_view(['get'])
 @permission_classes([permissions.IsAuthenticated])

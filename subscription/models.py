@@ -67,6 +67,7 @@ class Subscription(models.Model):
 
 class StripeSubscription(models.Model):
     created=models.DateTimeField(auto_now_add=True)
+    deleted=models.BooleanField(default=False)
     subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
     # fields we read during a post to stripe
     stripeSubscriptionId=models.CharField(max_length=50,default="null")

@@ -8,6 +8,7 @@ urlpatterns = [
     path('payment/createStripeSubscription/', views.create_stripe_subscription),
     path('payment/retryStripeSubscription/', views.retry_stripe_subscription),
     path('payment/userHasStripeSubscription/',views.user_has_stripe_subscription),
+    path('payment/cancelStripeSubscription/',views.cancel_subscription)
 ]
 
 

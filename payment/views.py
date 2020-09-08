@@ -69,6 +69,8 @@ def my_webhook_view(request):
         # The status of the invoice will show up as paid. Store the status in your
         # database to reference when a user accesses your service to avoid hitting rate
         # limits.
+
+        # will need to check against priceIds and prices to find out if we should do a full refill or a partial refill
         return JsonResponse('Invoice paid yo!', safe=False)
 
     if event_type == 'invoice.payment_failed':
@@ -219,6 +221,38 @@ def cancel_subscription(request):
         return JsonResponse(deletedSubscriptionData)
     except Exception as e:
         return JsonResponse(str(e),code=403, safe=False)
+
+@swagger_auto_schema(method='put', request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'priceId': openapi.Schema(type=openapi.TYPE_STRING),
+    }
+))
+@api_view(['put'])
+@permission_classes([permissions.IsAuthenticated])
+#this relies upon invoice.paid distinguishing between full and partial refills of user requests
+def update_stripe_subscription(request):
+    data = request.data
+    try:
+        sub=Subscription.objects.get(owner=request.user)
+        stripeSub=StripeSubscription.objects.filter(subscription=sub).order_by('-created')[0]
+        stripeSubscriptionId=stripeSub.stripeSubscriptionId
+
+        fetchedSubscription = stripe.Subscription.retrieve(stripeSubscriptionId)
+
+        updatedSubscription = stripe.Subscription.modify(
+            stripeSubscriptionId,
+            cancel_at_period_end=False,
+            items=[{
+                'id': fetchedSubscription['items']['data'][0].id,
+                'price': data['priceId'],
+            }]
+        )
+        return JsonResponse(updatedSubscription)
+    except Exception as e:
+        return JsonResponse(str(e),code=403, safe=False)
+
+
 '''
 @api_view(['get'])
 @permission_classes([permissions.IsAuthenticated])

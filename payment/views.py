@@ -247,7 +247,7 @@ def update_stripe_subscription(request):
                 'id': fetchedSubscription['items']['data'][0].id,
                 'price': data['priceId'],
             }],
-            proration_behavior='create_prorations',
+            proration_behavior='always_invoice',
         )
         return JsonResponse(updatedSubscription)
     except Exception as e:

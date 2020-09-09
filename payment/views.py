@@ -15,7 +15,7 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
-from subscription.models import Subscription, InvoiceId,StripeSubscription
+from subscription.models import Subscription, InvoiceId,StripeSubscription, SUBSCRIPTION_PROFILES
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
@@ -26,6 +26,8 @@ stripe.api_key = 'sk_test_51HB4dCJWFTMXIZUo5d1tlWus4t0NGBLPI6LqHVokCzOyXaYZ6f8rc
 # dont know where this should be set
 os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_VtPsqS18E3v6S5vDeEgXg5FDlYZdSYHV"
 # spurious commit
+
+
 
 
 @csrf_exempt
@@ -65,12 +67,43 @@ def my_webhook_view(request):
         except:
             return JsonResponse('Invoice created; too slow or couldnt find unique subscription',safe=False)
     if event_type == 'invoice.paid':
+        invoiceId=(data['object']['id'])
+
+        subId=(data['object']['subscription'])
+        #check against priceIds and prices to find out if we should do a full refill or a partial refill
+
+        try:
+            stripeSub=StripeSubscription.objects.get(stripeSubscriptionId=str(subId))
+            # should be a totally indepedent invoice
+            # refill and refresh subscriptionType ()
+            if data['object']['lines']['total_count']==1:
+                stripeSub.subscription.initialize_or_refill(data['object']['lines'][0]['plan']['product'])
+
+            # should be an update (upgrade/downgrade to subscription)
+            # upgrade (incrementing totalRequest allowed ect) if upgrade and updata subscriptionType
+            elif data['object']['lines']['total_count']==2:
+                # this is a pretty dumb way to do it (no documentation) but should work
+                invoice1=data['object']['lines']['total_count'][0]
+                invoice2=data['object']['lines']['total_count'][1]
+                if (invoice1['amount']<0 and invoice2['amount']<0) or (invoice1['amount']>0 and invoice2['amount']>0):
+                    raise Exception("unknown case where there are 2 positive or 2 negative prices")
+                # pass the product_id to the subscription
+                if invoice1['amount']>0:
+                    stripeSub.subscription.upgrade_or_downgrade(invoice1['plan']['product'])
+                else:
+                    stripeSub.subscription.upgrade_or_downgrade(invoice2['plan']['product'])
+
+            else:
+                raise Exception("unknown case where there are 3 or more subscriptions")
+            #foundSub=[subscription for subscription in SUBSCRIPTION_PROFILES if subscription[2]==subId]
+
+        except:
+            return JsonResponse('Invoice not paid!',code=400,safe=False)
         # Used to provision services after the trial has ended.
         # The status of the invoice will show up as paid. Store the status in your
         # database to reference when a user accesses your service to avoid hitting rate
         # limits.
 
-        # will need to check against priceIds and prices to find out if we should do a full refill or a partial refill
         return JsonResponse('Invoice paid yo!', safe=False)
 
     if event_type == 'invoice.payment_failed':

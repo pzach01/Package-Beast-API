@@ -62,9 +62,9 @@ class Subscription(models.Model):
         nextSubProfile=[sub for sub in SUBSCRIPTION_PROFILES if sub[3]==productId][0]
         # upgrade
         if currentSubProfile[1]<nextSubProfile[1]:
-            self.shipmentsAllowed=nextSubProfile[4]
-            self.itemsAllowed=nextSubProfile[5]
-            self.containersAllowed=nextSubProfile[6]
+            self.shipmentsAllowed=nextSubProfile[5]
+            self.itemsAllowed=nextSubProfile[6]
+            self.containersAllowed=nextSubProfile[7]
         # update subscriptionType
         self.subscriptionType=nextSubProfile[0]
         self.save()
@@ -72,9 +72,11 @@ class Subscription(models.Model):
     def initialize_or_refill(self, productId):
         nextSubProfile=[sub for sub in SUBSCRIPTION_PROFILES if sub[3]==productId][0]
 
-        self.shipmentsAllowed=nextSubProfile[4]
-        self.itemsAllowed=nextSubProfile[5]
-        self.containersAllowed=nextSubProfile[6]
+        self.shipmentsUsed=0
+
+        self.shipmentsAllowed=nextSubProfile[5]
+        self.itemsAllowed=nextSubProfile[6]
+        self.containersAllowed=nextSubProfile[7]
         # update subscriptionType
         self.subscriptionType=nextSubProfile[0]
         self.save()

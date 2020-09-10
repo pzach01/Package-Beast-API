@@ -75,10 +75,12 @@ def my_webhook_view(request):
         try:
             stripeSub=StripeSubscription.objects.get(stripeSubscriptionId=str(subId))
             # should be a totally indepedent invoice
-            # refill and refresh subscriptionType ()
+            # refill and refresh subscriptionType (), refill time
             if data['object']['lines']['total_count']==1:
                 stripeSub.subscription.initialize_or_refill(data['object']['lines']['data'][0]['plan']['product'])
-
+                # this may be overly simplistic
+                stripeSub.currentPeriodEnd=data['period_end']
+                stripeSub.save()
             # should be an update (upgrade/downgrade to subscription)
             # upgrade (incrementing totalRequest allowed ect) if upgrade and updata subscriptionType
             elif data['object']['lines']['total_count']==2:
@@ -181,6 +183,7 @@ def create_stripe_subscription(request):
     
 
     newStripeSubscription=StripeSubscription(subscription=sub
+    ,createdStripe=subscription['created']
     ,stripeSubscriptionId=subscription['id']
     ,stripeSubscriptionItemDataPriceId=subscription['items']['data'][0]['price']['id']
     ,stripeSubscriptionCustomer=subscription['customer'])
@@ -229,14 +232,16 @@ def retry_invoice(request):
 def get_subscription_info(request):
     try:
         sub=Subscription.objects.get(owner=request.user)
-        stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub)
+        stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub).order_by('-created')
 
         subscriptionActive=False
         if len(stripeSubscriptions)>0:
-            if stripeSubscriptions.order_by('-created')[0].deleted==False:
+            if stripeSubscriptions[0].deleted==False:
                 subscriptionActive=True
         returnData={}
         returnData['subscriptionActive']=subscriptionActive
+        returnData['paymentExpired']=stripeSubscriptions[0].currentPeriodEnd>(time.time())
+
         returnData['subscriptionType']=sub.subscriptionType
         returnData['shipmentsAllowed']=sub.shipmentsAllowed
         returnData['shipmentsUsed']=sub.shipmentsUsed
@@ -244,6 +249,8 @@ def get_subscription_info(request):
         returnData['itemsUsed']=sub.itemsUsed
         returnData['containersAllowed']=sub.containersAllowed
         returnData['containersUsed']=sub.containersUsed
+
+        returnData['subscriptionExpirationTime']=stripeSubscriptions[0].currentPeriodEnd
         return JsonResponse(returnData)
     except:
         return JsonResponse('Error getting this info',safe=False)

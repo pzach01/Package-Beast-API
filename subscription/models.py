@@ -85,6 +85,9 @@ class StripeSubscription(models.Model):
     created=models.DateTimeField(auto_now_add=True)
     deleted=models.BooleanField(default=False)
     subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
+
+    createdStripe=models.IntegerField(default=0)
+    current_period_end=models.IntegerField(default=0)
     # fields we read during a post to stripe
     stripeSubscriptionId=models.CharField(max_length=50,default="null")
     stripeSubscriptionItemDataPriceId=models.CharField(max_length=50)

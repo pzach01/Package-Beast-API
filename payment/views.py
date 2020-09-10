@@ -77,14 +77,14 @@ def my_webhook_view(request):
             # should be a totally indepedent invoice
             # refill and refresh subscriptionType ()
             if data['object']['lines']['total_count']==1:
-                stripeSub.subscription.initialize_or_refill(data['object']['lines'][0]['plan']['product'])
+                stripeSub.subscription.initialize_or_refill(data['object']['lines']['data'][0]['plan']['product'])
 
             # should be an update (upgrade/downgrade to subscription)
             # upgrade (incrementing totalRequest allowed ect) if upgrade and updata subscriptionType
             elif data['object']['lines']['total_count']==2:
                 # this is a pretty dumb way to do it (no documentation) but should work
-                invoice1=data['object']['lines']['total_count'][0]
-                invoice2=data['object']['lines']['total_count'][1]
+                invoice1=data['object']['lines']['data'][0]
+                invoice2=data['object']['lines']['data'][1]
                 if (invoice1['amount']<0 and invoice2['amount']<0) or (invoice1['amount']>0 and invoice2['amount']>0):
                     raise Exception("unknown case where there are 2 positive or 2 negative prices")
                 # pass the product_id to the subscription

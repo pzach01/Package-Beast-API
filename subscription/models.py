@@ -67,6 +67,7 @@ class Subscription(models.Model):
             self.containersAllowed=nextSubProfile[6]
         # update subscriptionType
         self.subscriptionType=nextSubProfile[0]
+        self.save()
     # reset used values and set to desired
     def initialize_or_refill(self, productId):
         nextSubProfile=[sub for sub in SUBSCRIPTION_PROFILES if sub[3]==productId][0]
@@ -76,7 +77,7 @@ class Subscription(models.Model):
         self.containersAllowed=nextSubProfile[6]
         # update subscriptionType
         self.subscriptionType=nextSubProfile[0]
-
+        self.save()
 
 class StripeSubscription(models.Model):
     created=models.DateTimeField(auto_now_add=True)

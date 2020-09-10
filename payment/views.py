@@ -195,7 +195,7 @@ def create_stripe_subscription(request):
 ))
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated])
-def retry_stripe_subscription(request):
+def retry_invoice(request):
     sub = Subscription.objects.get(owner=request.user)
     
     stripeCustomerId=sub.stripeCustomerId

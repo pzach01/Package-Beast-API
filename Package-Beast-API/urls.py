@@ -67,7 +67,6 @@ urlpatterns = [
     path('', include('containers.urls')),
     path('', include('items.urls')),
     path('', include('users.urls')),
-    path('', include('secret.urls')),
     path('', include('payment.urls')),
     path('accounts/', include('rest_auth.urls')),
     path('accounts/registration/', include('rest_auth.registration.urls')),

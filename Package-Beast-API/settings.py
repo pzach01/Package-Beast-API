@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     'items',
     'containers',
     'arrangements',
-    'secret',
     'users',
     'subscription',
     'payment',

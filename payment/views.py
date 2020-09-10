@@ -238,10 +238,16 @@ def get_subscription_info(request):
         if len(stripeSubscriptions)>0:
             if stripeSubscriptions[0].deleted==False:
                 subscriptionActive=True
+                # these fields must be initialized
+                returnData['paymentExpired']=stripeSubscriptions[0].currentPeriodEnd>(time.time())
+                returnData['subscriptionExpirationTime']=stripeSubscriptions[0].currentPeriodEnd
+
+        if not subscriptionActive:
+            returnData['paymentExpired']='null'
+            returnData['subscriptionExpirationTime']='null'
+
         returnData={}
         returnData['subscriptionActive']=subscriptionActive
-        returnData['paymentExpired']=stripeSubscriptions[0].currentPeriodEnd>(time.time())
-
         returnData['subscriptionType']=sub.subscriptionType
         returnData['shipmentsAllowed']=sub.shipmentsAllowed
         returnData['shipmentsUsed']=sub.shipmentsUsed
@@ -249,8 +255,7 @@ def get_subscription_info(request):
         returnData['itemsUsed']=sub.itemsUsed
         returnData['containersAllowed']=sub.containersAllowed
         returnData['containersUsed']=sub.containersUsed
-
-        returnData['subscriptionExpirationTime']=stripeSubscriptions[0].currentPeriodEnd
+        
         return JsonResponse(returnData)
     except:
         return JsonResponse('Error getting this info',safe=False)

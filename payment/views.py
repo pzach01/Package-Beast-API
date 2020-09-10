@@ -226,7 +226,7 @@ def retry_stripe_subscription(request):
 
 @api_view(['get'])
 @permission_classes([permissions.IsAuthenticated])
-def user_has_stripe_subscription(request):
+def get_subscription_info(request):
     try:
         sub=Subscription.objects.get(owner=request.user)
         stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub)
@@ -235,8 +235,16 @@ def user_has_stripe_subscription(request):
         if len(stripeSubscriptions)>0:
             if stripeSubscriptions.order_by('-created')[0].deleted==False:
                 subscriptionActive=True
-
-        return JsonResponse({'subscriptionActive': subscriptionActive})
+        returnData={}
+        returnData['subscriptionActive']=subscriptionActive
+        returnData['subscriptionType']=sub.subscriptionType
+        returnData['shipmentsAllowed']=sub.shipmentsAllowed
+        returnData['shipmentsUsed']=sub.shipmentsUsed
+        returnData['itemsAllowed']=sub.itemsAllowed
+        returnData['itemsUsed']=sub.itemsUsed
+        returnData['containersAllowed']=sub.containersAllowed
+        returnData['containersUsed']=sub.containersUsed
+        return JsonResponse(returnData)
     except:
         return JsonResponse('Error getting this info',safe=False)
 

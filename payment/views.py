@@ -235,6 +235,8 @@ def get_subscription_info(request):
         stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub).order_by('-created')
 
         subscriptionActive=False
+        returnData={}
+
         if len(stripeSubscriptions)>0:
             if stripeSubscriptions[0].deleted==False:
                 subscriptionActive=True
@@ -246,7 +248,6 @@ def get_subscription_info(request):
             returnData['paymentExpired']='null'
             returnData['subscriptionExpirationTime']='null'
 
-        returnData={}
         returnData['subscriptionActive']=subscriptionActive
         returnData['subscriptionType']=sub.subscriptionType
         returnData['shipmentsAllowed']=sub.shipmentsAllowed

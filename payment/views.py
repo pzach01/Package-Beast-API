@@ -79,7 +79,7 @@ def my_webhook_view(request):
             if data['object']['lines']['total_count']==1:
                 stripeSub.subscription.initialize_or_refill(data['object']['lines']['data'][0]['plan']['product'])
                 # this may be overly simplistic
-                stripeSub.currentPeriodEnd=data['object']['period_end']
+                stripeSub.currentPeriodEnd=data['object']['lines']['data'][0]['period']['end']
                 stripeSub.save()
             # should be an update (upgrade/downgrade to subscription)
             # upgrade (incrementing totalRequest allowed ect) if upgrade and updata subscriptionType

@@ -250,7 +250,7 @@ def get_subscription_info(request):
         # corresponds to ability to change subscription vs. ability to create subscription
         returnData['subscriptionActive']=subscriptionActive
         # 3 day grace period applied to userViewRights and also all remaining subscription time after a cancel
-        returnData['userHasViewRights']=stripeSubscriptions[0].currentPeriodEnd+(60*60*24*3)>time.time()
+        returnData['userHasViewRights']=stripeSubscriptions[0].currentPeriodEnd+(60*60*24*2)>time.time()
         returnData['subscriptionType']=sub.subscriptionType
         returnData['shipmentsAllowed']=sub.shipmentsAllowed
         returnData['shipmentsUsed']=sub.shipmentsUsed

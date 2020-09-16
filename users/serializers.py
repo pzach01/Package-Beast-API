@@ -20,7 +20,7 @@ class RegisterSerializer(serializers.Serializer):
     last_name = serializers.CharField(required=True, write_only=True)
     password1 = serializers.CharField(required=True, write_only=True, min_length=8)
     password2 = serializers.CharField(required=True, write_only=True, min_length=8)
-    recaptcha_token=serializers.CharField(required=True,write_only=True,max_length=256)
+    recaptcha_token=serializers.CharField(required=True,write_only=True,max_length=1012)
     def validate_email(self, email):
         email = get_adapter().clean_email(email)
         if allauth_settings.UNIQUE_EMAIL:

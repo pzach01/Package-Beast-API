@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 import requests
 from requests import post
 from subscription.models import Subscription
-from rest_framework.parsers import JSONParser
+import json
 class LoginSerializer(RestAuthLoginSerializer):
     username = None
 
@@ -44,7 +44,7 @@ class RegisterSerializer(serializers.Serializer):
         }
         resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=recaptchaInput)
 
-        resp = JSONParser().parse(resp)
+        resp = resp.json()
         if resp['score']<1:
 
             raise serializers.ValidationError(

@@ -7,7 +7,8 @@ from rest_framework import serializers
 from arrangements.models import Arrangement
 from users.models import User
 from django.utils.translation import ugettext_lazy as _
-
+import requests
+from requests import post
 from subscription.models import Subscription
 
 class LoginSerializer(RestAuthLoginSerializer):
@@ -19,7 +20,7 @@ class RegisterSerializer(serializers.Serializer):
     last_name = serializers.CharField(required=True, write_only=True)
     password1 = serializers.CharField(required=True, write_only=True, min_length=8)
     password2 = serializers.CharField(required=True, write_only=True, min_length=8)
-
+    recaptcha_token=serializers.CharField(required=True,write_only=True,max_length=50)
     def validate_email(self, email):
         email = get_adapter().clean_email(email)
         if allauth_settings.UNIQUE_EMAIL:
@@ -32,6 +33,23 @@ class RegisterSerializer(serializers.Serializer):
         return get_adapter().clean_password(password)
 
     def validate(self, data):
+        '''
+        secret	Required. The shared key between your site and reCAPTCHA.
+        response	Required. The user response token provided by the reCAPTCHA client-side integration on your site.
+        remoteip	Optional. The user's IP address.
+        '''
+        recaptchaInput={
+        'secret':'6LfXg8wZAAAAAP3qHCkfmqe3i2DE4EVa72jWDPTK',
+        'response':data['recaptcha_token']
+        }
+        resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=recaptchaInput)
+
+        if resp['score']<1:
+
+            raise serializers.ValidationError(
+                _("You were identified as a bot. Please try again or contact technical support.Recaptcha score:"+str(resp['score'])))
+
+
         if data['password1'] != data['password2']:
             raise serializers.ValidationError(
                 _("The two password fields didn't match."))

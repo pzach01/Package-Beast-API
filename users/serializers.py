@@ -43,6 +43,9 @@ class RegisterSerializer(serializers.Serializer):
         'response':data['recaptcha_token']
         }
         resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=recaptchaInput)
+        print('RECaptcha response')
+        print(resp)
+        print('End response')
         resp = json.dumps(resp)
         if resp['score']<1:
 

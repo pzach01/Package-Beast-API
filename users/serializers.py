@@ -44,7 +44,7 @@ class RegisterSerializer(serializers.Serializer):
         }
         resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=recaptchaInput)
 
-        resp = json.dumps(resp.text)
+        resp = resp.json()
         if resp['score']<1:
 
             raise serializers.ValidationError(

@@ -35,7 +35,7 @@ class RegisterSerializer(serializers.Serializer):
         resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=recaptchaInput)
 
         resp = resp.json()
-        if resp['score']<1:
+        if resp['score']<.5:
 
             raise serializers.ValidationError(
                 _("You were identified as a bot. Please try again or contact technical support.Recaptcha score:"+str(resp['score'])))

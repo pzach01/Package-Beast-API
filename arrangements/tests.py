@@ -60,8 +60,6 @@ def test_1():
     from rest_framework.authtoken.models import Token
     from arrangements.views import ArrangementList, Arrangement
     from rest_framework.test import force_authenticate
-
-    import json
     from users.models import User
 
     client = APIClient()
@@ -71,7 +69,8 @@ def test_1():
     pz_user = User.objects.get(email='peter.douglas.zach@gmail.com')
     pz_view = ArrangementList.as_view()
 
-    pz_request = factory.post('/arrangements/',json.dumps(inputData), content_type='application/json')
+    pz_request =factory.post('/arrangements/',data=inputData, format='json')
+
     force_authenticate(pz_request, user=pz_user)
     pz_response = pz_view(pz_request)
     data=pz_response.data

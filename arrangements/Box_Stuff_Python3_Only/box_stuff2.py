@@ -165,6 +165,8 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
         for ele in range(0, len(bins1)):
             if ele==indexUsed:
                 assert(len(minArrangment)==1)
+                # update the arrangment id so that it is placed in the right place
+                minArrangment[0].id=ele
                 containersUsed.append(minArrangment[0])
             else:
                 x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])

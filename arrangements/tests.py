@@ -431,8 +431,82 @@ def test_4(client):
     
     return client
 
+# QUESTION ASKED: expected behavior in the following use case
+# items: ['1x1x1','1x1x1']
+# containers:['2x2x1','2x1x1']
+def test_5(client):
+    inputData={
+    "multiBinPack": False,
+    "timeoutDuration": 30,
+    "containers": [
+        {
+        "sku": "unit",
+        "description": "string",
+        "xDim": 2,
+        "yDim": 2,
+        "zDim": 1,
+        "units": "in"
+        },
+        {
+        "sku": "unit",
+        "description": "string",
+        "xDim": 2,
+        "yDim": 1,
+        "zDim": 1,
+        "units": "in"
+        },
+
+    ],
+    "items": [
+        {
+        "id": 0,
+        "sku": "string",
+        "description": "string",
+        "length": 1,
+        "width": 1,
+        "height": 1,
+        "units": "in"
+        },
+        {
+        "id": 1,
+        "sku": "string",
+        "description": "string",
+        "length": 1,
+        "width": 1,
+        "height": 1,
+        "units": "in"
+        }
+    ]
+    }
 
 
+
+    factory = APIRequestFactory()
+
+
+    pz_user = User.objects.get(email='peter.douglas.zach@gmail.com')
+    pz_view = ArrangementList.as_view()
+
+    pz_request =factory.post('/arrangements/',data=inputData, format='json')
+
+    force_authenticate(pz_request, user=pz_user)
+    pz_response = pz_view(pz_request)
+    data=pz_response.data
+    
+
+    # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+
+    assert(data['arrangementPossible']==True)
+    assert(data['multiBinPack']==False)
+    selectedContainer=None
+    for container in data['containers']:
+        if (container['xDim']==2) and (container['yDim']==1 and container['zDim']==1):
+            selectedContainer=container['id']
+
+    for item in data['items']:
+        assert(item['container']==selectedContainer)
+        #assert(item['container']==selectedContainer)
+    return client
 
 from rest_framework.test import APIClient
 client = APIClient()
@@ -465,3 +539,10 @@ try:
     print('Passed Arrangments Test 4')
 except:
     print('------------Failed Arrangments Test 4')
+
+
+try:
+    client=test_5(client)
+    print('Passed Arrangments Test 5')
+except:
+    print('------------Failed Arrangments Test 5')

@@ -21,7 +21,8 @@ class ArrangementSerializer(serializers.ModelSerializer):
         model = Arrangement
         fields = ['id', 'created', 'owner', 'arrangementPossible', 'timeout', 'multiBinPack', 'timeoutDuration', 'containers', 'items']
         read_only_fields = ['arrangementPossible', 'timeout']       
-
+    def format_as_dimensions(self,x,y,z):
+        return str(x)+'x'+str(y)+'x'+str(z)
     def create(self, validated_data):
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')
@@ -29,21 +30,22 @@ class ArrangementSerializer(serializers.ModelSerializer):
         arrangement = Arrangement.objects.create(**validated_data)
         multiBinPack = arrangement.multiBinPack
 
-        # this string formatting will be replaced with something less stupid
         containerStrings = []
         itemStrings = []
         itemIds=[]
         for container in containers:
-            l, w, h = container['xDim'], container['yDim'], container['zDim']
-            containerStrings.append(str(l)+'x'+str(w)+'x'+str(h))
+            x,y,z = container['xDim'], container['yDim'], container['zDim']
+            as_string=self.format_as_dimensions(x,y,z)
+
+            containerStrings.append(as_string)
         for item in items:
-            item['xDim'] = item['height']
-            item['yDim'] = item['length']
-            item['zDim'] = item['width']
-            
-            l, w, h = item['xDim'], item['yDim'], item['zDim']
-            itemStrings.append(str(l)+'x'+str(w)+'x'+str(h))
+            item['xDim'],item['yDim'],item['zDim'] = item['height'],item['length'],item['width']
+            x,y,z= item['xDim'], item['yDim'], item['zDim']
+            as_string=self.format_as_dimensions(x,y,z)
+
+            itemStrings.append(as_string)
             itemIds.append(item['id'])
+        
         from .Box_Stuff_Python3_Only import box_stuff2 as bp
         apiObjects,timedout,arrangementPossible = bp.master_calculate_optimal_solution(
             containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
@@ -51,32 +53,27 @@ class ArrangementSerializer(serializers.ModelSerializer):
         arrangement.timeout = timedout
         arrangement.arrangementPossible = arrangementPossible
 
-        # This is where we can call calculate optimal soution, passing in items and containers.
-        # Note, items and containers are both ordered dictionary lists now, not strings.
-        # Their length, width, height, x, y, z, and the item's container need to be modified before
-        # creating in database with .create method as shown below
-        # See model definitions in items.models and containers.models for additional info
         containerList = []
-        index = 0
+        index=0
         for container in containers:
-            if not timedout and arrangementPossible:
-                xDim = apiObjects[index].xDim
-                yDim = apiObjects[index].yDim
-                zDim = apiObjects[index].zDim
-            else:
+            if (not arrangementPossible) or timedout:
                 xDim = container['xDim']
                 yDim = container['yDim']
                 zDim = container['zDim']
+            else:
+                xDim = apiObjects[index].xDim
+                yDim = apiObjects[index].yDim
+                zDim = apiObjects[index].zDim
+                index+=1
             sku = container['sku']
             description = container['description']
             units = container['units']
             volume = xDim*yDim*zDim
-            if multiBinPack or (not apiObjects[index].boxes==[]):
-                containerList.append(Container.objects.create(arrangement=arrangement, xDim=xDim, yDim=yDim, zDim=zDim, volume=volume,
-                                                          owner=validated_data['owner'], sku=sku, description=description, units=units))
-            index += 1
-
+            containerList.append(Container.objects.create(arrangement=arrangement, xDim=xDim, yDim=yDim, zDim=zDim, volume=volume,
+                                                        owner=validated_data['owner'], sku=sku, description=description, units=units))
         index = 0
+
+
         if not timedout and arrangementPossible:
             for container in apiObjects:
                 for item in container.boxes:
@@ -112,7 +109,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
         else:
             for item in items:
                 volume = item['width']*item['length']*item['height']
-                Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'], volume=volume, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
+                Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
 
         return arrangement
 

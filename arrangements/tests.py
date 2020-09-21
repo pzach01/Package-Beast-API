@@ -188,7 +188,7 @@ def test_2(client):
     assert(len(data['items'])==5)
     for item in data['items']:
         # null container field
-        assert(item['container']==0)
+        assert(item['container']==None)
     assert(len(data['containers'])==1)
     return client
 

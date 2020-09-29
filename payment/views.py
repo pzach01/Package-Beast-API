@@ -219,13 +219,16 @@ def retry_invoice(request):
 
     stripeSubscription=StripeSubscription.objects.filter(subscription=sub).order_by('-created')[0]
     #TODO: fix possibility to bug out here
-    invoiceIdsSorted=InvoiceId.objects.filter(stripeSubscription=stripeSubscription).order_by('-created')
-    foundInvoiceId=invoiceIdsSorted[0].stripeInvoiceId
-    invoice = stripe.Invoice.retrieve(
-        foundInvoiceId,
-        expand=['payment_intent'],
-    )
-    return JsonResponse(invoice)
+    try:
+        invoiceIdsSorted=InvoiceId.objects.filter(stripeSubscription=stripeSubscription).order_by('-created')
+        foundInvoiceId=invoiceIdsSorted[0].stripeInvoiceId
+        invoice = stripe.Invoice.retrieve(
+            foundInvoiceId,
+            expand=['payment_intent'],
+        )
+        return JsonResponse(invoice)
+    except:
+        return JsonResponse("No invoice has gone through yet",safe=False)
 
 @api_view(['get'])
 @permission_classes([permissions.IsAuthenticated])
@@ -249,7 +252,7 @@ def get_subscription_info(request):
             returnData['subscriptionExpirationTime']='null'
         # corresponds to ability to change subscription vs. ability to create subscription
         returnData['subscriptionActive']=subscriptionActive
-        # 3 day grace period applied to userViewRights and also all remaining subscription time after a cancel
+        # 2 day grace period applied to userViewRights and also all remaining subscription time after a cancel
         returnData['userHasViewRights']=stripeSubscriptions[0].currentPeriodEnd+(60*60*24*2)>time.time()
         returnData['subscriptionType']=sub.subscriptionType
         returnData['shipmentsAllowed']=sub.shipmentsAllowed

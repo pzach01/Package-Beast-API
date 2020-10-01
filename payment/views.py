@@ -99,7 +99,7 @@ def my_webhook_view(request):
             else:
                 raise Exception("unknown case where there are 3 or more subscriptions")
             #foundSub=[subscription for subscription in SUBSCRIPTION_PROFILES if subscription[2]==subId]
-        except subscription.models.StripeSubscription.DoesNotExist:
+        except StripeSubscription.DoesNotExist:
                 return JsonResponse('Couldnt find the subscription. Invoice not paid!',status=400,safe=False)
         except:
             return JsonResponse('Invoice not paid!',status=400,safe=False)

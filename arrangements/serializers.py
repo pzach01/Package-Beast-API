@@ -9,6 +9,7 @@ from containers.serializers import ContainerSerializer
 from items.serializers import ItemSerializer, ItemSerializerWithId
 from items.models import Item
 from containers.models import Container
+from .Box_Stuff_Python3_Only import box_stuff2 as bp
 
 
 class ArrangementSerializer(serializers.ModelSerializer):
@@ -23,6 +24,14 @@ class ArrangementSerializer(serializers.ModelSerializer):
         read_only_fields = ['arrangementPossible', 'timeout']       
     def format_as_dimensions(self,x,y,z):
         return str(x)+'x'+str(y)+'x'+str(z)
+    def convert_to_inches(self,x,y,z,units):
+        if units == "in":
+            return x,y,z,"in"
+        if units == "mm":
+            return x/25.4, y/25.4, z/25.4, "in"
+        if units == "cm":
+            return x/2.54, y/2.54, z/2.54, "in"
+
     def create(self, validated_data):
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')
@@ -39,14 +48,14 @@ class ArrangementSerializer(serializers.ModelSerializer):
 
             containerStrings.append(as_string)
         for item in items:
+            item['height'], item['length'], item['width'], item['units'] = self.convert_to_inches(item['height'], item['length'], item['width'], item['units'])
             item['xDim'],item['yDim'],item['zDim'] = item['height'],item['length'],item['width']
             x,y,z= item['xDim'], item['yDim'], item['zDim']
             as_string=self.format_as_dimensions(x,y,z)
 
             itemStrings.append(as_string)
             itemIds.append(item['id'])
-        
-        from .Box_Stuff_Python3_Only import box_stuff2 as bp
+           
         apiObjects,timedout,arrangementPossible = bp.master_calculate_optimal_solution(
             containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
         

@@ -8,6 +8,7 @@ from rest_framework import status, permissions
 
 from rest_framework import generics
 from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist 
 import json
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -98,7 +99,8 @@ def my_webhook_view(request):
             else:
                 raise Exception("unknown case where there are 3 or more subscriptions")
             #foundSub=[subscription for subscription in SUBSCRIPTION_PROFILES if subscription[2]==subId]
-
+        except subscription.models.StripeSubscription.DoesNotExist:
+                return JsonResponse('Couldnt find the subscription. Invoice not paid!',status=400,safe=False)
         except:
             return JsonResponse('Invoice not paid!',status=400,safe=False)
         # Used to provision services after the trial has ended.
@@ -153,7 +155,7 @@ def create_stripe_subscription(request):
     stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub).order_by('-created')
     if len(stripeSubscriptions)>0:
         if stripeSubscriptions[0].deleted==False:
-            return JsonResponse("You already have a subscription",safe=False, code=400)
+            return JsonResponse("You already have a subscription",status=400,safe=False)
     stripeCustomerId=sub.stripeCustomerId
     data = request.data
     # Attach the payment method to the customer
@@ -279,7 +281,7 @@ def cancel_subscription(request):
         stripeSub.save()
         return JsonResponse(deletedSubscriptionData)
     except Exception as e:
-        return JsonResponse(str(e),code=403, safe=False)
+        return JsonResponse(str(e),status=403, safe=False)
 
 @swagger_auto_schema(method='put', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT,
@@ -313,7 +315,7 @@ def update_stripe_subscription(request):
         )
         return JsonResponse(updatedSubscription)
     except Exception as e:
-        return JsonResponse(str(e),code=403, safe=False)
+        return JsonResponse(str(e),status=403, safe=False)
 
 
 '''

@@ -16,9 +16,8 @@ class ArrangementList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
     def get_queryset(self):
         user = self.request.user
-        return Arrangement.objects.filter(owner=user)
+        return Arrangement.objects.prefetch_related('items').prefetch_related('containers').filter(owner=user)
     
-    queryset = Arrangement.objects.all()
     serializer_class = ArrangementSerializer
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

@@ -249,15 +249,17 @@ def get_subscription_info(request):
         returnData={}
 
         if len(stripeSubscriptions)>0:
+            returnData['subscriptionExpirationTime']=stripeSubscriptions[0].currentPeriodEnd
+
             if stripeSubscriptions[0].deleted==False:
                 subscriptionActive=True
                 # these fields must be initialized
                 returnData['paymentExpired']=stripeSubscriptions[0].currentPeriodEnd>(time.time())
-                returnData['subscriptionExpirationTime']=stripeSubscriptions[0].currentPeriodEnd
+        else:
+            returnData['subscriptionExpirationTime']='null'
 
         if not subscriptionActive:
             returnData['paymentExpired']='null'
-            returnData['subscriptionExpirationTime']='null'
         # corresponds to ability to change subscription vs. ability to create subscription
         returnData['subscriptionActive']=subscriptionActive
         # 2 day grace period applied to userViewRights and also all remaining subscription time after a cancel

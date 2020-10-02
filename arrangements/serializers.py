@@ -58,7 +58,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
             itemStrings.append(as_string)
             itemIds.append(item['id'])
         #increment the amount of shipments the user has used
-        Subscription.objects.filter(owner=self.request.user)[0].increment_shipment_requests()
+        Subscription.objects.filter(owner=validated_data['owner'])[0].increment_shipment_requests()
         apiObjects,timedout,arrangementPossible = bp.master_calculate_optimal_solution(
             containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
         

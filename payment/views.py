@@ -26,7 +26,7 @@ import stripe
 stripe.api_key = 'sk_test_51HB4dCJWFTMXIZUo5d1tlWus4t0NGBLPI6LqHVokCzOyXaYZ6f8rcBqAeWZUdtfdc6tl5EenjpUXWrpFsyRmAwgJ00fRuOxc8b'
 
 # nice little webinterface API key
-os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_0mhpRFUdmoM1a7wpf0Tz4mUEb5qDXOBu"
+os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_VtPsqS18E3v6S5vDeEgXg5FDlYZdSYHV"
 # CLI api key
 #os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_0mhpRFUdmoM1a7wpf0Tz4mUEb5qDXOBu"
 

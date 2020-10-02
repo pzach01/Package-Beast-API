@@ -81,6 +81,16 @@ class Subscription(models.Model):
         self.subscriptionType=nextSubProfile[0]
         self.save()
 
+    def increment_shipment_requests(self):
+        self.shipmentsUsed+=1
+        self.save()
+    def increment_item_requests(self):
+        self.itemsUsed+=1
+        self.save()
+    def increment_container_requests(self):
+        self.containersUsed+=1
+        self.save()
+
 class StripeSubscription(models.Model):
     created=models.DateTimeField(auto_now_add=True)
     deleted=models.BooleanField(default=False)

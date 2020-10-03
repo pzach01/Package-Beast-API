@@ -94,9 +94,6 @@ class Subscription(models.Model):
     def increment_container_requests(self):
         self.containersUsed+=1
         self.save()
-    # def get_containersUsed(self):
-    #     print("yoyoyo")
-    #     self.containersUsed = Container.objects.filter(owner=request.user, arrangement__isnull=True).count()
 
 class StripeSubscription(models.Model):
     created=models.DateTimeField(auto_now_add=True)

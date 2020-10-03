@@ -17,12 +17,8 @@ class SubscriptionManager(models.Manager):
         )
         subscription=self.create(owner=user,stripeCustomerId=stripeCustomer.id)
 
-
         # do something with the book
         return subscription
-
-
-
 
 
 class Subscription(models.Model):

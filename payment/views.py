@@ -20,6 +20,8 @@ from subscription.models import Subscription, InvoiceId,StripeSubscription, SUBS
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 import time
+from items.models import Item
+from containers.models import Container
 # Using Django
 # newest version
 import stripe
@@ -268,9 +270,9 @@ def get_subscription_info(request):
         returnData['shipmentsAllowed']=sub.shipmentsAllowed
         returnData['shipmentsUsed']=sub.shipmentsUsed
         returnData['itemsAllowed']=sub.itemsAllowed
-        returnData['itemsUsed']=sub.itemsUsed
+        returnData['itemsUsed']=Item.objects.filter(owner=request.user, arrangement__isnull=True).count()
         returnData['containersAllowed']=sub.containersAllowed
-        returnData['containersUsed']=sub.containersUsed
+        returnData['containersUsed']=Container.objects.filter(owner=request.user, arrangement__isnull=True).count()
         
         return JsonResponse(returnData)
     except:

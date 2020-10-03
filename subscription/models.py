@@ -1,5 +1,7 @@
 from django.db import models
 import stripe
+from items.models import Item
+from containers.models import Container
 stripe.api_key = 'sk_test_51HB4dCJWFTMXIZUo5d1tlWus4t0NGBLPI6LqHVokCzOyXaYZ6f8rcBqAeWZUdtfdc6tl5EenjpUXWrpFsyRmAwgJ00fRuOxc8b'
 
 # THIS IS TIED TO CURRENT PRODUCTS; WONT BEHAVE CORRECTLY IF THESE FIELDS ARE WRONG
@@ -32,10 +34,16 @@ class Subscription(models.Model):
     shipmentsAllowed=models.IntegerField(default=0)
 
     itemsAllowed=models.IntegerField(default=0)
-    itemsUsed=models.IntegerField(default=0)
+
+    @property
+    def itemsUsed(self):
+        return Item.objects.filter(owner=self.owner, arrangement__isnull=True).count()
+    
+    @property
+    def containersUsed(self):
+        return Container.objects.filter(owner=self.owner, arrangement__isnull=True).count()
 
     containersAllowed=models.IntegerField(default=0)
-    containersUsed=models.IntegerField(default=0)
 
     #stripeInvoiceIds=models.CharField(default='', max_length=250)
     '''
@@ -86,6 +94,9 @@ class Subscription(models.Model):
     def increment_container_requests(self):
         self.containersUsed+=1
         self.save()
+    # def get_containersUsed(self):
+    #     print("yoyoyo")
+    #     self.containersUsed = Container.objects.filter(owner=request.user, arrangement__isnull=True).count()
 
 class StripeSubscription(models.Model):
     created=models.DateTimeField(auto_now_add=True)

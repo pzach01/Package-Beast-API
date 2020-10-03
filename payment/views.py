@@ -270,9 +270,9 @@ def get_subscription_info(request):
         returnData['shipmentsAllowed']=sub.shipmentsAllowed
         returnData['shipmentsUsed']=sub.shipmentsUsed
         returnData['itemsAllowed']=sub.itemsAllowed
-        returnData['itemsUsed']=Item.objects.filter(owner=request.user, arrangement__isnull=True).count()
+        returnData['itemsUsed']=sub.itemsUsed
         returnData['containersAllowed']=sub.containersAllowed
-        returnData['containersUsed']=Container.objects.filter(owner=request.user, arrangement__isnull=True).count()
+        returnData['containersUsed']=sub.containersUsed
         
         return JsonResponse(returnData)
     except:

@@ -44,6 +44,7 @@ class Subscription(models.Model):
         return Container.objects.filter(owner=self.owner, arrangement__isnull=True).count()
     @property
     def paymentUpToDate(self):
+        from subscription.models import StripeSubscription
         stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub).order_by('-created')
         return stripeSubscriptions[0].currentPeriodEnd+(60*60*24*2)>time.time()
 

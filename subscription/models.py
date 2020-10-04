@@ -2,6 +2,9 @@ from django.db import models
 import stripe
 from items.models import Item
 from containers.models import Container
+import time
+
+
 stripe.api_key = 'sk_test_51HB4dCJWFTMXIZUo5d1tlWus4t0NGBLPI6LqHVokCzOyXaYZ6f8rcBqAeWZUdtfdc6tl5EenjpUXWrpFsyRmAwgJ00fRuOxc8b'
 
 # THIS IS TIED TO CURRENT PRODUCTS; WONT BEHAVE CORRECTLY IF THESE FIELDS ARE WRONG
@@ -44,8 +47,8 @@ class Subscription(models.Model):
         return Container.objects.filter(owner=self.owner, arrangement__isnull=True).count()
     @property
     def paymentUpToDate(self):
-        from subscription.models import StripeSubscription
-        stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub).order_by('-created')
+
+        stripeSubscriptions=StripeSubscription.objects.filter(subscription=self).order_by('-created')
         return stripeSubscriptions[0].currentPeriodEnd+(60*60*24*2)>time.time()
 
     containersAllowed=models.IntegerField(default=0)

@@ -42,6 +42,10 @@ class Subscription(models.Model):
     @property
     def containersUsed(self):
         return Container.objects.filter(owner=self.owner, arrangement__isnull=True).count()
+    @property
+    def paymentUpToDate(self):
+        stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub).order_by('-created')
+        return stripeSubscriptions[0].currentPeriodEnd+(60*60*24*2)>time.time()
 
     containersAllowed=models.IntegerField(default=0)
 

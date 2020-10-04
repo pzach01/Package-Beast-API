@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from items.models import Item
 from django.http import Http404
+from subscription.models import Subscription
 
 
 class ItemSerializer(serializers.ModelSerializer):

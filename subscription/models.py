@@ -50,7 +50,15 @@ class Subscription(models.Model):
 
         stripeSubscriptions=StripeSubscription.objects.filter(subscription=self).order_by('-created')
         return stripeSubscriptions[0].currentPeriodEnd+(60*60*24*2)>time.time()
-
+    @property
+    def userCanCreateArrangment(self):
+        return (self.paymentUpToDate) and (self.shipmentsUsed<self.shipmentsAllowed)
+    @property
+    def userCanCreateItem(self):
+        return (self.paymentUpToDate) and (self.itemsUsed<self.itemsAllowed)
+    @property
+    def userCanCreateContainer(self):
+        return (self.paymentUpToDate) and (self.containersUsed<self.containersAllowed)
     containersAllowed=models.IntegerField(default=0)
 
     #stripeInvoiceIds=models.CharField(default='', max_length=250)

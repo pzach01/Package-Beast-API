@@ -11,6 +11,7 @@ from items.models import Item
 from containers.models import Container
 from .Box_Stuff_Python3_Only import box_stuff2 as bp
 from subscription.models import Subscription
+from django.http import Http403
 
 
 
@@ -35,6 +36,10 @@ class ArrangementSerializer(serializers.ModelSerializer):
             return x/2.54, y/2.54, z/2.54, "in"
 
     def create(self, validated_data):
+        userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
+        if not(userSubscription.userCanCreateArrangment):
+            raise Http403
+
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')
         timeoutDuration = validated_data.pop('timeoutDuration')
@@ -58,7 +63,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
             itemStrings.append(as_string)
             itemIds.append(item['id'])
         #increment the amount of shipments the user has used
-        Subscription.objects.filter(owner=validated_data['owner'])[0].increment_shipment_requests()
+        userSubscription.increment_shipment_requests()
         apiObjects,timedout,arrangementPossible = bp.master_calculate_optimal_solution(
             containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
         

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from items.models import Item
+from django.http import Http403
 
 
 class ItemSerializer(serializers.ModelSerializer):
@@ -11,6 +12,9 @@ class ItemSerializer(serializers.ModelSerializer):
                             'volume', 'xCenter', 'yCenter', 'zCenter', 'xDim', 'yDim', 'zDim', 'masterItemId']
 
     def create(self, validated_data):
+        userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
+        if not(userSubscription.userCanCreateItem):
+            raise Http403
         item = Item.objects.create(**validated_data)
 
         item.volume = validated_data['length'] * \

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from containers.models import Container
+from django.http import Http403
 
 
 class ContainerSerializer(serializers.ModelSerializer):
@@ -10,6 +11,9 @@ class ContainerSerializer(serializers.ModelSerializer):
         read_only_fields = ['arrangement', 'volume']
 
     def create(self, validated_data):
+        userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
+        if not(userSubscription.userCanCreateContainer):
+            raise Http403
         container = Container.objects.create(**validated_data)
         container.volume = validated_data['xDim'] * \
             validated_data['yDim']*validated_data['zDim']

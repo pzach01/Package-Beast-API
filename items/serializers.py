@@ -17,7 +17,7 @@ class ItemSerializer(serializers.ModelSerializer):
             raise Http404
         item = Item.objects.create(**validated_data)
 
-        item.volume = validated_data['length'] * \
+        item.volume = validated_data['length'] * 
             validated_data['width']*validated_data['height']
         item.masterItemId = item.id
         item.save()

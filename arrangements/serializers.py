@@ -11,7 +11,7 @@ from items.models import Item
 from containers.models import Container
 from .Box_Stuff_Python3_Only import box_stuff2 as bp
 from subscription.models import Subscription
-from django.http import Http403
+from django.http import Http404
 
 
 
@@ -38,7 +38,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
         if not(userSubscription.userCanCreateArrangment):
-            raise Http403
+            raise Http404
 
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')

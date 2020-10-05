@@ -37,29 +37,22 @@ class Subscription(models.Model):
     shipmentsAllowed=models.IntegerField(default=0)
 
     itemsAllowed=models.IntegerField(default=0)
+    containersAllowed=models.IntegerField(default=0)
 
-    @property
-    def itemsUsed(self):
+    def getItemsUsed(self):
         return Item.objects.filter(owner=self.owner, arrangement__isnull=True).count()
     
-    @property
-    def containersUsed(self):
+    def getContainersUsed(self):
         return Container.objects.filter(owner=self.owner, arrangement__isnull=True).count()
-    @property
-    def paymentUpToDate(self):
-
+    def getPaymentUpToDate(self):
         stripeSubscriptions=StripeSubscription.objects.filter(subscription=self).order_by('-created')
         return stripeSubscriptions[0].currentPeriodEnd+(60*60*24*2)>time.time()
-    @property
-    def userCanCreateArrangment(self):
-        return (self.paymentUpToDate) and (self.shipmentsUsed<self.shipmentsAllowed)
-    @property
-    def userCanCreateItem(self):
-        return (self.paymentUpToDate) and (self.itemsUsed<self.itemsAllowed)
-    @property
-    def userCanCreateContainer(self):
-        return (self.paymentUpToDate) and (self.containersUsed<self.containersAllowed)
-    containersAllowed=models.IntegerField(default=0)
+    def getUserCanCreateArrangment(self):
+        return (self.getPaymentUpToDate()) and (self.shipmentsUsed<self.shipmentsAllowed)
+    def getUserCanCreateItem(self):
+        return (self.getPaymentUpToDate()) and (self.getItemsUsed()<self.itemsAllowed)
+    def getUserCanCreateContainer(self):
+        return (self.getPaymentUpToDate()) and (self.getContainersUsed()<self.containersAllowed)
 
     #stripeInvoiceIds=models.CharField(default='', max_length=250)
     '''

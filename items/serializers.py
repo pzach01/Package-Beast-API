@@ -14,7 +14,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
-        if not(userSubscription.userCanCreateItem):
+        if not(userSubscription.getUserCanCreateItem()):
             raise Http404
         item = Item.objects.create(**validated_data)
 

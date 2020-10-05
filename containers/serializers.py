@@ -13,7 +13,7 @@ class ContainerSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
-        if not(userSubscription.userCanCreateContainer):
+        if not(userSubscription.getUserCanCreateContainer()):
             raise Http404
         container = Container.objects.create(**validated_data)
         container.volume = validated_data['xDim'] * \

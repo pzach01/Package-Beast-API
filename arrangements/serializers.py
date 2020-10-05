@@ -37,7 +37,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
-        if not(userSubscription.userCanCreateArrangment):
+        if not(userSubscription.getUserCanCreateArrangment()):
             raise Http404
 
         containers = validated_data.pop('containers')

@@ -15,7 +15,7 @@ class ItemSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
         if not(userSubscription.getUserCanCreateItem()):
-            raise Http404
+            raise Http404('user doesnt have right to create item')
         item = Item.objects.create(**validated_data)
 
         item.volume = validated_data['length'] * \

@@ -14,7 +14,7 @@ class ContainerSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
         if not(userSubscription.getUserCanCreateContainer()):
-            raise Http404
+            raise Http404('user doesnt have right to create container')
         container = Container.objects.create(**validated_data)
         container.volume = validated_data['xDim'] * \
             validated_data['yDim']*validated_data['zDim']

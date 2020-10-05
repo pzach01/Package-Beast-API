@@ -10,7 +10,7 @@ from rest_framework.authtoken.models import Token
 from arrangements.views import ArrangementList, Arrangement
 from rest_framework.test import force_authenticate
 from users.models import User
-
+from subscription.models import Subscription,StripeSubscription
 
 from rest_framework.test import APITestCase
 
@@ -19,6 +19,19 @@ class ArrangmentTests(APITestCase):
         u = User.objects.create(email='a@a.com')
         u.set_password('a')
         u.save()
+        sub=Subscription.objects.create(owner=u)
+        sub.shipmentsAllowed=500
+        sub.itemsAllowed=500
+        sub.containersAllowed=500
+
+        sub.save()
+
+
+        stripeSub=StripeSubscription.objects.create(subscription=sub)
+        import time
+        stripeSub.currentPeriodEnd=time.time()+(60*60*24*2)
+        stripeSub.save()
+
         # url = reverse('account-list')
         self.client.login(email="a@a.com", password="a")
         url = '/arrangements/'
@@ -27,6 +40,7 @@ class ArrangmentTests(APITestCase):
 
         data=response.data
         return data
+
     # QUESTION ASKED: does the code work in some basic form?, 
     def test_1(self):
         try:

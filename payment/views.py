@@ -270,7 +270,7 @@ def get_subscription_info(request):
         returnData['shipmentsAllowed']=sub.shipmentsAllowed
         returnData['shipmentsUsed']=sub.shipmentsUsed
         returnData['itemsAllowed']=sub.itemsAllowed
-        returnData['itemsUsed']=sub.getItemsUsed
+        returnData['itemsUsed']=sub.getItemsUsed()
         returnData['containersAllowed']=sub.containersAllowed
         returnData['containersUsed']=sub.getContainersUsed()
         

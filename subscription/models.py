@@ -12,7 +12,7 @@ stripe.api_key = 'sk_test_51HB4dCJWFTMXIZUo5d1tlWus4t0NGBLPI6LqHVokCzOyXaYZ6f8rc
 SUBSCRIPTION_PROFILES=[
     ('standard',0,1000,'prod_HzHvyINf9uyaxv','price_1HPJLlJWFTMXIZUoMH26j2EB',2,2,2),
     ('premium',1,3000,'prod_HzHxDGJSZDQ8GI','price_1HPJNoJWFTMXIZUo60gNaXlm',2,4,4),
-    ('beastMode',2,5000,'prod_HzHy8kP263Pqzp','price_1HPJOLJWFTMXIZUoGcXhTnax',2,6,6),
+    ('beastMode',2,5000,'prod_HzHy8kP263Pqzp','price_1HPJOLJWFTMXIZUoGcXhTnax',200,60,60),
 ]
 
 class SubscriptionManager(models.Manager):

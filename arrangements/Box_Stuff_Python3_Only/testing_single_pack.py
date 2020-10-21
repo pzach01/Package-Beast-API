@@ -30,7 +30,7 @@ def test_1():
         
     ]
 
-    packer=single_pack.single_pack(container, items)
+    packer=single_pack.single_pack(container, items,True,False)
     test_for_double_fit(packer, 10000)
     assert(packer.unfit_items==[])
 
@@ -44,7 +44,7 @@ def test_2():
         
     ]
 
-    packer=single_pack.single_pack(container, items)
+    packer=single_pack.single_pack(container, items,True,False)
     test_for_double_fit(packer, 10000)
     assert(packer.unfit_items==[])
 
@@ -58,7 +58,7 @@ def test_3():
         
     ]
 
-    packer=single_pack.single_pack(container, items)
+    packer=single_pack.single_pack(container, items,True,False)
     # 'None' valid arrangment
     assert(packer==None)
 
@@ -76,9 +76,9 @@ def kleenex_test():
     start=time.time()
     for i in range(0, 9):
         items.append(ItemPY3DBP(str(i),8.9375,3.5625,4.75))
-    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True)
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False)
     end=time.time()
-    print(end-start)
+    print(str(end-start)+" ,Kleenex test, intersections checked: "+str(packer.intersectionsChecked))
     assert(not (packer==None))
 def kleenex_test_overfitting():
     container=ContainerPY3DBP('container', 21.6875,15,6.125)
@@ -87,9 +87,9 @@ def kleenex_test_overfitting():
     start=time.time()
     for i in range(0, 10):
         items.append(ItemPY3DBP(str(i),8.9375,3.5625,4.75))
-    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True)
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False)
     end=time.time()
-    print(end-start)
+    print(str(end-start)+" ,Kleenex overfitting")
     assert((packer==None))
 
 
@@ -105,7 +105,7 @@ def dz_test_19():
 
 
     end=time.time()
-    print(end-start)
+    print(str(end-start)+" ,19 test, intersections checked: "+str(packer.intersectionsChecked))
 def dz_test_18():
     container=ContainerPY3DBP('container', 1800,1800,2400)
     items=[]
@@ -117,7 +117,7 @@ def dz_test_18():
     test_for_double_fit(packer, 10000)
 
     end=time.time()
-    print(end-start)
+    print(str(end-start)+" ,18 test, intersections checked: "+str(packer.intersectionsChecked))
     assert(not (packer==None))
 
 def test_doublefitting_raises_exception():
@@ -164,7 +164,7 @@ def dumbest_test_case_ever():
     start=time.time()
     for i in range(0, 1):
         items.append(ItemPY3DBP(str(i),2,2,2))
-    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True,timeout=1000)
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False,timeout=1000)
     test_for_double_fit(packer, 10000)
 
     end=time.time()
@@ -179,7 +179,7 @@ def timing_test_case():
         items=[]
         for i in range(0, maxItems):
             items.append(ItemPY3DBP(str(i),1,1,1))
-        packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=True,timeout=1000)
+        packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False,timeout=1000)
         end=time.time()
         assert(not (packer==None))
         print(str(i)+":"+str(end-start))

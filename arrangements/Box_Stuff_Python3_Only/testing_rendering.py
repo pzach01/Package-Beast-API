@@ -126,9 +126,12 @@ def render_test():
 
 
 
+    import time
+    start=time.time()
 
-
-    packer=single_pack.single_pack(container, items,True, True,1000)
+    packer=single_pack.single_pack(container, items,True, False,1000)
+    end=time.time()
+    print(str(end-start)+" ,19 test rendering, intersections checked: "+str(packer.intersectionsChecked))
 
     render(packer, bin_width,bin_height,bin_depth)
 
@@ -155,7 +158,7 @@ def render_test2():
     render_something_that_failed(container,items,coordinates)
     '''
 
-    packer=single_pack.single_pack(container, items,1000)
+    packer=single_pack.single_pack(container, items,True, False,1000)
     render(packer, container.xDim, container.yDim, container.zDim)
 
 
@@ -185,7 +188,7 @@ def recursive_bug():
         
     ]
 
-    packer=single_pack.single_pack(container, items,True, True,1000)
+    packer=single_pack.single_pack(container, items,True, False,1000)
     render(packer,container.xDim, container.yDim,container.zDim)
     assert (not (packer==None))
     test_for_double_fit(packer, 10000)
@@ -207,7 +210,7 @@ def render_antigravity():
 
     ]
 
-    packer=single_pack.single_pack(container, items,True, True,1000)
+    packer=single_pack.single_pack(container, items,True, False,1000)
     render(packer, container.xDim, container.yDim,container.zDim)
 render_antigravity()
 recursive_bug()

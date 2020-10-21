@@ -117,6 +117,7 @@ class Packer:
     # default initilization of rotation types to all rotations (-,-,-) to (+,+,+); all 8
     def __init__(self,rotationTypes,timeout):
         self.container = None
+        self.intersectionsChecked=0
         self.items = []
         self.unfit_items = []
         self.total_items = 0
@@ -178,6 +179,7 @@ class Packer:
                 for dimensionalRotation in self.rotationTypes:
                     itemToTryToPlace.set_rotation_type_and_dimension(dimensionalRotation)
                     # true by default item.position=[0,0,0]
+                    self.intersectionsChecked+=1
                     if self.can_place_at_position(itemToTryToPlace):
                         # then do it
                         oldItem=self.unfit_items.pop(0)
@@ -238,6 +240,7 @@ class Packer:
             itemToTryToPlace.position=possiblePivots[pivotIndex]
             for dimensionalRotation in self.rotationTypes:
                 itemToTryToPlace.set_rotation_type_and_dimension(dimensionalRotation)
+                self.intersectionsChecked+=1
 
                 if self.can_place_at_position(itemToTryToPlace):
                     # then do it

@@ -116,6 +116,8 @@ class ContainerPY3DBP:
 class Packer:
     # default initilization of rotation types to all rotations (-,-,-) to (+,+,+); all 8
     def __init__(self,rotationTypes,timeout):
+        self.bestDepth=0
+        self.bestItems=[]
         self.container = None
         self.intersectionsChecked=0
         self.items = []
@@ -135,7 +137,13 @@ class Packer:
         self.total_items = len(self.items) + 1
 
         return self.items.append(item)
-    
+    def copy_best_items(self,items):
+        self.bestItems=[]
+        for item in items:
+            newItem=ItemPY3DBP(item.name,item.xDim,item.yDim,item.zDim)
+            newItem.position=item.position
+            newItem.dimension=item.dimension
+            self.bestItems.append(newItem)
 
     def pack(self,render=False, bigger_first=False, distribute_items=False):
         self.render=render
@@ -163,6 +171,8 @@ class Packer:
         # recursive calls
         # add the origin as a valid first point to try to the first item
         if self.try_to_place_an_item():
+            self.bestDepth=self.items[len(self.items)-1].depth
+            self.copy_best_items(self.items)
 
             return True
         else:
@@ -192,6 +202,10 @@ class Packer:
 
                         if self.try_to_place_an_item():
                             return True
+
+                        if oldItem.depth>self.bestDepth:
+                            self.bestDepth=oldItem.depth
+                            self.copy_best_items(self.items)
                         # get rid of any sideeffects
                         self.unfit_items[0].pivotSets[itemToTryToPlace.depth]=set()
                         oldItem=self.items.pop(len(self.items)-1)
@@ -255,6 +269,9 @@ class Packer:
                     #self.unfit_items[0].pivotSets[itemToTryToPlace.depth]=copy.deepcopy(possiblePivots)
                     if self.try_to_place_an_item():
                         return True
+                    if oldItem.depth>self.bestDepth:
+                        self.bestDepth=oldItem.depth
+                        self.copy_best_items(self.items)
                     # clear any sideeffects
                     for p in range(pivotIndex, len(possiblePivots)):
                         self.unfit_items[0].pivotSets[itemToTryToPlace.depth].remove(possiblePivots[p])

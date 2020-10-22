@@ -371,7 +371,7 @@ def convert_to_api_form(arrangments,costList, binWeightCapacitys,timedOut):
         containerObjects.append(newContainer)
 
     for containerIndex in range(0, len(arrangments)):
-        for item in arrangments[containerIndex].items:
+        for item in arrangments[containerIndex].bestItems:
             x,y,z=item.position[0]+(item.get_dimension()[0]/2), item.position[1]+(item.get_dimension()[1]/2), item.position[2]+(item.get_dimension()[2]/2)
             # weight unitilized here
             newBox=BoxAPI(item.name, item.xDim,item.yDim,item.zDim, item.volume,0)

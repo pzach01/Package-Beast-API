@@ -118,6 +118,7 @@ class Packer:
     def __init__(self,rotationTypes,timeout):
         self.bestDepth=0
         self.bestItems=[]
+        self.isOptimal=False
         self.container = None
         self.intersectionsChecked=0
         self.items = []
@@ -173,10 +174,10 @@ class Packer:
         if self.try_to_place_an_item():
             self.bestDepth=self.items[len(self.items)-1].depth
             self.copy_best_items(self.items)
-
-            return True
+            self.isOptimal=True
+            return
         else:
-            return False
+            return
 
                 
     # returns True if item can be placed here, False otherwise
@@ -281,6 +282,9 @@ class Packer:
                     oldItem=self.items.pop(len(self.items)-1)
                     self.unfit_items.insert(0,oldItem)
             if time.time()>self.timeout:
+                if self.bestDepth<self.items[len(self.items)-1].depth:
+                    self.bestDepth=self.items[len(self.items)-1].depth
+                    self.copy_best_items(self.items)
                 raise TimeoutError('couldnt pack item in time')
             # add the point to the next item so that it could possibly use it as a valid point
             if not itemToTryToPlace.nextSmallestItemDepth==None:

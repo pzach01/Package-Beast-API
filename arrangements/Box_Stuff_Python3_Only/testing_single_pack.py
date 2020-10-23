@@ -60,7 +60,7 @@ def test_3():
 
     packer=single_pack.single_pack(container, items,True,False)
     # 'None' valid arrangment
-    assert(packer==None)
+    assert(not packer.isOptimal)
 
 # the test that broke pyshipping :)
 #bin=p.Package('1800x1800x2400')
@@ -79,7 +79,7 @@ def kleenex_test():
     packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False)
     end=time.time()
     print(str(end-start)+" ,Kleenex test, intersections checked: "+str(packer.intersectionsChecked))
-    assert(not (packer==None))
+    assert(packer.isOptimal)
 def kleenex_test_overfitting():
     container=ContainerPY3DBP('container', 21.6875,15,6.125)
     items=[]
@@ -90,7 +90,7 @@ def kleenex_test_overfitting():
     packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False)
     end=time.time()
     print(str(end-start)+" ,Kleenex overfitting")
-    assert((packer==None))
+    assert(not packer.isOptimal)
 
 
 def dz_test_19():
@@ -101,7 +101,7 @@ def dz_test_19():
     for i in range(0, 19):
         items.append(ItemPY3DBP(str(i),450,975,793))
     packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False,timeout=1000)
-    assert(not (packer==None))
+    assert( packer.isOptimal)
 
 
     end=time.time()
@@ -118,7 +118,7 @@ def dz_test_18():
 
     end=time.time()
     print(str(end-start)+" ,18 test, intersections checked: "+str(packer.intersectionsChecked))
-    assert(not (packer==None))
+    assert( packer.isOptimal)
 
 def test_doublefitting_raises_exception():
     item1=ItemPY3DBP('id=1', 10,10,10)
@@ -169,7 +169,7 @@ def dumbest_test_case_ever():
 
     end=time.time()
     print(end-start)
-    assert(not (packer==None))
+    assert( packer.isOptimal)
 def timing_test_case():
     container=ContainerPY3DBP('container', 20,20,20)
     import time
@@ -181,7 +181,7 @@ def timing_test_case():
             items.append(ItemPY3DBP(str(i),1,1,1))
         packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False,timeout=1000)
         end=time.time()
-        assert(not (packer==None))
+        assert(packer.isOptimal)
         print(str(i)+":"+str(end-start))
     endFinal=time.time()
     print("Final time: "+str(endFinal-startFinal))

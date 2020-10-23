@@ -182,9 +182,13 @@ def sort_points_we_can_add_to(pointsWeCanAddTo):
 
 
 
-def binpack(packages, bin,timeout):
-   
-    
+def binpack(packages, bin,timeout,saveNonOptimal=False):
+    # speedup for multibinpack
+    if not saveNonOptimal:
+        if bin.volume< sum([item.volume for item in packages]):
+            return None
+
+
     from . import single_pack as sp
     # convert to single pack format
 
@@ -192,10 +196,12 @@ def binpack(packages, bin,timeout):
     # setting bachTime=min(timeout,30) is a heuristic
     packer=sp.single_pack(bin, packages,True, False, timeout,min(timeout,30))
 
-
-
-    #return bp.binpack(packages, bin, iterlimit)
-    return packer
+    # seperates multibinpack from singlepack
+    if (not saveNonOptimal) and (not packer.isOptimal):
+        return None
+    else:
+        #return bp.binpack(packages, bin, iterlimit)
+        return packer
 
 
     ### check that permutations are producing the correct number of items for the (unique bin unique balls problem)

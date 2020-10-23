@@ -335,7 +335,7 @@ def test_underfits():
 #            print('Failed')
 #            break
 #        render_something_that_failed(container, items, coordinates)
-        if packer==None:
+        if not packer.isOptimal:
             # can do this to recieve verification that you can fit it in 
             render_something_that_failed(container, items, coordinates)
             raise Exception

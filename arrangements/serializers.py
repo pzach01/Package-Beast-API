@@ -92,6 +92,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
 
 
         if not timedout and arrangementPossible:
+            allIds=[item['id'] for item in items]
             for container in apiObjects:
                 for item in container.boxes:
                     xDim = item.xDim
@@ -112,7 +113,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
                     if foundItem==None:
                         raise Exception("clearly a bug")
                     assert(itemId==foundItem['id'])
-
+                    allIds.remove(itemId)
                     masterItemId=foundItem['id']
                     height = foundItem['height']
                     width = foundItem['width']
@@ -122,7 +123,19 @@ class ArrangementSerializer(serializers.ModelSerializer):
                     units = foundItem['units']
                     Item.objects.create(xDim=xDim, yDim=yDim, zDim=zDim, volume=volume, container=containerList[container.id], arrangement=arrangement,
                                         owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units, masterItemId=masterItemId, width=width, length=length, height=height)
-                    index += 1
+            # create items that dont fit
+            for uniqueId in allIds:
+                item=None
+                for lowerItem in items:
+                    if lowerItem['id']==uniqueId:
+                        item=lowerItem
+                        break
+                if item==None:
+                    raise Exception("clearly a bug")
+                # note the similarity with the code below
+                volume = item['width']*item['length']*item['height']
+                Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
+
         else:
             for item in items:
                 volume = item['width']*item['length']*item['height']

@@ -195,13 +195,18 @@ class ArrangmentTests(APITestCase):
 
             # checks on the data, will print -----------Failed Arrangments Test 2 if these fail
 
-            assert(data['arrangementPossible']==False)
+            assert(data['arrangementPossible']==True)
             assert(data['multiBinPack']==False)
             assert(len(data['items'])==5)
+            count=0
             for item in data['items']:
                 # null container field
-                assert(item['container']==None)
+                if(item['container']==None):
+                    pass
+                else:
+                    count+=1
             assert(len(data['containers'])==1)
+            assert(count==4)
             print("Arrangments test 2 Passed")
         except:
             print("------------------Arrangments test 2 Failed")
@@ -473,6 +478,7 @@ class ArrangmentTests(APITestCase):
 
 
             data=self.generic_logic(inputData)
+            print(data)
             assert(data['arrangementPossible']==True)
             assert(data['multiBinPack']==False)
             selectedContainer=None

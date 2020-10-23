@@ -28,6 +28,8 @@ def test_only_pack_one_container():
     assert(arrangmentPossible==True)
     usedContainers=len([container for container in containerList if len(container.boxes)>0])
     assert(usedContainers==1)
+    usedContainer=([container for container in containerList if len(container.boxes)>0])[0]
+    assert(usedContainer.volume==(10*5*5))
 
 
 def test_4():

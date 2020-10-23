@@ -116,7 +116,7 @@ class ContainerPY3DBP:
 class Packer:
     # default initilization of rotation types to all rotations (-,-,-) to (+,+,+); all 8
     def __init__(self,rotationTypes,timeout):
-        self.bestDepth=0
+        self.bestDepth=-1
         self.bestItems=[]
         self.isOptimal=False
         self.container = None

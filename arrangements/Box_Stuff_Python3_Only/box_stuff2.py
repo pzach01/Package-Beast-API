@@ -14,7 +14,7 @@ import time
 def calculate_partion_list_size(binListSize, itemListSize):
     return math.factorial(binListSize+itemListSize-1)/(math.factorial(binListSize)*math.factorial(itemListSize-1))
 
-def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeightCapacitys, boxWeights):
+def bruteforce_multibinpack(generator, binMasterList, boxMasterList,endTime,costList,binWeightCapacitys, boxWeights):
     import time
     timedOut=False
     minCost=float('inf')
@@ -58,7 +58,14 @@ def bruteforce(generator, binMasterList, boxMasterList,endTime,costList,binWeigh
         except StopIteration:
             break
     return arrangment, minCost,timedOut,bestRenderingList
-                
+def bruteforce_singlepack(generator, binMasterList, boxMasterList,endTime,costList,binWeightCapacitys, boxWeights):
+    import time
+    import math
+    assert(len(binMasterList)==1)
+    assert(len(costList)==1)
+    bin=binMasterList[0]
+    rendering=box_stuff1.binpack(boxMasterList,bin,endTime-time.time(),saveNonOptimal=True)
+    return None, costList[0] if len(rendering.bestItems)>0 else math.inf,len(rendering.bestItems)>0,[rendering]
 # bin can hold boxes without going over weight limit
 def weight_is_ok(binIndex, boxIndexes, binWeightCapacitys, boxWeights):
     if(binWeightCapacitys==None):
@@ -121,19 +128,23 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     
 
     assert((binWeightCapacitys==None and boxWeights==None) or (binWeightCapacitys!=None and binWeightCapacitys!=None))
+    volumeList=[]
+    for ele in bins1:
+        x,y,z=float(ele.split('x')[0]),float(ele.split('x')[1]),float(ele.split('x')[2])
+        volume=x*y*z
+        volumeList.append(volume)
     if(costList==None):
-        costList=[]
+        costList=volumeList
         # use volume
-        for ele in bins1:
-            x,y,z=float(ele.split('x')[0]),float(ele.split('x')[1]),float(ele.split('x')[2])
-            volume=x*y*z
-            costList.append(volume)
+
     # end replication of bruteforce code
     indexUsed=None
     anyArrangmentPossible=False
+    bestScore=0
+    optimalScore=sum([item for item in volumeList])
     for ele in range(0, len(bins1)):
         try:
-            if(costList[ele]<minCost):
+            if(costList[ele]<minCost or(not bestScore ==optimalScore)):
                 # cant subscript none so must use lambda
                 miniCostList=None if costList==None else [costList[ele]]
                 miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
@@ -143,13 +154,17 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                 apiFormat,timedOut,arrangmentPossible=master_calculate_optimal_solution([bins1[ele]], boxs1,(timeout/numRemaining),True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights)
                 end=time.time()
                 timeout-=(end-start)
-                if arrangmentPossible:
-                    anyArrangmentPossible=True
-                # no error, update to better solution
-                if not(timedOut) and arrangmentPossible:
-                    minArrangment=apiFormat
-                    minCost=costList[ele]
-                    indexUsed=ele
+
+                score=sum([box.volume for box in apiFormat[0].boxes])
+                if score>bestScore:
+                    bestScore=score
+                    if arrangmentPossible:
+                        anyArrangmentPossible=True
+                    # no error, update to better solution
+                    if not(timedOut) and arrangmentPossible:
+                        minArrangment=apiFormat
+                        minCost=costList[ele]
+                        indexUsed=ele
         # ran out of time
         except TimeoutError:
             pass
@@ -223,7 +238,11 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,
 
     
     ## find the index arrangment of the cheapest combination (actual computation)
-    minArrangment, minCost,timedOut,renderingList=bruteforce(generator,bins1, boxs1,time.time()+timeout,costList,binWeightCapacitys,boxWeights)
+    if len(bins1)>1:
+        minArrangment, minCost,timedOut,renderingList=bruteforce_multibinpack(generator,bins1, boxs1,time.time()+timeout,costList,binWeightCapacitys,boxWeights)
+    else:
+        minArrangment, minCost,timedOut,renderingList=bruteforce_singlepack(generator,bins1, boxs1,time.time()+timeout,costList,binWeightCapacitys,boxWeights)
+
     if(minCost==float('inf')):
         return None, timedOut, max(costList)>generator.cheapestPossible
 

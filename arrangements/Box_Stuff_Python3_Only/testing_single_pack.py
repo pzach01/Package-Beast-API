@@ -7,7 +7,7 @@ from .testing_imports import *
 def test_not_multibinpack():
     items=['4x4x4','4x4x4']
     containers=['4x4x4','4x4x4','10x5x5']
-    containerList,timedOut, arrangmentPossible=box_stuff2.master_calculate_optimal_solution(containers,items,1000000,False)
+    containerList,timedOut, arrangmentPossible=box_stuff2.master_calculate_optimal_solution(containers,items,500,False)
     assert(timedOut==False)
     assert(arrangmentPossible==True)
     usedContainer=[container for container in containerList if (len(container.boxes)>0)][0]
@@ -33,6 +33,7 @@ def test_1():
     packer=single_pack.single_pack(container, items,True,False)
     test_for_double_fit(packer, 10000)
     assert(packer.unfit_items==[])
+    assert(packer.isOptimal)
 
 
 def test_2():
@@ -47,6 +48,8 @@ def test_2():
     packer=single_pack.single_pack(container, items,True,False)
     test_for_double_fit(packer, 10000)
     assert(packer.unfit_items==[])
+    assert(packer.isOptimal)
+
 
 def test_3():
     container=ContainerPY3DBP('very-very-large-box', 5, 5, 10)

@@ -430,67 +430,64 @@ class ArrangmentTests(APITestCase):
     # items: ['1x1x1','1x1x1']
     # containers:['2x2x1','2x1x1']
     def test_5(self):
-        try:
-            inputData={
-            "multiBinPack": False,
-            "timeoutDuration": 30,
-            "containers": [
-                {
-                "sku": "unit",
-                "description": "string",
-                "xDim": 2,
-                "yDim": 2,
-                "zDim": 1,
-                "units": "in"
-                },
-                {
-                "sku": "unit",
-                "description": "string",
-                "xDim": 2,
-                "yDim": 1,
-                "zDim": 1,
-                "units": "in"
-                },
+        inputData={
+        "multiBinPack": False,
+        "timeoutDuration": 30,
+        "containers": [
+            {
+            "sku": "unit",
+            "description": "string",
+            "xDim": 2,
+            "yDim": 2,
+            "zDim": 1,
+            "units": "in"
+            },
+            {
+            "sku": "unit",
+            "description": "string",
+            "xDim": 2,
+            "yDim": 1,
+            "zDim": 1,
+            "units": "in"
+            },
 
-            ],
-            "items": [
-                {
-                "id": 0,
-                "sku": "string",
-                "description": "string",
-                "length": 1,
-                "width": 1,
-                "height": 1,
-                "units": "in"
-                },
-                {
-                "id": 1,
-                "sku": "string",
-                "description": "string",
-                "length": 1,
-                "width": 1,
-                "height": 1,
-                "units": "in"
-                }
-            ]
+        ],
+        "items": [
+            {
+            "id": 0,
+            "sku": "string",
+            "description": "string",
+            "length": 1,
+            "width": 1,
+            "height": 1,
+            "units": "in"
+            },
+            {
+            "id": 1,
+            "sku": "string",
+            "description": "string",
+            "length": 1,
+            "width": 1,
+            "height": 1,
+            "units": "in"
             }
- 
+        ]
+        }
 
 
-            data=self.generic_logic(inputData)
-            print(data)
-            assert(data['arrangementPossible']==True)
-            assert(data['multiBinPack']==False)
-            selectedContainer=None
-            for container in data['containers']:
-                if (container['xDim']==2) and (container['yDim']==1 and container['zDim']==1):
-                    selectedContainer=container['id']
 
-            for item in data['items']:
-                assert(item['container']==selectedContainer)
+        data=self.generic_logic(inputData)
+        assert(data['arrangementPossible']==True)
+        assert(data['multiBinPack']==False)
+        selectedContainer=None
+        for container in data['containers']:
+            if (container['xDim']==2) and (container['yDim']==1 and container['zDim']==1):
+                selectedContainer=container['id']
 
-            print("Arrangments test 5 Passed")
-        except:
-            print("------------------Arrangments test 5 Failed")
+        for item in data['items']:
+            assert(item['container']==selectedContainer)
+
+        print("Arrangments test 5 Passed")
+        
 
 

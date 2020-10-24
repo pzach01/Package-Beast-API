@@ -23,9 +23,7 @@ def test_for_overfits_both_types_api():
             print(end-start)
 
             assert(end-start-1<timeout)
-
-            assert(timedOut or not(arrangmentPossible))
-            assert(apiObjects==None)
+            assert(len(apiObjects[0].boxes)<len(itemList))
 
         else:
             container, items=generate_an_overfit_arrangment_type_b()
@@ -38,8 +36,7 @@ def test_for_overfits_both_types_api():
             print(end-start)
 
             assert(end-start-1<timeout)
-            assert(timedOut or not(arrangmentPossible))
-            assert(apiObjects==None)
+            assert(len(apiObjects[0].boxes)<len(itemList))
 def test_for_overfits_both_types():
     iterations=10000
     timeout=60
@@ -49,11 +46,11 @@ def test_for_overfits_both_types():
             container, items=generate_an_overfit_arrangment_type_a()
             assert(sum([item.volume for item in items])>container.volume)
             packer=single_pack.single_pack(container, items,False,False,timeout)
-            assert(packer==None)
+            assert(not packer.isOptimal)
         else:
             container, items=generate_an_overfit_arrangment_type_b()
             packer=single_pack.single_pack(container, items,False,False, timeout)
-            assert(packer==None)
+            assert(not packer.isOptimal)
 
 # volume overfit
 def test_for_overfits_type_a():
@@ -242,4 +239,4 @@ def try_to_expand_in_one_direction_2(existingShape, interiorPoints, directionToE
         existingShape.append(point)
     return interiorPoints, existingShape
 test_for_overfits_both_types_api()
-#test_for_overfits_both_types()
+test_for_overfits_both_types()

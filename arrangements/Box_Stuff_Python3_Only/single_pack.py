@@ -31,6 +31,7 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
         p.items=[]
         p.unfit_items=[]
         p.set_container(container)
+        p.isOptimal=True
         return p  
 
 

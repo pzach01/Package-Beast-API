@@ -242,7 +242,7 @@ def test_one_underfit(ele):
     container=ContainerPY3DBP('Container',container.xDim, container.yDim, container.zDim)
     packer=single_pack.single_pack(container, items,True, True,math.inf)
     assert(len(packer.items)==len(items))
-    if packer==None:
+    if not packer.isOptimal:
         #packer=single_pack.single_pack(container, itemList,1000)        
         #specialContainer,specialItems=container,items
         #print("failed")
@@ -327,8 +327,13 @@ def test_underfits():
     failedAt1000Iterations=0
     for ele in range(0, 1000000):
         print(ele)
+
         packer=None
         packer, container, items, coordinates=test_one_underfit(ele)
+        if ele==16841:
+            print("Container: "+str(container.xDim)+'x'+str(container.yDim)+'x'+str(container.zDim))
+            for item in items:
+                print("Item: "+str(item.xDim)+'x'+str(item.yDim)+'x'+str(item.zDim))
 #        try:
 #            packer, container, items, coordinates=test_one_underfit(ele)
 #        except Exception:
@@ -344,6 +349,6 @@ def test_underfits_api():
     for ele in range(0, 100000):
         print(ele)
         test_one_underfit_api(ele)
-test_underfits_api()
-#test_underfits()
+#test_underfits_api()
+test_underfits()
 

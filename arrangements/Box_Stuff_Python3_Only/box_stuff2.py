@@ -154,17 +154,16 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                 apiFormat,timedOut,arrangmentPossible=master_calculate_optimal_solution([bins1[ele]], boxs1,(timeout/numRemaining),True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights)
                 end=time.time()
                 timeout-=(end-start)
-
-                score=sum([box.volume for box in apiFormat[0].boxes])
-                if ((score>=bestScore) or (score==bestScore and costList[ele]<minCost)):
-                    bestScore=score
-                    if arrangmentPossible:
+                if arrangmentPossible:
+                    score=sum([box.volume for box in apiFormat[0].boxes])
+                    if ((score>=bestScore) or (score==bestScore and costList[ele]<minCost)):
+                        bestScore=score
                         anyArrangmentPossible=True
-                    # no error, update to better solution
-                    if not(timedOut) and arrangmentPossible:
-                        minArrangment=apiFormat
-                        minCost=costList[ele]
-                        indexUsed=ele
+                        # no error, update to better solution
+                        if not(timedOut) and arrangmentPossible:
+                            minArrangment=apiFormat
+                            minCost=costList[ele]
+                            indexUsed=ele
                     
         # ran out of time
         except TimeoutError:

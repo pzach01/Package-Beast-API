@@ -239,4 +239,4 @@ def try_to_expand_in_one_direction_2(existingShape, interiorPoints, directionToE
         existingShape.append(point)
     return interiorPoints, existingShape
 test_for_overfits_both_types_api()
-test_for_overfits_both_types()
+#test_for_overfits_both_types()

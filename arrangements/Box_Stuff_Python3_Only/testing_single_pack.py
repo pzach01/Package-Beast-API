@@ -12,7 +12,11 @@ def test_not_multibinpack():
     assert(arrangmentPossible==True)
     usedContainer=[container for container in containerList if (len(container.boxes)>0)][0]
     assert(usedContainer.volume==(10*5*5))
-    
+def test_overfitting_one_item_one_container():
+    items=['10x10x10']
+    containers=['5x5x5']
+    containerList,timedOut, arrangmentPossible=box_stuff2.master_calculate_optimal_solution(containers,items,35,False)
+    assert(timedOut)    
 
 # tests for overfitting when we are packing items into a single container
 
@@ -189,6 +193,7 @@ def timing_test_case():
     endFinal=time.time()
     print("Final time: "+str(endFinal-startFinal))
 print('testing_single_pack.py')
+test_overfitting_one_item_one_container()
 timing_test_case()
 dumbest_test_case_ever()
 test_1()

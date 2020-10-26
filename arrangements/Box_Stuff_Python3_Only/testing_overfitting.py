@@ -24,7 +24,10 @@ def test_for_overfits_both_types_api():
 
             assert(end-start-1<timeout)
             assert(len(apiObjects[0].boxes)<len(itemList))
-
+            if(len(apiObjects[0].boxes)>1):
+                assert(arrangmentPossible)
+            if end-start>timeout:
+                assert timedOut
         else:
             container, items=generate_an_overfit_arrangment_type_b()
             containerList=[container.get_dimension_string()]
@@ -37,6 +40,10 @@ def test_for_overfits_both_types_api():
 
             assert(end-start-1<timeout)
             assert(len(apiObjects[0].boxes)<len(itemList))
+            if(len(apiObjects[0].boxes)>1):
+                assert(arrangmentPossible)
+            if end-start>timeout:
+                assert timedOut
 def test_for_overfits_both_types():
     iterations=10000
     timeout=60

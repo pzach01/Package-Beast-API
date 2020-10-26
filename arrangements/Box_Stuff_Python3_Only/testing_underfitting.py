@@ -349,6 +349,6 @@ def test_underfits_api():
     for ele in range(0, 100000):
         print(ele)
         test_one_underfit_api(ele)
-#test_underfits_api()
-test_underfits()
+test_underfits_api()
+#test_underfits()
 

@@ -65,7 +65,7 @@ def bruteforce_singlepack(generator, binMasterList, boxMasterList,endTime,costLi
     assert(len(costList)==1)
     bin=binMasterList[0]
     rendering=box_stuff1.binpack(boxMasterList,bin,endTime-time.time(),saveNonOptimal=True)
-    return None, costList[0] if len(rendering.bestItems)>0 else math.inf,len(rendering.bestItems)>0,[rendering]
+    return None, costList[0] if len(rendering.bestItems)>0 else math.inf,endTime-time.time()<0,[rendering]
 # bin can hold boxes without going over weight limit
 def weight_is_ok(binIndex, boxIndexes, binWeightCapacitys, boxWeights):
     if(binWeightCapacitys==None):
@@ -139,7 +139,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
 
     # end replication of bruteforce code
     indexUsed=None
-    anyArrangmentPossible=False
+    anyTimeout=False
     bestScore=0
     optimalScore=sum([item for item in volumeList])
     for ele in range(0, len(bins1)):
@@ -154,16 +154,16 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                 apiFormat,timedOut,arrangmentPossible=master_calculate_optimal_solution([bins1[ele]], boxs1,(timeout/numRemaining),True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights)
                 end=time.time()
                 timeout-=(end-start)
+                anyTimeout=True if (timedOut or anyTimeout) else False
+
                 if arrangmentPossible:
                     score=sum([box.volume for box in apiFormat[0].boxes])
                     if ((score>=bestScore) or (score==bestScore and costList[ele]<minCost)):
                         bestScore=score
-                        anyArrangmentPossible=True
                         # no error, update to better solution
-                        if not(timedOut) and arrangmentPossible:
-                            minArrangment=apiFormat
-                            minCost=costList[ele]
-                            indexUsed=ele
+                        minArrangment=apiFormat
+                        minCost=costList[ele]
+                        indexUsed=ele
                     
         # ran out of time
         except TimeoutError:
@@ -175,7 +175,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     containersUsed=[]
     if indexUsed==None:
         # no arrangment, timedout, unable to decide if arrangment is possible
-        return None, True, anyArrangmentPossible
+        return None, anyTimeout, False
     else:
         for ele in range(0, len(bins1)):
             if ele==indexUsed:
@@ -186,7 +186,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
             else:
                 x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])
                 containersUsed.append(BinAPI(ele,x,y,z,costList[ele],0,False))
-    return containersUsed,False,True
+    return containersUsed,anyTimeout,True
 
 # wrapper for the ItemPY3DBP class
 def string_wrapper_for_item_class(itemString):
@@ -213,7 +213,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,
     # half a billion
     maxMemorySize=500000000
     if(partitionListSize > maxMemorySize):
-        return None, False, None
+        return None, False, False
     
     # if we reach this time trigger a timeout error
     
@@ -244,7 +244,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,
         minArrangment, minCost,timedOut,renderingList=bruteforce_singlepack(generator,bins1, boxs1,time.time()+timeout,costList,binWeightCapacitys,boxWeights)
 
     if(minCost==float('inf')):
-        return None, timedOut, max(costList)>generator.cheapestPossible
+        return None, timedOut, False
 
     
     
@@ -264,7 +264,7 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,
     # sort by maxTuple 
     for container in apiFormat:
         container.boxes=sorted(container.boxes, key= lambda box:(box.x+(box.xDim/2),box.y+(box.yDim/2),box.z+(box.zDim/2)))
-    return apiFormat,False, True
+    return apiFormat,timedOut, True
 
 
 class BinAPI():

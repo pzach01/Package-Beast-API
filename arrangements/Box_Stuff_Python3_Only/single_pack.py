@@ -179,8 +179,10 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
 
         randomSearch=False
         useBigSetsInDimensionalMixups=True
+        start=time.time()
         res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,timePerIterationType),min(timePerIterationType,min(timeout,recursiveTimeout)),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
-        timeout-=timePerIterationType
+        end=time.time()
+        timeout-=end-start
         if res.isOptimal:
             return res
         bestPacker=get_best_packer(bestPacker,res)
@@ -190,16 +192,18 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
 
         randomSearch=True
         useBigSetsInDimensionalMixups=False
-        
+        start=time.time()        
         res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,timePerIterationType),min(timePerIterationType,min(timeout,recursiveTimeout)),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
-        timeout-=timePerIterationType  
+        end=time.time()
+        timeout-=end-start
         if res.isOptimal:
             return res
         bestPacker=get_best_packer(bestPacker,res)
 
-
+        start=time.time()
         res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,timePerIterationType),min(timePerIterationType,min(timeout,recursiveTimeout)),RotationType.ALL,randomSearch,useBigSetsInDimensionalMixups)
-        timeout-=timePerIterationType
+        end=time.time()
+        timeout-=end-start
         if res.isOptimal:
             return res
         bestPacker=get_best_packer(bestPacker,res)

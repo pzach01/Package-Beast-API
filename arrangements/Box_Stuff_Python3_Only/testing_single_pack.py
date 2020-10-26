@@ -8,7 +8,7 @@ def test_not_multibinpack():
     items=['4x4x4','4x4x4']
     containers=['4x4x4','4x4x4','10x5x5']
     containerList,timedOut, arrangmentPossible=box_stuff2.master_calculate_optimal_solution(containers,items,500,False)
-    assert(timedOut==False)
+    assert(timedOut==True)
     assert(arrangmentPossible==True)
     usedContainer=[container for container in containerList if (len(container.boxes)>0)][0]
     assert(usedContainer.volume==(10*5*5))

@@ -185,6 +185,7 @@ def sort_points_we_can_add_to(pointsWeCanAddTo):
 def binpack(packages, bin,timeout,saveNonOptimal=False):
     # speedup for multibinpack
     if not saveNonOptimal:
+        timeout=min(30,timeout)
         if bin.volume< sum([item.volume for item in packages]):
             return None
 

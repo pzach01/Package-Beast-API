@@ -73,7 +73,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
         containerList = []
         index=0
         for container in containers:
-            if (not arrangementPossible) or timedout:
+            if (not arrangementPossible):
                 xDim = container['xDim']
                 yDim = container['yDim']
                 zDim = container['zDim']
@@ -91,7 +91,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
         index = 0
 
 
-        if not timedout and arrangementPossible:
+        if arrangementPossible:
             allIds=[item['id'] for item in items]
             for container in apiObjects:
                 for item in container.boxes:

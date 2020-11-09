@@ -59,6 +59,6 @@ class User(AbstractUser):
     usersTermsOfServiceRevision = models.IntegerField(default=0)
     @property
     def termsOfServiceRevision(self):
-        termsOfServiceRevision = 1
+        termsOfServiceRevision = 2
         return termsOfServiceRevision
 

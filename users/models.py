@@ -55,4 +55,10 @@ class User(AbstractUser):
     multiBinPack = models.BooleanField(default=False)
     disableFillContainerAnimation = models.BooleanField(default=False)
     disablePreviousNextItemAnimation = models.BooleanField(default=False)
-    animationSpeed = (models.IntegerField(default=50))
+    animationSpeed = models.IntegerField(default=50)
+    usersTermsOfServiceRevision = models.IntegerField(default=0)
+    @property
+    def termsOfServiceRevision(self):
+        termsOfServiceRevision = 1
+        return termsOfServiceRevision
+

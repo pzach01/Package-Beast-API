@@ -1,5 +1,6 @@
 
 from . import single_pack
+
 from . import py3dbp_main
 from .py3dbp_main import ContainerPY3DBP,ItemPY3DBP,Packer
 import random
@@ -24,7 +25,6 @@ from .py3dbp_constants import RotationType
 from . import py3dbp_auxiliary_methods
 from .py3dbp_auxiliary_methods import outside_container
 from .box_stuff2 import master_calculate_optimal_solution
-
 
 # iterationLimit (for each container)
 def test_for_double_fit(packer, iterationLimit):

@@ -59,9 +59,12 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
                     if printIteration:
                         print("           innerIteration: "+str(innerIteration))
                     innerIteration+=1
-                    itemsMixedUp=mixer.next()
-                
 
+
+
+                                    
+
+                    itemsMixedUp=mixer.next()
 
 
                     packer =Packer(rotationType,recursiveTimeout)
@@ -241,21 +244,46 @@ class DimensionalMixupBigSetsGenerator():
             self.partitionArrangment=(0,self.partitionArrangment[0]+1,self.partitionArrangment[2]-1)
         else:
             self.partitionArrangment=(self.partitionArrangment[0]+1, self.partitionArrangment[1]-1, self.partitionArrangment[2])
-
+    def increment_partion_count_2(self):
+        # reset
+        if self.partitionArrangment[1]==len(self.item_permutation):
+            self.allTwosVisited=True
+            # gets incremented to 0 down the line
+            self.count=-1
+            self.partitionArrangment=(0,0,len(self.item_permutation))
+        else:
+            self.partitionArrangment=(0, self.partitionArrangment[1]+1, self.partitionArrangment[2]-1)
 
     # returns the switches (0-5) for each item (3 in total)
-    def get_item_arrangment(self,count):
-        return self.base_6_as_switches(count, 3)
+    def get_item_arrangment(self,count,n):
+        return self.base_6_as_switches(count, n)
     # this is a special case of the general; but we chose 3 partitions because we don't have the speed 
     # to enumerate pase this for large n, and for small n it will be found by the random algorithm
-    def get_switches_3_partition(self,count,n):
+    def get_switches_2_parition(self,count,length):
+        if self.count==6**2:
+            self.increment_partion_count_2()
+            self.count=0
+        switches=[-1 for ele in range(0, length)]
+
+        currentIndex=0
+        self.itemArrangment=self.get_item_arrangment(self.count,2)
+        # note, we start on the RHS of the tuple and 'count' over to the left, hence index 0 is unused in the 2 case
+        for index in range(0, self.partitionArrangment[1]):
+            switches[currentIndex]=self.itemArrangment[0]
+            currentIndex+=1
+        for index in range(0, self.partitionArrangment[2]):
+            switches[currentIndex]=self.itemArrangment[1]
+            currentIndex+=1
+
+        return switches
+    def get_switches_3_partition(self,count,length):
         if self.count==6**3:
             self.increment_partion_count()
             self.count=0
-        switches=[-1 for ele in range(0, n)]
+        switches=[-1 for ele in range(0, length)]
 
         currentIndex=0
-        self.itemArrangment=self.get_item_arrangment(count)
+        self.itemArrangment=self.get_item_arrangment(self.count,3)
         for index in range(0, self.partitionArrangment[0]):
             switches[currentIndex]=self.itemArrangment[0]
             currentIndex+=1
@@ -269,6 +297,7 @@ class DimensionalMixupBigSetsGenerator():
         return switches
 
     def __init__(self, item_permutation):
+        self.allTwosVisited=False
         self.item_permutation=item_permutation
         for item in item_permutation:
             # default to xDim>=yDim>=zDim
@@ -282,8 +311,11 @@ class DimensionalMixupBigSetsGenerator():
             raise StopIteration
 
         newItems=[]
-        switches=self.get_switches_3_partition(self.count,len(self.item_permutation))
-        
+        if self.allTwosVisited:
+            switches=self.get_switches_3_partition(self.count,len(self.item_permutation))
+        else:
+            switches=self.get_switches_2_parition(self.count,len(self.item_permutation))
+
         for index in range(0, len(self.item_permutation)):
             if switches[index]==0:
                 newItems.append(ItemPY3DBP(self.item_permutation[index].name,self.item_permutation[index].xDim, self.item_permutation[index].yDim, self.item_permutation[index].zDim))

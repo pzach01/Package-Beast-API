@@ -192,7 +192,22 @@ def timing_test_case():
         print(str(i)+":"+str(end-start))
     endFinal=time.time()
     print("Final time: "+str(endFinal-startFinal))
+def hard_test_case():
+    container=ContainerPY3DBP('container', 23,29.25,12.75)
+    items=[]
+    import time
+    start=time.time()
+    for i in range(0, 21):
+        items.append(ItemPY3DBP(str(i),4.438,9.75,7.875))
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False,timeout=1000)
+    test_for_double_fit(packer, 10000)
+
+    end=time.time()
+    print('Hard test case:'+str(end-start))
+    assert( packer.isOptimal)
 print('testing_single_pack.py')
+hard_test_case()
+
 test_overfitting_one_item_one_container()
 timing_test_case()
 dumbest_test_case_ever()

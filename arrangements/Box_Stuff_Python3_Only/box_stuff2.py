@@ -158,7 +158,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
 
                 if arrangmentPossible:
                     score=sum([box.volume for box in apiFormat[0].boxes])
-                    if ((score>=bestScore) or (score==bestScore and costList[ele]<minCost)):
+                    if ((score>bestScore) or (score==bestScore and costList[ele]<minCost)):
                         bestScore=score
                         # no error, update to better solution
                         minArrangment=apiFormat

@@ -19,7 +19,14 @@ def test_ids_only_pack_one_container():
         assert(usableContainers[0].boxes[1].id==0)
     else:
         assert(usableContainers[0].boxes[1].id==1)
-
+def david_test():
+    items=['4.5x9.75x7.93' for ele in range(0,20)]
+    containers=['18x24x18','29.25x23x12.75']
+    containerList,timedOut, arrangmentPossible=box_stuff2.master_calculate_optimal_solution(containers,items,240, False)
+    assert(arrangmentPossible==True)
+    usableContainers=([container for container in containerList if len(container.boxes)>0])    
+    usedContainer=usableContainers[0]
+    assert(usedContainer.volume==(18*18*24))
 
 def test_only_pack_one_container():
     items=['4x4x4','4x4x4']
@@ -162,6 +169,7 @@ def weight_testing():
     assert(usedVolume==10**3) 
 
 #multibinpack_test_1()
+david_test()
 test_ids_only_pack_one_container()
 test_only_pack_one_container()
 weight_testing()

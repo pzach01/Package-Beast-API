@@ -497,6 +497,15 @@ class ArrangmentTests(APITestCase):
         "multiBinPack": False,
         "timeoutDuration": 30,
         "containers": [
+
+            {
+            "sku": "unit",
+            "description": "string",
+            "xDim": 12.75,
+            "yDim": 29.25,
+            "zDim": 23,
+            "units": "in"
+            },
             {
             "sku": "unit",
             "description": "string",
@@ -504,15 +513,7 @@ class ArrangmentTests(APITestCase):
             "yDim": 24,
             "zDim": 18,
             "units": "in"
-            },
-            {
-            "sku": "unit",
-            "description": "string",
-            "xDim": 4.5,
-            "yDim": 9.75,
-            "zDim": 7.93,
-            "units": "in"
-            },
+            }
 
         ],
         "items": [

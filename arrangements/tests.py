@@ -489,5 +489,229 @@ class ArrangmentTests(APITestCase):
 
         print("Arrangments test 5 Passed")
         
+    # QUESTION ASKED: expected behavior (packing in smallest container) in following use case
+    # items: ['4.5x9.75x7.93' for ele in range(0,20)]
+    # containers:['18x24x18','29.25x12.75x23']
+    def test_6(self):
+        inputData={
+        "multiBinPack": False,
+        "timeoutDuration": 30,
+        "containers": [
+            {
+            "sku": "unit",
+            "description": "string",
+            "xDim": 18,
+            "yDim": 24,
+            "zDim": 18,
+            "units": "in"
+            },
+            {
+            "sku": "unit",
+            "description": "string",
+            "xDim": 4.5,
+            "yDim": 9.75,
+            "zDim": 7.93,
+            "units": "in"
+            },
+
+        ],
+        "items": [
+            {
+            "id": 0,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 1,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 2,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 3,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 4,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 5,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 6,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 7,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 8,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 9,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 10,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 11,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 12,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 13,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 14,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 15,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 16,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 17,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 18,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            },
+            {
+            "id": 19,
+            "sku": "string",
+            "description": "string",
+            "length": 4.5,
+            "width": 9.75,
+            "height": 7.93,
+            "units": "in"
+            }
+
+
+        ]
+        }
+        data=self.generic_logic(inputData)
+
+        assert(data['arrangementPossible']==True)
+        assert(data['multiBinPack']==False)
+        selectedContainer=None
+        for container in data['containers']:
+            if (container['xDim']==18) and (container['yDim']==24 and container['zDim']==18):
+                selectedContainer=container['id']
+        assert(len(data['items'])==20)
+        for item in data['items']:
+            assert(item['container']==selectedContainer)
+
+        print("Arrangments test 6 Passed")
 
 

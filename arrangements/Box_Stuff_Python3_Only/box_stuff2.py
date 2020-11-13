@@ -11,6 +11,14 @@ import math
 import itertools
 import time
 
+def truncate_to_nth_decimal_point(number, n):
+    number=str(number)
+    if '.' not in number:
+        return float(number)
+    beforeDecimal,afterDecimal=number.split('.')[0],number.split('.')[1]
+    newNumber=beforeDecimal+'.'+afterDecimal[0:min(n,len(afterDecimal))]
+    return float(newNumber)
+
 def calculate_partion_list_size(binListSize, itemListSize):
     return math.factorial(binListSize+itemListSize-1)/(math.factorial(binListSize)*math.factorial(itemListSize-1))
 
@@ -157,7 +165,8 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                 anyTimeout=True if (timedOut or anyTimeout) else False
 
                 if arrangmentPossible:
-                    score=sum([box.volume for box in apiFormat[0].boxes])
+                    # 3rd decimal point
+                    score=truncate_to_nth_decimal_point(sum([box.volume for box in apiFormat[0].boxes]),3)
                     if ((score>bestScore) or (score==bestScore and costList[ele]<minCost)):
                         bestScore=score
                         # no error, update to better solution

@@ -22,7 +22,7 @@ def test_ids_only_pack_one_container():
 def david_test():
     items=['4.5x9.75x7.93' for ele in range(0,20)]
     containers=['18x24x18','29.25x23x12.75']
-    containerList,timedOut, arrangmentPossible=box_stuff2.master_calculate_optimal_solution(containers,items,240, False)
+    containerList,timedOut, arrangmentPossible=box_stuff2.master_calculate_optimal_solution(containers,items,30, False)
     assert(arrangmentPossible==True)
     usableContainers=([container for container in containerList if len(container.boxes)>0])    
     usedContainer=usableContainers[0]

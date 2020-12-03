@@ -149,10 +149,40 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     indexUsed=None
     anyTimeout=False
     bestScore=0
-    optimalScore=sum([item for item in volumeList])
+    optimalScore=truncate_to_nth_decimal_point(sum([item for item in volumeList]),3)
+
+    # timeout allocation fractions for each rotation:
+    # f(1)=[1]
+    # f(2)=[1/3, 1]; first gets 1/3 of time remaining, 2nd gets all of time remaining
+    # f(3)=[1/7,1/3, 1]; first gets 1/7 of time remaining, 2nd gets 1/3 of time remaining, last gets all remaining time
+    # ...
+
+    # f(n)=[1] if x==1 else [1/((2**n)-1)]+f(n-1)
+
+    # timeProfiles=f(numRotations)
+    # for rotation in numRotations:
+    # \tab timeAllocated=timeProfiles[rotation]*timeout
+    # \tab
+    # \tab start=time.time()
+    # \tab ....
+    # \tab work
+    # \tab ...
+    # \tab end=time.time()
+    # timeout-=(end-start)
+
+
+    # back to previous inner loop thinking (AKA 'work')
+    # key ideas: 
+    # a)on the last rotation, we should only look at bins whose volume is greater then or equal to the 'optimalScore'
+    # b)we should never be searching bins whose volume is less then bestScore (these will never lead to an improvment)
+    # c) we should update numRemaining after every search (AKA this is dynamic in the inner loop)
+    # d) integrate existing controls in this framework ....
+    #                                  ? how to ^ ?
+
     for ele in range(0, len(bins1)):
         try:
-            if(costList[ele]<minCost or(not bestScore ==optimalScore)):
+            # if (reduces cost then at least maintains score) or (if not optimal then increases score)
+            if(costList[ele]<minCost and volumeList[ele]>=bestScore) or  (not bestScore==optimalScore and volumeList[ele]>bestScore):
                 # cant subscript none so must use lambda
                 miniCostList=None if costList==None else [costList[ele]]
                 miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
@@ -167,6 +197,8 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                 if arrangmentPossible:
                     # 3rd decimal point
                     score=truncate_to_nth_decimal_point(sum([box.volume for box in apiFormat[0].boxes]),3)
+
+                    # this line is still necessary because of the partial results return
                     if ((score>bestScore) or (score==bestScore and costList[ele]<minCost)):
                         bestScore=score
                         # no error, update to better solution

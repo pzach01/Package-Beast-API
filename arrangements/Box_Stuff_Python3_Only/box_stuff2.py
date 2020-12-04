@@ -67,7 +67,10 @@ def bruteforce_multibinpack(generator, binMasterList, boxMasterList,endTime,cost
             break
     return arrangment, minCost,timedOut,bestRenderingList
 def bruteforce_singlepack(generator, binMasterList, boxMasterList,endTime,costList,binWeightCapacitys, boxWeights):
+
     import time
+    if endTime<time.time():
+        raise Exception("unsupported value in timeout field")
     import math
     assert(len(binMasterList)==1)
     assert(len(costList)==1)
@@ -140,7 +143,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     for ele in bins1:
         x,y,z=float(ele.split('x')[0]),float(ele.split('x')[1]),float(ele.split('x')[2])
         volume=x*y*z
-        volumeList.append(volume)
+        volumeList.append(truncate_to_nth_decimal_point(volume,3))
     if(costList==None):
         costList=volumeList
         # use volume
@@ -151,15 +154,8 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     bestScore=0
     optimalScore=truncate_to_nth_decimal_point(sum([item for item in volumeList]),3)
 
-    # timeout allocation fractions for each rotation:
-    # f(1)=[1]
-    # f(2)=[1/3, 1]; first gets 1/3 of time remaining, 2nd gets all of time remaining
-    # f(3)=[1/7,1/3, 1]; first gets 1/7 of time remaining, 2nd gets 1/3 of time remaining, last gets all remaining time
-    # ...
 
-    # f(n)=[1] if x==1 else [1/((2**n)-1)]+f(n-1)
 
-    # timeProfiles=f(numRotations)
     # for rotation in numRotations:
     # \tab timeAllocated=timeProfiles[rotation]*timeout
     # \tab
@@ -179,39 +175,87 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     # d) integrate existing controls in this framework ....
     #                                  ? how to ^ ?
 
-    for ele in range(0, len(bins1)):
-        try:
-            # if (reduces cost then at least maintains score) or (if not optimal then increases score)
-            if(costList[ele]<minCost and volumeList[ele]>=bestScore) or  (not bestScore==optimalScore and volumeList[ele]>bestScore):
-                # cant subscript none so must use lambda
-                miniCostList=None if costList==None else [costList[ele]]
-                miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
-                # call master_calculate_optimal_solution with just one bin
-                numRemaining=(len(bins1))-ele
-                start=time.time()
-                apiFormat,timedOut,arrangmentPossible=master_calculate_optimal_solution([bins1[ele]], boxs1,(timeout/numRemaining),True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights)
-                end=time.time()
-                timeout-=(end-start)
-                anyTimeout=True if (timedOut or anyTimeout) else False
+    numRotations=3
+    # timeout allocation fractions for each rotation:
+    # f(1)=[1]
+    # f(2)=[1/3, 1]; first gets 1/3 of time remaining, 2nd gets all of time remaining
+    # f(3)=[1/7,1/3, 1]; first gets 1/7 of time remaining, 2nd gets 1/3 of time remaining, last gets all remaining time
+    # ...
 
-                if arrangmentPossible:
-                    # 3rd decimal point
-                    score=truncate_to_nth_decimal_point(sum([box.volume for box in apiFormat[0].boxes]),3)
+    # f(n)=[1] if x==1 else [1/((2**n)-1)]+f(n-1)
+    timeProfilesLambda=lambda x: [1] if x==1 else [1/((2**x)-1)]+timeProfilesLambda(x-1)
+    timeProfiles=timeProfilesLambda(numRotations)
+    noMoreRotations=False
+    for rotation in range(0, numRotations):
 
-                    # this line is still necessary because of the partial results return
-                    if ((score>bestScore) or (score==bestScore and costList[ele]<minCost)):
-                        bestScore=score
-                        # no error, update to better solution
-                        minArrangment=apiFormat
-                        minCost=costList[ele]
-                        indexUsed=ele
-                    
-        # ran out of time
-        except TimeoutError:
-            pass
-        # no solution, look for next bin
-        except NotImplementedError:
-            pass
+        indicesRemainingInitial=[index for index in range(0, len(bins1))]
+        # get containers that could (be cheaper and yield same or better score) or (if not optimal yet yield a better score)
+        indicesRemainingInitial=[index for index in indicesRemainingInitial if ((costList[index]<minCost and volumeList[index]>=bestScore) or  (not bestScore==optimalScore and volumeList[index]>bestScore))]
+
+        # if on the last rotation only use containers that can produce optimal score
+        if (rotation==(numRotations-1)):
+            indicesRemainingInitial=[index for index in indicesRemainingInitial if volumeList[ele]>=optimalScore]
+
+        numRemainingInitial=len(indicesRemainingInitial)
+        # override using multiple rotations and try to pack everything in one container in first pass
+        if numRemainingInitial==1:
+            fractionToUseForThisRotation=1
+            noMoreRotations=True
+        else:
+            fractionToUseForThisRotation=timeProfiles[rotation]
+        timeForThisRotation=timeout*fractionToUseForThisRotation
+        start=time.time()
+
+        for ele in range(0, len(bins1)):
+            try:
+                # default to all remaining containers
+                indicesRemaining=[index for index in range(ele, len(bins1))]
+                # get containers that could (be cheaper and yield same or better score) or (if not optimal yet yield a better score)
+                indicesRemaining=[index for index in indicesRemaining if ((costList[index]<minCost and volumeList[index]>=bestScore) or  (not bestScore==optimalScore and volumeList[index]>bestScore))]
+
+                # if on the last rotation only use containers that can produce optimal score
+                if (rotation==(numRotations-1)):
+                    indicesRemaining=[index for index in indicesRemaining if volumeList[ele]>=optimalScore]
+
+                numRemaining=len(indicesRemaining)
+                # override case where there is exactly one item remaining
+
+                # we use this non-verbose form to avoid repeating ourselves (chiefly the condition(s) above)
+                if ele in indicesRemaining:
+                    # sanity check
+                    assert(indicesRemaining[0]==ele)
+                    # cant subscript none so must use lambda
+                    miniCostList=None if costList==None else [costList[ele]]
+                    miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
+
+                    innerStart=time.time()
+                    apiFormat,timedOut,arrangmentPossible=master_calculate_optimal_solution([bins1[ele]], boxs1,(timeForThisRotation/numRemaining),True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights)
+                    innerEnd=time.time()
+                    timeForThisRotation-=(innerEnd-innerStart)
+                    anyTimeout=True if (timedOut or anyTimeout) else False
+
+                    if arrangmentPossible:
+                        # 3rd decimal point
+                        score=truncate_to_nth_decimal_point(sum([box.volume for box in apiFormat[0].boxes]),3)
+
+                        # this line is still necessary because of the partial results return
+                        if ((score>bestScore) or (score==bestScore and costList[ele]<minCost)):
+                            bestScore=score
+                            # no error, update to better solution
+                            minArrangment=apiFormat
+                            minCost=costList[ele]
+                            indexUsed=ele
+                        
+            # ran out of time
+            except TimeoutError:
+                pass
+            # no solution, look for next bin
+            except NotImplementedError:
+                pass
+        end=time.time()
+        timeout-=(end-start)
+        if noMoreRotations:
+            break
     # we have to jankily reformat the API to add a bunch of empty containers
     containersUsed=[]
     if indexUsed==None:

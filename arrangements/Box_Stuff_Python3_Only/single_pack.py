@@ -171,19 +171,19 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
     recursiveTimeout=max(.00005*((len(itemList)*(len(itemList)+1))/2),.01)
     batchMultiplier=1
 
-
-    timePerIterationType=batchTime/3
+    oneNinthBatchTime=batchTime/9
     # heuristic: 30 second batches that gradually get larger
     while(timeout>0):
         # 1 percent growth in timeouts
         batchMultiplier*=1.01
         recursiveTimeout=recursiveTimeout*batchMultiplier
-        timePerIterationType=timePerIterationType*batchMultiplier
+        oneNinthBatchTime=oneNinthBatchTime*batchMultiplier
 
         randomSearch=False
         useBigSetsInDimensionalMixups=True
         start=time.time()
-        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,timePerIterationType),min(timePerIterationType,min(timeout,recursiveTimeout)),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+        # use the heuristic 7/9 of the time
+        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,oneNinthBatchTime*7),min(oneNinthBatchTime,min(timeout,recursiveTimeout)),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
         end=time.time()
         timeout-=end-start
         if res.isOptimal:
@@ -196,7 +196,7 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
         randomSearch=True
         useBigSetsInDimensionalMixups=False
         start=time.time()        
-        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,timePerIterationType),min(timePerIterationType,min(timeout,recursiveTimeout)),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
+        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,oneNinthBatchTime),min(oneNinthBatchTime,min(timeout,recursiveTimeout)),RotationType.HEURISTIC,randomSearch,useBigSetsInDimensionalMixups)
         end=time.time()
         timeout-=end-start
         if res.isOptimal:
@@ -204,7 +204,7 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
         bestPacker=get_best_packer(bestPacker,res)
 
         start=time.time()
-        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,timePerIterationType),min(timePerIterationType,min(timeout,recursiveTimeout)),RotationType.ALL,randomSearch,useBigSetsInDimensionalMixups)
+        res= single_pack_given_timing_and_rotations(container, itemList, printIteration, min(timeout,oneNinthBatchTime),min(oneNinthBatchTime,min(timeout,recursiveTimeout)),RotationType.ALL,randomSearch,useBigSetsInDimensionalMixups)
         end=time.time()
         timeout-=end-start
         if res.isOptimal:

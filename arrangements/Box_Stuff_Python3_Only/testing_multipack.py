@@ -27,6 +27,7 @@ def david_test():
     usableContainers=([container for container in containerList if len(container.boxes)>0])    
     usedContainer=usableContainers[0]
     assert(usedContainer.volume==(18*18*24))
+    assert(len(usedContainer.boxes)==20)
 
 def test_only_pack_one_container():
     items=['4x4x4','4x4x4']

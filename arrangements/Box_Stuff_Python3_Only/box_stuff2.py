@@ -152,28 +152,16 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     indexUsed=None
     anyTimeout=False
     bestScore=0
-    optimalScore=truncate_to_nth_decimal_point(sum([item for item in volumeList]),3)
 
+    optimalScore=0
+    for ele in boxs1:
+        x,y,z=float(ele.split('x')[0]),float(ele.split('x')[1]),float(ele.split('x')[2])
+        volume=x*y*z
+        optimalScore+=volume
+    # so that it matches up at 3rd decimal point        
+    optimalScore=truncate_to_nth_decimal_point(optimalScore,3)
 
-
-    # for rotation in numRotations:
-    # \tab timeAllocated=timeProfiles[rotation]*timeout
-    # \tab
-    # \tab start=time.time()
-    # \tab ....
-    # \tab work
-    # \tab ...
-    # \tab end=time.time()
-    # timeout-=(end-start)
-
-
-    # back to previous inner loop thinking (AKA 'work')
-    # key ideas: 
-    # a)on the last rotation, we should only look at bins whose volume is greater then or equal to the 'optimalScore'
-    # b)we should never be searching bins whose volume is less then bestScore (these will never lead to an improvment)
-    # c) we should update numRemaining after every search (AKA this is dynamic in the inner loop)
-    # d) integrate existing controls in this framework ....
-    #                                  ? how to ^ ?
+    # possible bugs could result from differences in truncation for different fields in the code
 
     numRotations=3
     # timeout allocation fractions for each rotation:

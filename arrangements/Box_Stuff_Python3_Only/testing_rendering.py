@@ -160,8 +160,10 @@ def render_test2():
     from .testing_underfitting import render_something_that_failed
     render_something_that_failed(container,items,coordinates)
     '''
-
+    start=time.time()
     packer=single_pack.single_pack(container, items,True, False,1000)
+    end=time.time()
+    print('wierd case: '+str(end-start))
     assert(len(packer.bestItems)==4)
     assert(packer.isOptimal)
 

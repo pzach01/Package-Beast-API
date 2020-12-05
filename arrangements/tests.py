@@ -722,3 +722,62 @@ class ArrangmentTests(APITestCase):
         print("Arrangments test 6 Passed")
 
 
+    # PZ test case that tests if masterItemId matches the correct value
+    def test_7(self):
+        inputData={
+        "multiBinPack": False,
+        "timeoutDuration": 30,
+        "containers": [
+            {
+            "sku": "string",
+            "description": "string",
+            "xDim": 1,
+            "yDim": 1,
+            "zDim": 1,
+            "units": "in"
+            }
+        ],
+        "items": [
+            {
+            "id": 6763,
+            "sku": "string",
+            "description": "string",
+            "length": 1,
+            "width": 1,
+            "height": 1,
+            "units": "in"
+            },
+            {
+            "id": 6763,
+            "sku": "string",
+            "description": "string",
+            "length": 1,
+            "width": 1,
+            "height": 1,
+            "units": "in"
+            },
+            {
+            "id": 6763,
+            "sku": "string",
+            "description": "string",
+            "length": 1,
+            "width": 1,
+            "height": 1,
+            "units": "in"
+            }
+        ]
+        }
+
+        import time
+        start=time.time()
+        data=self.generic_logic(inputData)
+        end=time.time()
+        
+        assert(data['arrangementPossible']==True)
+        assert(data['multiBinPack']==False)
+
+        for item in data['items']:
+             assert (item['masterItemId']==6763)
+                # 30 seconds/2 containers
+
+        print("Arrangments test 7 Passed")

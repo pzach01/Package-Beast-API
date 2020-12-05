@@ -349,6 +349,74 @@ def test_underfits_api():
     for ele in range(0, 100000):
         print(ele)
         test_one_underfit_api(ele)
-test_underfits_api()
-#test_underfits()
 
+
+
+
+# try to fit items into a single (optimized) container when you are given multiple containers into 
+def test_one_underfit_multipack():
+    import random
+
+    timeout=30
+    numItems=random.randint(1,15)
+
+    container, items,coordinates=generate_bins_that_fit(numItems)
+
+
+    numContainers=random.randint(1,15)
+    containers=[container.get_dimension_string()]
+    # only save container in this code
+    for ele in range(0, numContainers):
+        container, items,coordinates=generate_bins_that_fit(numItems)
+        containers.append(container.get_dimension_string())
+
+    random.shuffle(containers)
+    if len(items)==0:
+        return 
+
+    # one container as a list
+
+    items=[item.get_dimension_string() for item in items]
+    ids=[ele for ele in range(0, len(items))]
+
+
+    bestVolumeUsed=0
+    import math
+    bestCost=math.inf
+    for container in containers:
+        apiObjects, timedOut, arrangmentPossible=master_calculate_optimal_solution([container],items,timeout,False,ids)
+        # why is this here?
+        if apiObjects==None:
+            continue
+        volumeUsed=0 if len(apiObjects[0].boxes)==0 else sum([box.volume for box in apiObjects[0].boxes])
+        cost=apiObjects[0].volume
+        # update best score
+        if volumeUsed>bestVolumeUsed:
+            bestCost=cost
+            bestVolumeUsed=volumeUsed
+        elif volumeUsed==bestVolumeUsed:
+            if bestCost>cost:
+                bestCost=cost
+                bestVolumeUsed=volumeUsed
+
+    foundVolumeUsed=0
+    foundCost=math.inf
+    while(bestVolumeUsed>foundVolumeUsed and bestCost<foundCost):
+        apiObjects, timedOut, arrangmentPossible=master_calculate_optimal_solution(containers,items,timeout,False,ids)
+        if apiObjects==None:
+            # too wierd to happen during regular behavior
+            raise Exception('wierd stuff')
+        nonEmptyContainers=[container for container in apiObjects if len(container.boxes)>0]
+        assert(len(nonEmptyContainers)==1)
+        foundVolumeUsed=sum([box.volume for box in nonEmptyContainers[0].boxes])
+        foundCost=nonEmptyContainers[0].volume
+    print('Timeout :'+str(timeout))
+
+def test_underfits_multipack():
+    for ele in range(0, 100000):
+        print(ele)
+        test_one_underfit_multipack()
+
+#test_underfits_api()
+#test_underfits()
+test_underfits_multipack()

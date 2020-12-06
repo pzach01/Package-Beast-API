@@ -406,11 +406,21 @@ def test_one_underfit_multipack(printStuff=True):
         if apiObjects==None:
             # too wierd to happen during regular behavior
             raise Exception('wierd stuff')
+    
         nonEmptyContainers=[container for container in apiObjects if len(container.boxes)>0]
         assert(len(nonEmptyContainers)==1)
         mostSpaceUsedWithMultipleContainers=sum([box.volume for box in nonEmptyContainers[0].boxes])
         leastContainerVolumeWithMultipleContainers=nonEmptyContainers[0].volume
         timeout*=2
+        # check that there isnt an unsorted stepthrough function
+        for objectIndex in range(0, len(apiObjects[0].boxes)):
+            if not(objectIndex==0):
+                lastObject=apiObjects[0].boxes[objectIndex-1]
+                thisObject=apiObjects[0].boxes[objectIndex]
+                if (lastObject.x+(lastObject.xDim/2))>(thisObject.x+(thisObject.xDim/2)):
+                    if (lastObject.y+(lastObject.yDim/2))>(thisObject.y+(thisObject.yDim/2)):
+                        if (lastObject.z+(lastObject.zDim/2))>(thisObject.z+(thisObject.zDim/2)):
+                            raise Exception("unsorted objects for stepthrough function")
 
     if printStuff:
         print('Method: single pack')
@@ -430,4 +440,4 @@ def test_underfits_multipack():
 
 #test_underfits_api()
 #test_underfits()
-test_underfits_multipack()
+#test_underfits_multipack()

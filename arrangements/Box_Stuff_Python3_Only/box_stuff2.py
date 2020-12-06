@@ -174,16 +174,23 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     timeProfilesLambda=lambda x: [1] if x==1 else [1/((2**x)-1)]+timeProfilesLambda(x-1)
     timeProfiles=timeProfilesLambda(numRotations)
     noMoreRotations=False
-    for rotation in range(0, numRotations):
 
-        indicesRemainingInitial=[index for index in range(0, len(bins1))]
+    # best to make this a local method then repeating some code, but dont want to clutter up (already crowded) global namespace
+    def get_indices_remaining(startingIndex,bins,costList, minCost,bestScore,optimalScore,rotation):
+        # sometimes starting index is non-zero to reflect ignoring already searched bins
+        indicesRemaining=[index for index in range(startingIndex, len(bins))]
         # get containers that could (be cheaper and yield same or better score) or (if not optimal yet yield a better score)
-        indicesRemainingInitial=[index for index in indicesRemainingInitial if ((costList[index]<minCost and volumeList[index]>=bestScore) or  (not bestScore==optimalScore and volumeList[index]>bestScore))]
+        indicesRemaining=[index for index in indicesRemaining if ((costList[index]<minCost and volumeList[index]>=bestScore) or  (not bestScore==optimalScore and volumeList[index]>bestScore))]
 
         # if on the last rotation only use containers that can produce optimal score
         if (rotation==(numRotations-1)):
-            indicesRemainingInitial=[index for index in indicesRemainingInitial if volumeList[ele]>=optimalScore]
+            indicesRemaining=[index for index in indicesRemaining if volumeList[ele]>=optimalScore]
+        return indicesRemaining
 
+
+    for rotation in range(0, numRotations):
+        # lot going on in this line
+        indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,rotation)
         numRemainingInitial=len(indicesRemainingInitial)
         # override using multiple rotations and try to pack everything in one container in first pass
         if numRemainingInitial==1:
@@ -196,14 +203,8 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
 
         for ele in range(0, len(bins1)):
             try:
-                # default to all remaining containers
-                indicesRemaining=[index for index in range(ele, len(bins1))]
-                # get containers that could (be cheaper and yield same or better score) or (if not optimal yet yield a better score)
-                indicesRemaining=[index for index in indicesRemaining if ((costList[index]<minCost and volumeList[index]>=bestScore) or  (not bestScore==optimalScore and volumeList[index]>bestScore))]
+                indicesRemaining=get_indices_remaining(ele,bins1,costList, minCost,bestScore,optimalScore,rotation)
 
-                # if on the last rotation only use containers that can produce optimal score
-                if (rotation==(numRotations-1)):
-                    indicesRemaining=[index for index in indicesRemaining if volumeList[ele]>=optimalScore]
 
                 numRemaining=len(indicesRemaining)
                 # override case where there is exactly one item remaining

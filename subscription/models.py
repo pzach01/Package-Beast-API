@@ -45,8 +45,12 @@ class Subscription(models.Model):
     def getContainersUsed(self):
         return Container.objects.filter(owner=self.owner, arrangement__isnull=True).count()
     def getPaymentUpToDate(self):
-        stripeSubscriptions=StripeSubscription.objects.filter(subscription=self).order_by('-created')
-        return stripeSubscriptions[0].currentPeriodEnd+(60*60*24*2)>time.time()
+        if self.subscriptionType is not 'trial':
+            stripeSubscriptions=StripeSubscription.objects.filter(subscription=self).order_by('-created')
+            return stripeSubscriptions[0].currentPeriodEnd+(60*60*24*2)>time.time()
+        else:
+            # 2 week trial period
+            return time.time()>(self.created+(60*60*24*14))
     def getUserCanCreateArrangment(self):
         return (self.getPaymentUpToDate()) and (self.shipmentsUsed<self.shipmentsAllowed)
     def getUserCanCreateItem(self):

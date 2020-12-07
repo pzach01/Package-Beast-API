@@ -258,7 +258,7 @@ def get_subscription_info(request):
                 # these fields must be initialized
                 returnData['paymentExpired']=stripeSubscriptions[0].currentPeriodEnd>(time.time())
         else:
-            returnData['subscriptionExpirationTime']='null'
+            returnData['subscriptionExpirationTime']=sub.created+(60*60*24*14)
 
         if not subscriptionActive:
             returnData['paymentExpired']='null'

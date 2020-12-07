@@ -9,6 +9,7 @@ stripe.api_key = 'sk_test_51HB4dCJWFTMXIZUo5d1tlWus4t0NGBLPI6LqHVokCzOyXaYZ6f8rc
 
 # THIS IS TIED TO CURRENT PRODUCTS; WONT BEHAVE CORRECTLY IF THESE FIELDS ARE WRONG
 # type, ordering, cost, product id, price id, shipmentsAllowed, itemsAllowed, containersAllowed
+# these 'emptyFields' are such to prevent reverse engineering
 SUBSCRIPTION_PROFILES=[
     ('trial',0,0,'emptyField741130','emptyField372215',10,10,10),
     ('standard',1,1000,'prod_HzHvyINf9uyaxv','price_1HPJLlJWFTMXIZUoMH26j2EB',2,2,2),
@@ -45,12 +46,12 @@ class Subscription(models.Model):
     def getContainersUsed(self):
         return Container.objects.filter(owner=self.owner, arrangement__isnull=True).count()
     def getPaymentUpToDate(self):
-        if self.subscriptionType is not 'trial':
+        if not (self.subscriptionType == 'trial'):
             stripeSubscriptions=StripeSubscription.objects.filter(subscription=self).order_by('-created')
             return stripeSubscriptions[0].currentPeriodEnd+(60*60*24*2)>time.time()
         else:
             # 2 week trial period
-            return time.time()>(self.created+(60*60*24*14))
+            return time.time()>(self.created.timestamp()+(60*60*24*14))
     def getUserCanCreateArrangment(self):
         return (self.getPaymentUpToDate()) and (self.shipmentsUsed<self.shipmentsAllowed)
     def getUserCanCreateItem(self):

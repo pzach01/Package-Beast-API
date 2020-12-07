@@ -10,9 +10,10 @@ stripe.api_key = 'sk_test_51HB4dCJWFTMXIZUo5d1tlWus4t0NGBLPI6LqHVokCzOyXaYZ6f8rc
 # THIS IS TIED TO CURRENT PRODUCTS; WONT BEHAVE CORRECTLY IF THESE FIELDS ARE WRONG
 # type, ordering, cost, product id, price id, shipmentsAllowed, itemsAllowed, containersAllowed
 SUBSCRIPTION_PROFILES=[
-    ('standard',0,1000,'prod_HzHvyINf9uyaxv','price_1HPJLlJWFTMXIZUoMH26j2EB',2,2,2),
-    ('premium',1,3000,'prod_HzHxDGJSZDQ8GI','price_1HPJNoJWFTMXIZUo60gNaXlm',2,4,4),
-    ('beastMode',2,5000,'prod_HzHy8kP263Pqzp','price_1HPJOLJWFTMXIZUoGcXhTnax',200,60,60),
+    ('trial',0,0,'emptyField741130','emptyField372215',10,10,10),
+    ('standard',1,1000,'prod_HzHvyINf9uyaxv','price_1HPJLlJWFTMXIZUoMH26j2EB',2,2,2),
+    ('premium',2,3000,'prod_HzHxDGJSZDQ8GI','price_1HPJNoJWFTMXIZUo60gNaXlm',2,4,4),
+    ('beastMode',3,5000,'prod_HzHy8kP263Pqzp','price_1HPJOLJWFTMXIZUoGcXhTnax',200,60,60),
 ]
 
 class SubscriptionManager(models.Manager):
@@ -22,7 +23,6 @@ class SubscriptionManager(models.Manager):
         )
         subscription=self.create(owner=user,stripeCustomerId=stripeCustomer.id)
 
-        # do something with the book
         return subscription
 
 
@@ -31,13 +31,13 @@ class Subscription(models.Model):
         'users.User', related_name='subscription', on_delete=models.CASCADE)
     created=models.DateTimeField(auto_now_add=True)
     stripeCustomerId=models.CharField(max_length=20)
-    subscriptionType=models.CharField(max_length=20,default='none')
+    subscriptionType=models.CharField(max_length=20,default='trial')
     
     shipmentsUsed=models.IntegerField(default=0)
-    shipmentsAllowed=models.IntegerField(default=0)
+    shipmentsAllowed=models.IntegerField(default=10)
 
-    itemsAllowed=models.IntegerField(default=0)
-    containersAllowed=models.IntegerField(default=0)
+    itemsAllowed=models.IntegerField(default=10)
+    containersAllowed=models.IntegerField(default=10)
 
     def getItemsUsed(self):
         return Item.objects.filter(owner=self.owner, arrangement__isnull=True).count()

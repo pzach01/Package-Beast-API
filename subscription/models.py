@@ -51,7 +51,7 @@ class Subscription(models.Model):
             return stripeSubscriptions[0].currentPeriodEnd+(60*60*24*2)>time.time()
         else:
             # 2 week trial period
-            return time.time()>(self.created.timestamp()+(60*60*24*14))
+            return time.time()<(self.created.timestamp()+(60*60*24*14))
     def getUserCanCreateArrangment(self):
         return (self.getPaymentUpToDate()) and (self.shipmentsUsed<self.shipmentsAllowed)
     def getUserCanCreateItem(self):

@@ -5,7 +5,7 @@ from containers.models import Container
 import time
 
 
-stripe.api_key = 'sk_test_51HB4dCJWFTMXIZUo5d1tlWus4t0NGBLPI6LqHVokCzOyXaYZ6f8rcBqAeWZUdtfdc6tl5EenjpUXWrpFsyRmAwgJ00fRuOxc8b'
+stripe.api_key = os.getenv('STRIPE_API_SECRET')
 
 # THIS IS TIED TO CURRENT PRODUCTS; WONT BEHAVE CORRECTLY IF THESE FIELDS ARE WRONG
 # type, ordering, cost, product id, price id, shipmentsAllowed, itemsAllowed, containersAllowed

@@ -781,3 +781,320 @@ class ArrangmentTests(APITestCase):
                 # 30 seconds/2 containers
 
         print("Arrangments test 7 Passed")
+
+
+    # DZ test case from December 10, 2020
+    #     containers=[
+    # '26x15.25x7.313',
+    #'19.5x14.5x12.188'
+    #,'16x12x12',
+    #'22x16x15',
+    #'18x18x24',
+    #'10x10x12',
+    #'21x16x10',
+    #'29.25x12.75x23',
+    #'2x2x1',
+    #'2x2x1'
+    #]
+    # items=[21 gorilla gloves]
+    # aka '9.75x4.438x7.875'
+    def test_8(self):
+        inputData={
+        "multiBinPack": False,
+        "timeoutDuration": 30,
+        "containers": [
+            {
+            "sku": "string",
+            "description": "string",
+            "xDim": 26,
+            "yDim": 15.25,
+            "zDim": 7.313,
+            "units": "in"
+            },
+            {
+            "sku": "string",
+            "description": "string",
+            "xDim": 19.5,
+            "yDim": 14.5,
+            "zDim": 12.188,
+            "units": "in"
+            },
+            {
+            "sku": "string",
+            "description": "string",
+            "xDim": 16,
+            "yDim": 12,
+            "zDim": 12,
+            "units": "in"
+            },
+            {
+            "sku": "string",
+            "description": "string",
+            "xDim": 22,
+            "yDim": 16,
+            "zDim": 15,
+            "units": "in"
+            },
+            {
+            "sku": "string",
+            "description": "string",
+            "xDim": 18,
+            "yDim": 18,
+            "zDim": 24,
+            "units": "in"
+            },
+            {
+            "sku": "string",
+            "description": "string",
+            "xDim": 10,
+            "yDim": 10,
+            "zDim": 12,
+            "units": "in"
+            },
+            {
+            "sku": "string",
+            "description": "string",
+            "xDim": 21,
+            "yDim": 16,
+            "zDim": 10,
+            "units": "in"
+            },
+            {
+            "sku": "string",
+            "description": "string",
+            "xDim": 29.25,
+            "yDim": 12.75,
+            "zDim": 23,
+            "units": "in"
+            },
+            {
+            "sku": "string",
+            "description": "string",
+            "xDim": 2,
+            "yDim": 2,
+            "zDim": 1,
+            "units": "in"
+            },
+            {
+            "sku": "string",
+            "description": "string",
+            "xDim": 2,
+            "yDim": 2,
+            "zDim": 1,
+            "units": "in"
+            }
+        ],
+        "items": [
+            {
+            "id": 100,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 101,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 102,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 103,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 104,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 105,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 106,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 107,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 108,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 109,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 110,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 111,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 112,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 113,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 114,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 115,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 116,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 117,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 118,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 119,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            },
+            {
+            "id": 120,
+            "sku": "string",
+            "description": "gorillaGloves",
+            "length": 9.75,
+            "width": 4.438,
+            "height": 7.875,
+            "units": "in"
+            }
+        ]
+        }
+
+        import time
+        start=time.time()
+        data=self.generic_logic(inputData)
+        end=time.time()
+        assert(data['arrangementPossible']==True)
+        assert(data['multiBinPack']==False)
+        selectedContainer=None
+        foundContainerId=data['items'][0]['container']
+        # all items point to same container
+        assert(len(data['items'])==21)
+        for item in data['items']:
+            assert(foundContainerId==item['container'])
+
+
+        selectedContainer=None
+        for container in data['containers']:
+            if container['id']==foundContainerId:
+                selectedContainer=container   
+        foundContainerString=(str(selectedContainer['xDim'])+'x'+str(selectedContainer['yDim'])+'x'+str(selectedContainer['zDim']))
+        assert(foundContainerString=='29.25x12.75x23.0')
+        print('Arrangments test 8 Passed')

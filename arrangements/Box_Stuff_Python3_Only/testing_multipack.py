@@ -1,6 +1,49 @@
 from . import testing_imports
 from .testing_imports import *
 
+def dz_test_case_dec_10_2020():
+    items=['9.75x4.438x7.875' for ele in range(0,21)]
+    containers=['26x15.25x7.313',
+    '19.5x14.5x12.188'
+    ,'16x12x12',
+    '22x16x15',
+    '18x18x24',
+    '10x10x12',
+    '21x16x10',
+    '29.25x12.75x23',
+    '2x2x1',
+    '2x2x1'
+    ]
+    import time
+    start=time.time()
+    containerList,timedOut, arrangmentPossible=box_stuff2.master_calculate_optimal_solution(containers,items,30, False)
+    end=time.time()
+    print("Time used:"+str(end-start))
+    usableContainers=([container for container in containerList if len(container.boxes)>0])    
+    assert(len(usableContainers)==1)
+    usedContainer=usableContainers[0]
+    if not (len(usedContainer.boxes)==21):
+        print('suboptimal at dz_test_case_dec_10_2020')
+
+def test_ids_only_pack_one_container():
+    items=['4x4x4','5x5x5']
+    containers=['4x4x4','4x4x4','10x5x5']
+    containerList,timedOut, arrangmentPossible=box_stuff2.master_calculate_optimal_solution(containers,items,240, False,[0,1])
+    # 30 seconds packing on 4x4x4
+    assert(timedOut==True)
+    assert(arrangmentPossible==True)
+    usableContainers=([container for container in containerList if len(container.boxes)>0])    
+    assert(len(usableContainers)==1)
+    if usableContainers[0].boxes[0].xDim==4:
+        assert(usableContainers[0].boxes[0].id==0)
+    else:
+        assert(usableContainers[0].boxes[0].id==1)
+
+    if usableContainers[0].boxes[1].xDim==4:
+        assert(usableContainers[0].boxes[1].id==0)
+    else:
+        assert(usableContainers[0].boxes[1].id==1)
+
 def test_ids_only_pack_one_container():
     items=['4x4x4','5x5x5']
     containers=['4x4x4','4x4x4','10x5x5']
@@ -168,7 +211,7 @@ def weight_testing():
     assert(arrangmentPossible==True)
     usedVolume=sum([bin.volume for bin in containerList if len(bin.boxes) is not 0 ])
     assert(usedVolume==10**3) 
-
+dz_test_case_dec_10_2020()
 #multibinpack_test_1()
 david_test()
 test_ids_only_pack_one_container()

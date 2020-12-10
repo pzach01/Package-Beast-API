@@ -3,7 +3,7 @@ import stripe
 from items.models import Item
 from containers.models import Container
 import time
-
+import os
 
 stripe.api_key = os.getenv('STRIPE_API_SECRET')
 

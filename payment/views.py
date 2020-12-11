@@ -271,8 +271,6 @@ def get_subscription_info(request):
         returnData['itemsUsed']=sub.getItemsUsed()
         returnData['containersAllowed']=sub.containersAllowed
         returnData['containersUsed']=sub.getContainersUsed()
-        import socket
-        returnData['hostname']=socket.gethostname()
         return JsonResponse(returnData)
     except:
         return JsonResponse('Error getting this info',safe=False)

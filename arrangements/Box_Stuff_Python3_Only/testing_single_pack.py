@@ -69,6 +69,18 @@ def test_3():
     # 'None' valid arrangment
     assert(not packer.isOptimal)
 
+
+def dz_test_12_12_2020():
+    container=ContainerPY3DBP('container', 18,18,24)
+    items=[]
+    import time
+    start=time.time()
+    for i in range(0, 21):
+        items.append(ItemPY3DBP(str(i),9.75,4.438,7.875))
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False,timeout=1000)
+    end=time.time()
+    print(str(end-start)+" ,DZ test 12-12-2020, intersections checked: "+str(packer.intersectionsChecked))
+    assert(packer.isOptimal)
 # the test that broke pyshipping :)
 #bin=p.Package('1800x1800x2400')
 #box=p.Package('450x975x793') # 17 of these
@@ -207,7 +219,7 @@ def hard_test_case():
     assert( packer.isOptimal)
 print('testing_single_pack.py')
 hard_test_case()
-
+dz_test_12_12_2020()
 test_overfitting_one_item_one_container()
 timing_test_case()
 dumbest_test_case_ever()

@@ -25,6 +25,19 @@ def dz_test_case_dec_10_2020():
     if not (len(usedContainer.boxes)==21):
         print('suboptimal at dz_test_case_dec_10_2020')
 
+def lz_test_case_dec_13_2020():
+    items=['1x1x1' for ele in range(0,9)]
+    containers=['2x2x2','1x1x1','2.1x2x2','2.2x2x2']
+    import time
+    start=time.time()
+    containerList,timedOut, arrangmentPossible=box_stuff2.master_calculate_optimal_solution(containers,items,30, False)
+    end=time.time()
+    assert(end-start>30)
+    usableContainers=([container for container in containerList if len(container.boxes)>0])    
+    assert(len(usableContainers)==1)
+    usedContainer=usableContainers[0]
+    assert (len(usedContainer.boxes)==8)
+
 def test_ids_only_pack_one_container():
     items=['4x4x4','5x5x5']
     containers=['4x4x4','4x4x4','10x5x5']
@@ -211,6 +224,7 @@ def weight_testing():
     assert(arrangmentPossible==True)
     usedVolume=sum([bin.volume for bin in containerList if len(bin.boxes) is not 0 ])
     assert(usedVolume==10**3) 
+lz_test_case_dec_13_2020()
 dz_test_case_dec_10_2020()
 #multibinpack_test_1()
 david_test()

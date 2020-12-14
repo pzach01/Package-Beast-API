@@ -219,7 +219,7 @@ def hard_test_case():
     assert( packer.isOptimal)
 print('testing_single_pack.py')
 hard_test_case()
-dz_test_12_12_2020()
+#dz_test_12_12_2020()
 test_overfitting_one_item_one_container()
 timing_test_case()
 dumbest_test_case_ever()

@@ -216,6 +216,54 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
 
 
 
+class DimensionalMixupBigSetsGeneratorWithExhaustiveEnds():
+    def __init__(self, item_permutation):
+        # constant
+        self.numberNotInExhaustiveEnd=1
+
+        # observe that these two lists make up the whole list
+        self.bigSetsGenerator=DimensionalMixupBigSetsGenerator(item_permutation[0:(len(item_permutation)-self.numberNotInExhaustiveEnd)])
+        self.notBigSetsPermutations=item_permutation(item_permutation[(len(item_permutation)-self.numberNotInExhaustiveEnd):])
+
+        self.maxCount=6**numberNotInExhaustiveEnd
+
+        self.count=self.maxCount
+        self.bigSetsItems=None
+    def next(self):
+        # check if need to reset; do so if need be (count gets set to 0 and get next bigSetsItems)
+        if self.count==self.maxCount:
+            self.count=0
+            self.bigSetsItems=self.bigSetsGenerator.next()
+        
+        # get permutations from count
+        self.notBigSetsItems=self.getPermutations(count)
+        
+        self.count+=1
+
+        return self.bigSetsItems+self.notBigSetsItems
+    def getPermutations(self, count):
+        permutation=[]
+        for index in reversed(range(0, len(self.notBigSetsPermutations))):
+            thisFlip=count//6**index
+            count=count%6**index
+
+            if thisFlip==0:
+                permutation.append(ItemPY3DBP(self.notBigSetsItems[index].name,self.notBigSetsItems[index].xDim, self.notBigSetsItems[index].yDim, self.notBigSetsItems[index].zDim))
+            elif thisFlip==1:
+                permutation.append(ItemPY3DBP(self.notBigSetsItems[index].name,self.notBigSetsItems[index].xDim, self.notBigSetsItems[index].zDim, self.notBigSetsItems[index].yDim))
+            elif thisFlip==2:
+                permutation.append(ItemPY3DBP(self.notBigSetsItems[index].name,self.notBigSetsItems[index].yDim, self.notBigSetsItems[index].xDim, self.notBigSetsItems[index].zDim))
+            elif thisFlip==3:
+                permutation.append(ItemPY3DBP(self.notBigSetsItems[index].name,self.notBigSetsItems[index].yDim, self.notBigSetsItems[index].zDim, self.notBigSetsItems[index].xDim))
+            elif thisFlip==4:
+                permutation.append(ItemPY3DBP(self.notBigSetsItems[index].name,self.notBigSetsItems[index].zDim, self.notBigSetsItems[index].xDim, self.notBigSetsItems[index].yDim))
+            elif thisFlip==5:
+                permutation.append(ItemPY3DBP(self.notBigSetsItems[index].name,self.notBigSetsItems[index].zDim, self.notBigSetsItems[index].yDim, self.notBigSetsItems[index].xDim))
+            else:
+                print(switches)
+                raise Exception("bug in BigSetsWithExhaustiveEnds generator")
+        return permutation
+
 # next() returns one of the possible ways to mixup the Length Width Height of an item for each item in the permutation; obviously not just 6 because it is for
 # each item in the current ordering; 
 # thus 6**n mixups

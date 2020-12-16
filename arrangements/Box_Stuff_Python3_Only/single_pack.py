@@ -217,35 +217,73 @@ def single_pack(container, itemList,volumeSafeGuard=True,printIteration=True,tim
 
 
 class DimensionalMixupBigSetsGeneratorWithExhaustiveEnds():
-    def __init__(self, item_permutation):
+    def __init__(self, item_permutation,exhaustiveEndingLength):
         # constant
-        self.numberNotInExhaustiveEnd=1
+        self.exhaustiveEndingLength=min(exhaustiveEndingLength,len(item_permutation))
+
+            
 
         # observe that these two lists make up the whole list
-        self.bigSetsGenerator=DimensionalMixupBigSetsGenerator(item_permutation[0:(len(item_permutation)-self.numberNotInExhaustiveEnd)])
-        self.notBigSetsPermutations=item_permutation(item_permutation[(len(item_permutation)-self.numberNotInExhaustiveEnd):])
+        self.useBigSetsGenerator=len(item_permutation[0:(len(item_permutation)-self.exhaustiveEndingLength)])>0
+        self.bigSetsGenerator=DimensionalMixupBigSetsGenerator(item_permutation[0:(len(item_permutation)-self.exhaustiveEndingLength)])
+        self.notBigSetsItems=item_permutation[(len(item_permutation)-self.exhaustiveEndingLength):]
 
-        self.maxCount=6**numberNotInExhaustiveEnd
+        self.maxCount=6**self.exhaustiveEndingLength
 
         self.count=self.maxCount
         self.bigSetsItems=None
+
+
+
+        # temporary, debugging
+        self.expectedList=None
     def next(self):
         # check if need to reset; do so if need be (count gets set to 0 and get next bigSetsItems)
         if self.count==self.maxCount:
             self.count=0
-            self.bigSetsItems=self.bigSetsGenerator.next()
-        
-        # get permutations from count
-        self.notBigSetsItems=self.getPermutations(count)
+            
+            if self.useBigSetsGenerator:
+                self.bigSetsItems=self.bigSetsGenerator.next()
+
+                # debugging
+                if self.useBigSetsGenerator:
+                    zippyLoo=zip(self.bigSetsItems,self.expectedList)
+                    allSame=True
+                    while(True):
+                        try:
+                            a,b=next(zippyLoo)
+                            if not (a.xDim==b.xDim):
+                                allSame=False
+                            if not (a.yDim==b.yDim):
+                                allSame=False
+                            if not (a.zDim==b.zDim):
+                                allSame=False
+                            if not (a.name==b.name):
+                                allSame=False
+                        except StopIteration:
+                            break
+                    if allSame:
+                        1+1
+            # only need one pass if this is false, then clockout next time we hit max count
+            else:
+                self.useBigSetsGenerator=True
+                # use empty list since everyting is over the full permutations
+                self.bigSetsItems=[]
+
+
+        # get permutations from count, dont reset the order of permutations in the master list
+        notBigSetsTemp=self.getPermutations(self.count)
         
         self.count+=1
 
-        return self.bigSetsItems+self.notBigSetsItems
+        return self.bigSetsItems+notBigSetsTemp
     def getPermutations(self, count):
         permutation=[]
-        for index in reversed(range(0, len(self.notBigSetsPermutations))):
-            thisFlip=count//6**index
-            count=count%6**index
+
+        for index in (range(0, len(self.notBigSetsItems))):
+            thisFlip=count%6
+            count=count//6
+
 
             if thisFlip==0:
                 permutation.append(ItemPY3DBP(self.notBigSetsItems[index].name,self.notBigSetsItems[index].xDim, self.notBigSetsItems[index].yDim, self.notBigSetsItems[index].zDim))

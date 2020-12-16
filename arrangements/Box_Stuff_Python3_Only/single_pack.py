@@ -325,11 +325,16 @@ class DimensionalMixupBigSetsGenerator():
 
     def increment_partion_count(self):
         if self.partitionArrangment[0]==len(self.item_permutation):
+            #(n,0,0)->
             raise StopIteration
-        if self.partitionArrangment[1]==0:
-            self.partitionArrangment=(0,self.partitionArrangment[0]+1,self.partitionArrangment[2]-1)
+        elif self.partitionArrangment[2]==0:
+            #(x,y,0)->
+            #(x+1,0,y-1)
+            self.partitionArrangment=(self.partitionArrangment[0]+1,0,self.partitionArrangment[1]-1)
         else:
-            self.partitionArrangment=(self.partitionArrangment[0]+1, self.partitionArrangment[1]-1, self.partitionArrangment[2])
+            #(x,y,z)->
+            #(x,y+1,z-1)
+            self.partitionArrangment=(self.partitionArrangment[0], self.partitionArrangment[1]+1, self.partitionArrangment[2]-1)
     def increment_partion_count_2(self):
         # reset
         if self.partitionArrangment[1]==len(self.item_permutation):

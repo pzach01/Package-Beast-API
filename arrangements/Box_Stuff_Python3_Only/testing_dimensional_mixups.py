@@ -213,7 +213,8 @@ def test_3_partition_with_exhaustive_ending():
     assert(permutationObserved)
 
 for ele in range(0, 100000):
-    #test_3_partition()
-    #test_2_partition()
-    test_3_partition_with_exhaustive_ending()
+    test_3_partition()
+    test_2_partition()
+
+    #test_3_partition_with_exhaustive_ending()
     print(ele)

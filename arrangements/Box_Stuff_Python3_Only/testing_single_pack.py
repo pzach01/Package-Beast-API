@@ -77,9 +77,13 @@ def dz_test_12_12_2020():
     start=time.time()
     for i in range(0, 21):
         items.append(ItemPY3DBP(str(i),9.75,4.438,7.875))
-    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False,timeout=1000)
+    timeout=120
+    batchTime=120
+    packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False,timeout=timeout,batchTime=batchTime)
     end=time.time()
     print(str(end-start)+" ,DZ test 12-12-2020, intersections checked: "+str(packer.intersectionsChecked))
+    if timeout>30 or batchTime>30:
+        print("still too slow^")
     assert(packer.isOptimal)
 # the test that broke pyshipping :)
 #bin=p.Package('1800x1800x2400')
@@ -219,7 +223,7 @@ def hard_test_case():
     assert( packer.isOptimal)
 print('testing_single_pack.py')
 hard_test_case()
-#dz_test_12_12_2020()
+dz_test_12_12_2020()
 test_overfitting_one_item_one_container()
 timing_test_case()
 dumbest_test_case_ever()

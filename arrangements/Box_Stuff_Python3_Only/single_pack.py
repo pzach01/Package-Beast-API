@@ -324,26 +324,27 @@ class DimensionalMixupBigSetsGenerator():
 
 
     def increment_partion_count(self):
-        if self.partitionArrangment[0]==len(self.item_permutation):
-            #(n,0,0)->
+        if self.partitionArrangment[2]==len(self.item_permutation):
+            #(0,0,n)->
             raise StopIteration
-        elif self.partitionArrangment[2]==0:
-            #(x,y,0)->
-            #(x+1,0,y-1)
-            self.partitionArrangment=(self.partitionArrangment[0]+1,0,self.partitionArrangment[1]-1)
+        elif self.partitionArrangment[0]==0:
+            
+            #(0,x,y)->
+            #(x-1,0,y+1)
+            self.partitionArrangment=(self.partitionArrangment[1]-1, 0, self.partitionArrangment[2]+1)
         else:
             #(x,y,z)->
-            #(x,y+1,z-1)
-            self.partitionArrangment=(self.partitionArrangment[0], self.partitionArrangment[1]+1, self.partitionArrangment[2]-1)
+            #(x-1,y+1,z)
+            self.partitionArrangment=(self.partitionArrangment[0]-1, self.partitionArrangment[1]+1, self.partitionArrangment[2])
     def increment_partion_count_2(self):
         # reset
         if self.partitionArrangment[1]==len(self.item_permutation):
             self.allTwosVisited=True
             # gets incremented to 0 down the line
             self.count=-1
-            self.partitionArrangment=(0,0,len(self.item_permutation))
+            self.partitionArrangment=(len(self.item_permutation),0,0)
         else:
-            self.partitionArrangment=(0, self.partitionArrangment[1]+1, self.partitionArrangment[2]-1)
+            self.partitionArrangment=(self.partitionArrangment[0]-1, self.partitionArrangment[1]+1, 0)
 
     # returns the switches (0-5) for each item (3 in total)
     def get_item_arrangment(self,count,n):
@@ -359,10 +360,10 @@ class DimensionalMixupBigSetsGenerator():
         currentIndex=0
         self.itemArrangment=self.get_item_arrangment(self.count,2)
         # note, we start on the RHS of the tuple and 'count' over to the left, hence index 0 is unused in the 2 case
-        for index in range(0, self.partitionArrangment[1]):
+        for index in range(0, self.partitionArrangment[0]):
             switches[currentIndex]=self.itemArrangment[0]
             currentIndex+=1
-        for index in range(0, self.partitionArrangment[2]):
+        for index in range(0, self.partitionArrangment[1]):
             switches[currentIndex]=self.itemArrangment[1]
             currentIndex+=1
 
@@ -395,7 +396,7 @@ class DimensionalMixupBigSetsGenerator():
             item.xDim,item.yDim,item.zDim=list(reversed(sorted([item.xDim,item.yDim,item.zDim])))
         self.count=0
         self.max=6**3*(len(item_permutation)**3)
-        self.partitionArrangment=(0,0,len(item_permutation))
+        self.partitionArrangment=(len(item_permutation),0,0)
     def next(self):
         # have enumerated all permutations
         if self.count==self.max:

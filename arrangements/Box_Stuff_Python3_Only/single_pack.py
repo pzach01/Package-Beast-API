@@ -65,24 +65,25 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
                                     
 
                     itemsMixedUp=mixer.next()
+                    if not itemsMixedUp==None:
 
-
-                    packer =Packer(rotationType,recursiveTimeout)
-                    
-                    packer.set_container(copy.deepcopy(container))
-                    for item in itemsMixedUp:
-                        packer.add_item(item)
-                    try:
-                        packer.pack()
-                    except TimeoutError:
-                        pass
-                    if packer.isOptimal:
-                        return packer
-                    # set new best packer
-                    if bestPacker==None:
-                        bestPacker=packer
-                    if sum([item.volume for item in bestPacker.bestItems])<sum([item.volume for item in packer.bestItems]):
-                        bestPacker=packer
+                        packer =Packer(rotationType,recursiveTimeout)
+                        
+                        packer.set_container(copy.deepcopy(container))
+                        for item in itemsMixedUp:
+                            packer.add_item(item)
+                        try:
+                            packer.pack()
+                            mixer.update_generator(len(packer.bestItems))
+                        except TimeoutError:
+                            pass
+                        if packer.isOptimal:
+                            return packer
+                        # set new best packer
+                        if bestPacker==None:
+                            bestPacker=packer
+                        if sum([item.volume for item in bestPacker.bestItems])<sum([item.volume for item in packer.bestItems]):
+                            bestPacker=packer
 
                     # timeout
                     if time.time()>endTime:
@@ -314,6 +315,26 @@ class DimensionalMixupBigSetsGeneratorWithExhaustiveEnds():
 # W x L x H
 
 class DimensionalMixupBigSetsGenerator():
+
+    # disqualify stuff future stuff
+    def update_generator(self, depthAchieved):
+        limitingIndex=depthAchieved+1
+        # 216 of these keys
+        if self.itemArrangment not in self.depthLimits.keys():
+            self.depthLimits[self.itemArrangment]={}
+
+
+        #(x)
+
+        if self.partitionArrangment[0]>=limitingIndex:
+            self.depthLimits[self.itemArrangment][('x')]=depthAchieved
+        #(self.partionArrangment[0],x)
+        elif (self.partitionArrangment[0]+self.partitionArrangment[1])>=limitingIndex:
+                self.depthLimits[self.itemArrangment][(self.partitionArrangment[0],'x')]=depthAchieved
+        #(self.partitionArrangment[0],self.partitionArrangment[1],x)
+        else:
+            self.depthLimits[self.itemArrangment][(self.partitionArrangment[0],self.partitionArrangment[1],'x')]=depthAchieved
+
     def base_6_as_switches(self, number, n):
         # want to throw a bug right away if something dumb happens
         switches=[-1 for ele in range(0, n)]
@@ -348,7 +369,7 @@ class DimensionalMixupBigSetsGenerator():
 
     # returns the switches (0-5) for each item (3 in total)
     def get_item_arrangment(self,count,n):
-        return self.base_6_as_switches(count, n)
+        return tuple(self.base_6_as_switches(count, n))
     # this is a special case of the general; but we chose 3 partitions because we don't have the speed 
     # to enumerate pase this for large n, and for small n it will be found by the random algorithm
     def get_switches_2_parition(self,count,length):
@@ -397,6 +418,9 @@ class DimensionalMixupBigSetsGenerator():
         self.count=0
         self.max=6**3*(len(item_permutation)**3)
         self.partitionArrangment=(len(item_permutation),0,0)
+
+
+        self.depthLimits={}
     def next(self):
         # have enumerated all permutations
         if self.count==self.max:
@@ -428,9 +452,13 @@ class DimensionalMixupBigSetsGenerator():
         
 
         self.count+=1
+        # have to update here so that we don't redo work when we update the generator
         return newItems
 
 class DimensionalMixupsGenerator():
+    # does nothing, use to avoid if statment at runtime
+    def update_generator(self, nonsenseField):
+        return 
     def base_6_as_switches(self, number, n):
         # want to throw a bug right away if something dumb happens
         switches=[-1 for ele in range(0, n)]

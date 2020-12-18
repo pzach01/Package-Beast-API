@@ -81,18 +81,22 @@ def test_3_partition():
     while(True):
         try:
             res=mixer.next()
-            assert(len(res)==len(item_permutation))
-            foundIt=True
-            # check if all the items are equal
-            for index in range(0, len(res)):
-                if not permutationToObserve[index].name==res[index].name:
-                    foundIt=False
-                if not permutationToObserve[index].xDim==res[index].xDim:
-                    foundIt=False
-                if not permutationToObserve[index].yDim==res[index].yDim:
-                    foundIt=False
-                if not permutationToObserve[index].zDim==res[index].zDim:
-                    foundIt=False
+            if res is None:
+                foundIt=False
+            else:
+                assert(len(res)==len(item_permutation))
+                foundIt=True
+                # check if all the items are equal
+                for index in range(0, len(res)):
+                    if not permutationToObserve[index].name==res[index].name:
+                        foundIt=False
+                    if not permutationToObserve[index].xDim==res[index].xDim:
+                        foundIt=False
+                    if not permutationToObserve[index].yDim==res[index].yDim:
+                        foundIt=False
+                    if not permutationToObserve[index].zDim==res[index].zDim:
+                        foundIt=False
+
             if foundIt:
                 permutationObserved=True
                 break

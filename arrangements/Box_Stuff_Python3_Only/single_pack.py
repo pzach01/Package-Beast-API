@@ -58,6 +58,7 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
                 try:
                     if printIteration:
                         print("           innerIteration: "+str(innerIteration))
+
                     innerIteration+=1
 
 
@@ -74,9 +75,11 @@ def single_pack_given_timing_and_rotations(container, itemList, printIteration, 
                             packer.add_item(item)
                         try:
                             packer.pack()
-                            mixer.update_generator(len(packer.bestItems))
                         except TimeoutError:
                             pass
+
+                        mixer.update_generator(len(packer.bestItems))
+
                         if packer.isOptimal:
                             return packer
                         # set new best packer
@@ -325,7 +328,6 @@ class DimensionalMixupBigSetsGenerator():
 
 
         #(x)
-
         if self.partitionArrangment[0]>=limitingIndex:
             self.depthLimits[self.itemArrangment][('x')]=depthAchieved
         #(self.partionArrangment[0],x)
@@ -419,7 +421,7 @@ class DimensionalMixupBigSetsGenerator():
         self.max=6**3*(len(item_permutation)**3)
         self.partitionArrangment=(len(item_permutation),0,0)
 
-
+        self.itemArrangment=None
         self.depthLimits={}
     def next(self):
         # have enumerated all permutations
@@ -452,9 +454,41 @@ class DimensionalMixupBigSetsGenerator():
         
 
         self.count+=1
-        # have to update here so that we don't redo work when we update the generator
-        return newItems
 
+        # this is somewhat edge case behavior because the generator as a whole double enumerates
+        # but computation is heavily frontloaded so this is a useful optimization
+        if len(self.itemArrangment)>2:
+            # subset of twos partition; already visited
+            if self.itemArrangment[1]==self.itemArrangment[2]:
+                return None
+            if self.itemArrangment[0]==self.itemArrangment[1]:
+                return None
+            if self.partitionArrangment[0]==0:
+                return None
+            if self.partitionArrangment[2]==0:
+                return None
+            
+        # asking for forgivness and not permission
+
+        try:
+            if self.depthLimits[self.itemArrangment][('x')]<sum(self.partitionArrangment[0:1]):
+                return None
+        except KeyError:
+            pass
+    
+        try:
+            if self.depthLimits[self.itemArrangment][(self.partitionArrangment[0],'x')]<sum(self.partitionArrangment[0:2]):
+                return None
+        except KeyError:
+            pass
+
+        try:
+            if self.depthLimits[self.itemArrangment][(self.partitionArrangment[0],self.partitionArrangment[1],'x')]<sum(self.partitionArrangment[0:3]):
+                return None
+        except KeyError:
+            pass
+        
+        return newItems
 class DimensionalMixupsGenerator():
     # does nothing, use to avoid if statment at runtime
     def update_generator(self, nonsenseField):
@@ -497,4 +531,6 @@ class DimensionalMixupsGenerator():
         
 
         self.count+=1
+        
+
         return newItems

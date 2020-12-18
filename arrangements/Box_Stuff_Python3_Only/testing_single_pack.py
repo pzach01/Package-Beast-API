@@ -77,8 +77,8 @@ def dz_test_12_12_2020():
     start=time.time()
     for i in range(0, 21):
         items.append(ItemPY3DBP(str(i),9.75,4.438,7.875))
-    timeout=30
-    batchTime=30
+    timeout=10000
+    batchTime=10000
     packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False,timeout=timeout,batchTime=batchTime)
     end=time.time()
     print(str(end-start)+" ,DZ test 12-12-2020, intersections checked: "+str(packer.intersectionsChecked))

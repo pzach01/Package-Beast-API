@@ -323,19 +323,22 @@ class DimensionalMixupBigSetsGenerator():
     def update_generator(self, depthAchieved):
         limitingIndex=depthAchieved+1
         # 216 of these keys
-        if self.itemArrangment not in self.depthLimits.keys():
-            self.depthLimits[self.itemArrangment]={}
-
+        if self.itemArrangment[0:1] not in self.depthLimits.keys():
+            self.depthLimits[self.itemArrangment[0:1]]={}
+        if self.itemArrangment[0:2] not in self.depthLimits.keys():
+            self.depthLimits[self.itemArrangment[0:2]]={}
+        if self.itemArrangment[0:3] not in self.depthLimits.keys():
+            self.depthLimits[self.itemArrangment[0:3]]={}
 
         #(x)
         if self.partitionArrangment[0]>=limitingIndex:
-            self.depthLimits[self.itemArrangment][('x')]=depthAchieved
+            self.depthLimits[self.itemArrangment[0:1]][('x')]=depthAchieved
         #(self.partionArrangment[0],x)
         elif (self.partitionArrangment[0]+self.partitionArrangment[1])>=limitingIndex:
-                self.depthLimits[self.itemArrangment][(self.partitionArrangment[0],'x')]=depthAchieved
+                self.depthLimits[self.itemArrangment[0:2]][(self.partitionArrangment[0],'x')]=depthAchieved
         #(self.partitionArrangment[0],self.partitionArrangment[1],x)
         else:
-            self.depthLimits[self.itemArrangment][(self.partitionArrangment[0],self.partitionArrangment[1],'x')]=depthAchieved
+            self.depthLimits[self.itemArrangment[0:3]][(self.partitionArrangment[0],self.partitionArrangment[1],'x')]=depthAchieved
 
     def base_6_as_switches(self, number, n):
         # want to throw a bug right away if something dumb happens
@@ -359,46 +362,18 @@ class DimensionalMixupBigSetsGenerator():
             #(x,y,z)->
             #(x-1,y+1,z)
             self.partitionArrangment=(self.partitionArrangment[0]-1, self.partitionArrangment[1]+1, self.partitionArrangment[2])
-    def increment_partion_count_2(self):
-        # reset
-        if self.partitionArrangment[1]==len(self.item_permutation):
-            self.allTwosVisited=True
-            # gets incremented to 0 down the line
-            self.count=-1
-            self.partitionArrangment=(len(self.item_permutation),0,0)
-        else:
-            self.partitionArrangment=(self.partitionArrangment[0]-1, self.partitionArrangment[1]+1, 0)
+
 
     # returns the switches (0-5) for each item (3 in total)
     def get_item_arrangment(self,count,n):
         return tuple(self.base_6_as_switches(count, n))
-    # this is a special case of the general; but we chose 3 partitions because we don't have the speed 
-    # to enumerate pase this for large n, and for small n it will be found by the random algorithm
-    def get_switches_2_parition(self,count,length):
-        if self.count==6**2:
-            self.increment_partion_count_2()
-            self.count=0
-        switches=[-1 for ele in range(0, length)]
-
-        currentIndex=0
-        self.itemArrangment=self.get_item_arrangment(self.count,2)
-        # note, we start on the RHS of the tuple and 'count' over to the left, hence index 0 is unused in the 2 case
-        for index in range(0, self.partitionArrangment[0]):
-            switches[currentIndex]=self.itemArrangment[0]
-            currentIndex+=1
-        for index in range(0, self.partitionArrangment[1]):
-            switches[currentIndex]=self.itemArrangment[1]
-            currentIndex+=1
-
         return switches
     def get_switches_3_partition(self,count,length):
-        if self.count==6**3:
-            self.increment_partion_count()
-            self.count=0
+
+
         switches=[-1 for ele in range(0, length)]
 
         currentIndex=0
-        self.itemArrangment=self.get_item_arrangment(self.count,3)
         for index in range(0, self.partitionArrangment[0]):
             switches[currentIndex]=self.itemArrangment[0]
             currentIndex+=1
@@ -412,7 +387,6 @@ class DimensionalMixupBigSetsGenerator():
         return switches
 
     def __init__(self, item_permutation):
-        self.allTwosVisited=False
         self.item_permutation=item_permutation
         for item in item_permutation:
             # default to xDim>=yDim>=zDim
@@ -423,16 +397,49 @@ class DimensionalMixupBigSetsGenerator():
 
         self.itemArrangment=None
         self.depthLimits={}
+    def update_partition_and_item_arrangment(self):
+        if self.count==6**3:
+            self.increment_partion_count()
+            self.count=0
+        self.itemArrangment=self.get_item_arrangment(self.count,3)
     def next(self):
         # have enumerated all permutations
         if self.count==self.max:
             raise StopIteration
 
         newItems=[]
-        if self.allTwosVisited:
-            switches=self.get_switches_3_partition(self.count,len(self.item_permutation))
-        else:
-            switches=self.get_switches_2_parition(self.count,len(self.item_permutation))
+        # always do these two things
+        self.update_partition_and_item_arrangment()
+        self.count+=1
+
+        # this is somewhat edge case behavior because the generator as a whole double enumerates
+        # but computation is heavily frontloaded so this is a useful optimization
+        if self.itemArrangment[1]==self.itemArrangment[2]:
+            return None
+        if self.itemArrangment[0]==self.itemArrangment[1]:
+            return None
+            
+        # asking for forgivness and not permission
+
+        try:
+            if self.depthLimits[self.itemArrangment[0:1]][('x')]<sum(self.partitionArrangment[0:1]):
+                return None
+        except KeyError:
+            pass
+    
+        try:
+            if self.depthLimits[self.itemArrangment[0:2]][(self.partitionArrangment[0],'x')]<sum(self.partitionArrangment[0:2]):
+                return None
+        except KeyError:
+            pass
+
+        try:
+            if self.depthLimits[self.itemArrangment[0:3]][(self.partitionArrangment[0],self.partitionArrangment[1],'x')]<sum(self.partitionArrangment[0:3]):
+                return None
+        except KeyError:
+            pass
+
+        switches=self.get_switches_3_partition(self.count,len(self.item_permutation))
 
         for index in range(0, len(self.item_permutation)):
             if switches[index]==0:
@@ -453,40 +460,7 @@ class DimensionalMixupBigSetsGenerator():
 
         
 
-        self.count+=1
 
-        # this is somewhat edge case behavior because the generator as a whole double enumerates
-        # but computation is heavily frontloaded so this is a useful optimization
-        if len(self.itemArrangment)>2:
-            # subset of twos partition; already visited
-            if self.itemArrangment[1]==self.itemArrangment[2]:
-                return None
-            if self.itemArrangment[0]==self.itemArrangment[1]:
-                return None
-            if self.partitionArrangment[0]==0:
-                return None
-            if self.partitionArrangment[2]==0:
-                return None
-            
-        # asking for forgivness and not permission
-
-        try:
-            if self.depthLimits[self.itemArrangment][('x')]<sum(self.partitionArrangment[0:1]):
-                return None
-        except KeyError:
-            pass
-    
-        try:
-            if self.depthLimits[self.itemArrangment][(self.partitionArrangment[0],'x')]<sum(self.partitionArrangment[0:2]):
-                return None
-        except KeyError:
-            pass
-
-        try:
-            if self.depthLimits[self.itemArrangment][(self.partitionArrangment[0],self.partitionArrangment[1],'x')]<sum(self.partitionArrangment[0:3]):
-                return None
-        except KeyError:
-            pass
         
         return newItems
 class DimensionalMixupsGenerator():

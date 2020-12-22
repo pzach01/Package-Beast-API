@@ -226,7 +226,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                     miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
 
                     innerStart=time.time()
-                    apiFormat,timedOut,arrangmentPossible=master_calculate_optimal_solution([bins1[ele]], boxs1,(timeForThisRotation/numRemaining),True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights)
+                    apiFormat,timedOut,arrangmentPossible,renderingList=master_calculate_optimal_solution([bins1[ele]], boxs1,(timeForThisRotation/numRemaining),True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights,True)
                     innerEnd=time.time()
                     timeForThisRotation-=(innerEnd-innerStart)
                     anyTimeout=True if (timedOut or anyTimeout) else False
@@ -264,6 +264,8 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                 assert(len(minArrangment)==1)
                 # update the arrangment id so that it is placed in the right place
                 minArrangment[0].id=ele
+                # change minArrangment[0] to have the boxes of the packer and then resort
+
                 containersUsed.append(minArrangment[0])
             else:
                 x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])
@@ -278,7 +280,7 @@ def string_wrapper_for_container_class(itemString):
     l,w,h=float(itemString.split('x')[0]),float(itemString.split('x')[1]),float(itemString.split('x')[2])
     return ContainerPY3DBP('',l,w,h)
 # bin weights must be in same order, same for box weights
-def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,itemsIds=[],costList=None,binWeightCapacitys=None, boxWeights=None):
+def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,itemsIds=[],costList=None,binWeightCapacitys=None, boxWeights=None,returnRenderingList=False):
     # metaparameter, expose to API at some point
     if len(boxs1)==0:
         raise Exception("cant try with no items")
@@ -326,7 +328,10 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,
         minArrangment, minCost,timedOut,renderingList=bruteforce_singlepack(generator,bins1, boxs1,time.time()+timeout,costList,binWeightCapacitys,boxWeights)
 
     if(minCost==float('inf')):
-        return None, timedOut, False
+        if returnRenderingList:
+            return None, timedOut, False,[]
+        else:
+            return None, timedOut, False
 
     
     
@@ -346,7 +351,11 @@ def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,
     # sort by maxTuple 
     for container in apiFormat:
         container.boxes=sorted(container.boxes, key= lambda box:(box.x+(box.xDim/2),box.y+(box.yDim/2),box.z+(box.zDim/2)))
-    return apiFormat,timedOut, True
+
+    if returnRenderingList:
+        return apiFormat,timedOut, True,renderingList
+    else:
+        return apiFormat,timedOut,True
 
 
 class BinAPI():

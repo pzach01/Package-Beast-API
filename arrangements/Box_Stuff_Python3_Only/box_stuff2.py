@@ -12,9 +12,15 @@ import itertools
 import time
 
 
-def lock_recursion_and_increase_timeout(container):
+def lock_recursion_and_increase_timeout(container,packer):
+    container.boxes=[]
+    for item in packer.bestItems:
+        x,y,z=item.position[0]+(item.get_dimension()[0]/2), item.position[1]+(item.get_dimension()[1]/2), item.position[2]+(item.get_dimension()[2]/2)
+        # weight unitilized here
+        newBox=BoxAPI(item.name, item.xDim,item.yDim,item.zDim, item.volume,0)
+        newBox.set_center((x,y,z))
+        container.add_box(newBox)
     container.boxes=sorted(container.boxes, key= lambda box:(box.x+(box.xDim/2),box.y+(box.yDim/2),box.z+(box.zDim/2)))
-
     return container
     '''
     for containerIndex in range(0, len(arrangments)):
@@ -30,7 +36,7 @@ def lock_recursion_and_increase_timeout(container):
         container.boxes=sorted(container.boxes, key= lambda box:(box.x+(box.xDim/2),box.y+(box.yDim/2),box.z+(box.zDim/2)))
 
     return container
-    '''
+    ''' 
 def truncate_to_nth_decimal_point(number, n):
     number=str(number)
     if '.' not in number:
@@ -156,6 +162,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     import math
     minCost=math.inf
     minArrangment=None
+    minPacker=None
     
 
     assert((binWeightCapacitys==None and boxWeights==None) or (binWeightCapacitys!=None and binWeightCapacitys!=None))
@@ -260,6 +267,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                             bestScore=score
                             # no error, update to better solution
                             minArrangment=apiFormat
+                            minPacker=renderingList[0]
                             minCost=costList[ele]
                             indexUsed=ele
                         
@@ -286,7 +294,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                 container=minArrangment[0]
                 container.id=ele
                 # change minArrangment[0] to have the boxes of the packer and then resort
-                tightenedContainer=lock_recursion_and_increase_timeout(container)
+                tightenedContainer=lock_recursion_and_increase_timeout(container,minPacker)
                 containersUsed.append(tightenedContainer)
             else:
                 x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])

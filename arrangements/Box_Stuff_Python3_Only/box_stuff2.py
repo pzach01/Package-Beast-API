@@ -11,6 +11,26 @@ import math
 import itertools
 import time
 
+
+def lock_recursion_and_increase_timeout(container):
+    container.boxes=sorted(container.boxes, key= lambda box:(box.x+(box.xDim/2),box.y+(box.yDim/2),box.z+(box.zDim/2)))
+
+    return container
+    '''
+    for containerIndex in range(0, len(arrangments)):
+        for item in arrangments[containerIndex].bestItems:
+            x,y,z=item.position[0]+(item.get_dimension()[0]/2), item.position[1]+(item.get_dimension()[1]/2), item.position[2]+(item.get_dimension()[2]/2)
+            # weight unitilized here
+            newBox=BoxAPI(item.name, item.xDim,item.yDim,item.zDim, item.volume,0)
+            newBox.set_center((x,y,z))
+            (containerObjects[containerIndex]).add_box(newBox)
+
+
+    for container in apiFormat:
+        container.boxes=sorted(container.boxes, key= lambda box:(box.x+(box.xDim/2),box.y+(box.yDim/2),box.z+(box.zDim/2)))
+
+    return container
+    '''
 def truncate_to_nth_decimal_point(number, n):
     number=str(number)
     if '.' not in number:
@@ -263,10 +283,11 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
             if ele==indexUsed:
                 assert(len(minArrangment)==1)
                 # update the arrangment id so that it is placed in the right place
-                minArrangment[0].id=ele
+                container=minArrangment[0]
+                container.id=ele
                 # change minArrangment[0] to have the boxes of the packer and then resort
-
-                containersUsed.append(minArrangment[0])
+                tightenedContainer=lock_recursion_and_increase_timeout(container)
+                containersUsed.append(tightenedContainer)
             else:
                 x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])
                 containersUsed.append(BinAPI(ele,x,y,z,costList[ele],0,False))

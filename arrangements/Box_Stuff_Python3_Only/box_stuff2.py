@@ -13,6 +13,7 @@ import time
 
 
 def lock_recursion_and_increase_timeout(container,packer):
+    raise NotImplementedError('method not finished yet')
     container.boxes=[]
     for item in packer.bestItems:
         x,y,z=item.position[0]+(item.get_dimension()[0]/2), item.position[1]+(item.get_dimension()[1]/2), item.position[2]+(item.get_dimension()[2]/2)
@@ -294,7 +295,8 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                 container=minArrangment[0]
                 container.id=ele
                 # change minArrangment[0] to have the boxes of the packer and then resort
-                tightenedContainer=lock_recursion_and_increase_timeout(container,minPacker)
+                lockRecursion=False
+                tightenedContainer=lock_recursion_and_increase_timeout(container,minPacker) if lockRecursion else container
                 containersUsed.append(tightenedContainer)
             else:
                 x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])

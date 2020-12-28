@@ -131,6 +131,9 @@ class Packer:
         self.timeout=time.time()+timeout
         self.render=False
 
+        # only false when we are using information from a previous packers best results
+        self.packFromBeginning=True
+
     def set_container(self, container):
         self.container=container
 
@@ -145,12 +148,7 @@ class Packer:
             newItem.position=item.position
             newItem.dimension=item.dimension
             self.bestItems.append(newItem)
-
-    def pack(self,render=False, bigger_first=False, distribute_items=False):
-        self.render=render
-        self.unfit_items=copy.deepcopy(self.items)
-        self.items=[]
-        # stuff that is useful in disqualifying bad pivots
+    def initialize_object_hierarchy(self):
         depthCount=0
         for item in self.unfit_items:
             item.set_depth(depthCount)
@@ -169,6 +167,15 @@ class Packer:
                 if upperItem.zDim>lowerItem.zDim:
                     upperItem.nextSmallestItemDepth=lowerItem.depth
                     break
+    def pack(self,render=False, bigger_first=False, distribute_items=False):
+        self.render=render
+        if self.packFromBeginning:
+            self.unfit_items=copy.deepcopy(self.items)
+            self.items=[]
+
+        self.initialize_object_hierarchy()
+        # stuff that is useful in disqualifying bad pivots
+
         # recursive calls
         # add the origin as a valid first point to try to the first item
         if self.try_to_place_an_item():

@@ -14,6 +14,37 @@ import time
 
 def lock_recursion_and_increase_timeout(container,packer):
     raise NotImplementedError('method not finished yet')
+
+    # how is this tested? very important question?
+    # initial thoughts: turn all other pack methods timeout to 0 and ensure it stil gets what we think
+    # cant have size 0 bestItems and optimal packer
+    if ((not(packer.isOptimal)) and (not(len(packer.bestItems)==0))): 
+        # get the packer that yields the best arrangment seen so far
+        allPivots=get_all_pivots(packer)
+        generator=DimensionalMixupsGenerator(packer.unfit_items)
+        while(True):
+            try:
+                newPacker=Packer()
+                newPacker.items=packer.bestItems
+                newPakcer.unfit_items=next(generator)
+                # run the start of pack without self.try_to_place_item
+                # actually just make this its own method and call it before calling pack (initialize item hierarchy)
+                newPacker.initialize_object_hierarchy()
+                for itemIndex in packer.unfit_items:
+                    newPacker.unfit_items[itemIndex].pivotSets=[set() for range(0, len(packer.items)+len(packer.unfit_items))]
+                # regular code will pass down the object hierarchy here
+                newPacker.unfit_items[0][0]=allPivots
+                # will have to make some the start of packer.pack() optional (and turn off here but true by default)
+                newPacker.rotationType=Rotation.ALL
+                newPacker.pack()
+
+                if newPacker.isOptimal:
+                    packer=newPacker
+                    break
+            except StopIteration:
+                break
+
+
     container.boxes=[]
     for item in packer.bestItems:
         x,y,z=item.position[0]+(item.get_dimension()[0]/2), item.position[1]+(item.get_dimension()[1]/2), item.position[2]+(item.get_dimension()[2]/2)

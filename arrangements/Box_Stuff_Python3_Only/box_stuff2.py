@@ -31,7 +31,7 @@ def lock_recursion_and_increase_timeout(container,packer):
                 # actually just make this its own method and call it before calling pack (initialize item hierarchy)
                 newPacker.initialize_object_hierarchy()
                 for itemIndex in packer.unfit_items:
-                    newPacker.unfit_items[itemIndex].pivotSets=[set() for range(0, len(packer.items)+len(packer.unfit_items))]
+                    newPacker.unfit_items[itemIndex].pivotSets=[set() for ele in range(0, len(packer.items)+len(packer.unfit_items))]
                 # regular code will pass down the object hierarchy here
                 newPacker.unfit_items[0][0]=allPivots
                 # will have to make some the start of packer.pack() optional (and turn off here but true by default)

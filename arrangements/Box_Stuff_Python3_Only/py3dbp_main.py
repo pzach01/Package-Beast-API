@@ -147,13 +147,36 @@ class Packer:
             newItem=ItemPY3DBP(item.name,item.xDim,item.yDim,item.zDim)
             newItem.position=item.position
             newItem.dimension=item.dimension
+            newItem.minTuple=item.minTuple
+            newItem.maxTuple=item.maxTuple
             self.bestItems.append(newItem)
     def initialize_object_hierarchy(self):
         depthCount=0
+
+        for item in self.items:
+            item.set_depth(depthCount)
+            item.initialize_pivot_sets(len(self.unfit_items)+len(self.items))
+            depthCount+=1
         for item in self.unfit_items:
             item.set_depth(depthCount)
-            item.initialize_pivot_sets(len(self.unfit_items))
+            item.initialize_pivot_sets(len(self.unfit_items)+len(self.items))
             depthCount+=1
+
+        # set depth for items
+        for upperItemIndex in range(0, len(self.items)):
+            upperItem=self.items[upperItemIndex]
+            for lowerItemIndex in range(upperItemIndex+1, len(self.items)+len(self.unfit_items)):
+                lowerItem=(self.items+self.unfit_items)[lowerItemIndex]
+                if upperItem.xDim>lowerItem.xDim:
+                    upperItem.nextSmallestItemDepth=lowerItem.depth
+                    break
+                if upperItem.yDim>lowerItem.yDim:
+                    upperItem.nextSmallestItemDepth=lowerItem.depth
+                    break
+                if upperItem.zDim>lowerItem.zDim:
+                    upperItem.nextSmallestItemDepth=lowerItem.depth
+                    break
+        # set depth for unfit items
         for upperItemIndex in range(0, len(self.unfit_items)):
             upperItem=self.unfit_items[upperItemIndex]
             for lowerItemIndex in range(upperItemIndex+1,len(self.unfit_items)):
@@ -172,8 +195,8 @@ class Packer:
         if self.packFromBeginning:
             self.unfit_items=copy.deepcopy(self.items)
             self.items=[]
+            self.initialize_object_hierarchy()
 
-        self.initialize_object_hierarchy()
         # stuff that is useful in disqualifying bad pivots
 
         # recursive calls

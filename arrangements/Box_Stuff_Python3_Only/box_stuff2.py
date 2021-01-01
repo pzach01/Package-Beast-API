@@ -12,37 +12,76 @@ import itertools
 import time
 
 
-def lock_recursion_and_increase_timeout(container,packer):
-    raise NotImplementedError('method not finished yet')
+def lock_recursion_and_increase_timeout(container,packer,timeout, testMode):
+    if timeout<5:
+        raise Exception("unsupported behavior in timeout structure")
+    from .py3dbp_main import Packer
+    from .py3dbp_constants import Axis, RotationType
+    from .single_pack import DimensionalMixupsGenerator,get_best_packer
+    import time
 
     # how is this tested? very important question?
     # initial thoughts: turn all other pack methods timeout to 0 and ensure it stil gets what we think
     # cant have size 0 bestItems and optimal packer
-    if ((not(packer.isOptimal)) and (not(len(packer.bestItems)==0))): 
+    if (((not(packer.isOptimal)) and (not(len(packer.bestItems)==0)) or testMode) and (len(packer.items)+len(packer.unfit_items)>1)): 
+        endTime=time.time()+timeout
+
         # get the packer that yields the best arrangment seen so far
-        allPivots=get_all_pivots(packer)
-        generator=DimensionalMixupsGenerator(packer.unfit_items)
+
+        initialPacker=Packer(packer.rotationTypes,5)
+        initialPacker.container=packer.container
+        initialPacker.items=packer.bestItems
+
+        allPivots=set()
+        for item in initialPacker.items:
+            for pivotPoint in Axis.ALL:
+                firstValue,secondValue,thirdValue=pivotPoint[0],pivotPoint[1],pivotPoint[2]
+                newPivot=(item.position[0]+firstValue*item.xDim,item.position[1]+secondValue*item.yDim,item.position[2]+thirdValue*item.zDim)
+                allPivots.add(newPivot)
+        trueUnfits=(packer.items+packer.unfit_items)[len(packer.bestItems):]
+        generator=DimensionalMixupsGenerator(trueUnfits)
         while(True):
             try:
-                newPacker=Packer()
-                newPacker.items=packer.bestItems
-                newPakcer.unfit_items=next(generator)
+                if time.time()>endTime:
+                    break
+                if testMode:
+
+                    #generator.count=random.ranndint(0, 6**len(trueUnfits)-1)
+                    print("Generator: "+str(generator.count))
+
+                newPacker=copy.deepcopy(initialPacker)
+
+
+                newPacker.unfit_items=generator.next()
                 # run the start of pack without self.try_to_place_item
                 # actually just make this its own method and call it before calling pack (initialize item hierarchy)
                 newPacker.initialize_object_hierarchy()
-                for itemIndex in packer.unfit_items:
-                    newPacker.unfit_items[itemIndex].pivotSets=[set() for ele in range(0, len(packer.items)+len(packer.unfit_items))]
                 # regular code will pass down the object hierarchy here
-                newPacker.unfit_items[0][0]=allPivots
+                newPacker.unfit_items[0].pivotSets[0]=allPivots
                 # will have to make some the start of packer.pack() optional (and turn off here but true by default)
-                newPacker.rotationType=Rotation.ALL
+                newPacker.rotationTypes=RotationType.ALL
+                newPacker.packFromBeginning=False
+                newPacker.isOptimal=False
+                newPacker.bestItems=[]
+                newPacker.bestDepth=0
+                newPacker.timeout=time.time()+1
+                
                 newPacker.pack()
+                packer=get_best_packer(packer,newPacker)
 
                 if newPacker.isOptimal:
-                    packer=newPacker
                     break
+                if testMode:    
+                    break
+
             except StopIteration:
                 break
+            except TimeoutError:
+                packer=get_best_packer(packer,newPacker)
+                if testMode:
+                    break
+                pass
+
 
 
     container.boxes=[]
@@ -195,7 +234,9 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     minCost=math.inf
     minArrangment=None
     minPacker=None
-    
+
+    timeSpentAtEndPacking=5
+    timeout-=timeSpentAtEndPacking
 
     assert((binWeightCapacitys==None and boxWeights==None) or (binWeightCapacitys!=None and binWeightCapacitys!=None))
     volumeList=[]
@@ -317,6 +358,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     containersUsed=[]
     if indexUsed==None:
         # no arrangment, timedout, unable to decide if arrangment is possible
+
         return None, anyTimeout, False
     else:
         for ele in range(0, len(bins1)):
@@ -326,8 +368,12 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
                 container=minArrangment[0]
                 container.id=ele
                 # change minArrangment[0] to have the boxes of the packer and then resort
-                lockRecursion=False
-                tightenedContainer=lock_recursion_and_increase_timeout(container,minPacker) if lockRecursion else container
+                lockRecursion=True
+
+                testMode=False
+                if testMode:
+                    minPacker.bestItems=minPacker.bestItems[:max(1,(len(minPacker.bestItems)-random.randint(1,5)))]
+                tightenedContainer=lock_recursion_and_increase_timeout(container,minPacker,timeSpentAtEndPacking,testMode) if lockRecursion else container
                 containersUsed.append(tightenedContainer)
             else:
                 x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])

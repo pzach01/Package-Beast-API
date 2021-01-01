@@ -217,7 +217,9 @@ def test_one_underfit_api(ele):
     start=time.time()
     apiObjects, timedOut, arrangmentPossible=master_calculate_optimal_solution(containers,items,timeout,False,ids)
     end=time.time()
-    if end-start<timeout:
+    if end-start<(timeout-5):
+        print(end-start)
+        assert(len(apiObjects[0].boxes)==len(items))
         assert(arrangmentPossible)
         assert(not timedOut)
         for objectIndex in range(0, len(apiObjects[0].boxes)):
@@ -230,7 +232,16 @@ def test_one_underfit_api(ele):
                             raise Exception("unsorted objects for stepthrough function")
         test_for_double_fit_api_version(apiObjects,1000)
         test_for_outside_container_api(apiObjects)
+    # cant assert optimality because generator could have run out
+    elif (timeout-5)<(end-start)<(timeout):
+        print("Lock recursion case"+str(end-start))
+
+        assert(end-start>(timeout-5))
+        test_for_double_fit_api_version(apiObjects,1000)
+        test_for_outside_container_api(apiObjects)
     else:
+        print("Strong case:"+str(end-start))
+
         assert(timedOut)
 
 def test_one_underfit(ele):
@@ -438,6 +449,6 @@ def test_underfits_multipack():
         print(ele)
         test_one_underfit_multipack()
 
-#test_underfits_api()
+test_underfits_api()
 #test_underfits()
-test_underfits_multipack()
+#test_underfits_multipack()

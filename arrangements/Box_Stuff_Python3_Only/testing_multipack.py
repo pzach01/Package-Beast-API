@@ -32,7 +32,8 @@ def lz_test_case_dec_13_2020():
     start=time.time()
     containerList,timedOut, arrangmentPossible=box_stuff2.master_calculate_optimal_solution(containers,items,30, False)
     end=time.time()
-    assert(end-start>30)
+    # 30 minus 5 for the last pack
+    assert(end-start>25)
     usableContainers=([container for container in containerList if len(container.boxes)>0])    
     assert(len(usableContainers)==1)
     usedContainer=usableContainers[0]

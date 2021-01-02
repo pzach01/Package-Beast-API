@@ -71,18 +71,21 @@ class Subscription(models.Model):
     '''
     objects=SubscriptionManager()
     #return true if upgrade false if downgrade
-    def choose_upgrade_or_downgrade(self, productId):
+    def choose_upgrade_or_downgrade_with_product_id(self, productId):
         currentSubProfile=[sub for sub in SUBSCRIPTION_PROFILES if sub[0]==self.subscriptionType][0]
         nextSubProfile=[sub for sub in SUBSCRIPTION_PROFILES if sub[3]==productId][0]
         return currentSubProfile[1]<nextSubProfile[1]
-
+    def choose_upgrade_or_downgrade_with_price_id(self, priceId):
+        currentSubProfile=[sub for sub in SUBSCRIPTION_PROFILES if sub[0]==self.subscriptionType][0]
+        nextSubProfile=[sub for sub in SUBSCRIPTION_PROFILES if sub[3]==priceId][0]
+        return currentSubProfile[1]<nextSubProfile[1]
     # if upgrade then increment required values and change subscriptionType else just change subscriptionType
     # DESIGN DECISION: subscriptionType holds the type corresponding to last paid invoice, but because we dont limit
     # permissions immediately upon downgrading sub type, this may not correspond to the permissions profile (ie. requests allowed)
     # for the subscription until next month (in general case)
     def upgrade_or_downgrade(self, productId):
 
-        upgrade=self.choose_upgrade_or_downgrade(productId)
+        upgrade=self.choose_upgrade_or_downgrade_with_product_id(productId)
 
         # upgrade
         if upgrade:

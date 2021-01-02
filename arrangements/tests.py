@@ -1096,5 +1096,6 @@ class ArrangmentTests(APITestCase):
             if container['id']==foundContainerId:
                 selectedContainer=container   
         foundContainerString=(str(selectedContainer['xDim'])+'x'+str(selectedContainer['yDim'])+'x'+str(selectedContainer['zDim']))
-        assert(foundContainerString=='29.25x12.75x23.0')
+        print(foundContainerString)
+        assert(foundContainerString=='18.0x18.0x24.0')
         print('Arrangments test 8 Passed')

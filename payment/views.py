@@ -307,7 +307,7 @@ def update_stripe_subscription(request):
         stripeSubscriptionId=stripeSub.stripeSubscriptionId
 
         fetchedSubscription = stripe.Subscription.retrieve(stripeSubscriptionId)
-        upgrade= fetchedSubscription.choose_upgrade_or_downgrade(data['productId'])
+        upgrade= fetchedSubscription.choose_upgrade_or_downgrade_with_price_id(data['priceId'])
         if upgrade:
             proration_behavior='always_invoice'
         else:

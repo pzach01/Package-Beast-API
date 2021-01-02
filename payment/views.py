@@ -95,10 +95,16 @@ def my_webhook_view(request):
                     raise Exception("unknown case where there are 2 positive or 2 negative prices")
                 # pass the product_id to the subscription
                 if invoice1['amount']>0:
-                    stripeSub.subscription.upgrade_subscription(invoice1['plan']['product'])
-                else:
-                    stripeSub.subscription.upgrade_subscription(invoice2['plan']['product'])
 
+                    stripeSub.subscription.initialize_or_refill(invoice1['plan']['product'])
+                    # this may be overly simplistic
+                    stripeSub.currentPeriodEnd=invoice1['period']['end']
+                    stripeSub.save()
+                else:
+                    stripeSub.subscription.initialize_or_refill(invoice2['plan']['product'])
+                    # this may be overly simplistic
+                    stripeSub.currentPeriodEnd=invoice2['period']['end']
+                    stripeSub.save()
             else:
                 raise Exception("unknown case where there are 3 or more subscriptions")
             #foundSub=[subscription for subscription in SUBSCRIPTION_PROFILES if subscription[2]==subId]

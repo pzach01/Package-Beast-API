@@ -84,6 +84,7 @@ class Subscription(models.Model):
     # permissions immediately upon downgrading sub type, this may not correspond to the permissions profile (ie. requests allowed)
     # for the subscription until next month (in general case)
     def upgrade_or_downgrade(self, productId):
+        nextSubProfile=[sub for sub in SUBSCRIPTION_PROFILES if sub[3]==productId][0]
 
         upgrade=self.choose_upgrade_or_downgrade_with_product_id(productId)
 

@@ -309,25 +309,37 @@ def update_stripe_subscription(request):
         fetchedSubscription = stripe.Subscription.retrieve(stripeSubscriptionId)
         upgrade= sub.choose_upgrade_or_downgrade_with_price_id(data['priceId'])
         if upgrade:
-            proration_behavior='always_invoice'
+            updatedSubscription = stripe.Subscription.modify(
+                stripeSubscriptionId,
+                cancel_at_period_end=False,
+                items=[{
+                    'id': fetchedSubscription['items']['data'][0].id,
+                    'price': data['priceId'],
+                }],
+
+                # this should be none if we are downgrading
+                proration_behavior='always_invoice',
+                # attempt to set proration_date to start of the current period (this billing cycle) so no matter
+                # when you upgrade it has the same cost
+                proration_date=fetchedSubscription['current_period_start'],
+            )
+
         else:
-            proration_behavior='none'
+            updatedSubscription = stripe.Subscription.modify(
+                stripeSubscriptionId,
+                cancel_at_period_end=False,
+                items=[{
+                    'id': fetchedSubscription['items']['data'][0].id,
+                    'price': data['priceId'],
+                }],
+
+                # this should be none if we are downgrading
+                proration_behavior='none',
+                # attempt to set proration_date to start of the current period (this billing cycle) so no matter
+                # when you upgrade it has the same cost
+            )
 
 
-        updatedSubscription = stripe.Subscription.modify(
-            stripeSubscriptionId,
-            cancel_at_period_end=False,
-            items=[{
-                'id': fetchedSubscription['items']['data'][0].id,
-                'price': data['priceId'],
-            }],
-
-            # this should be none if we are downgrading
-            proration_behavior=proration_behavior,
-            # attempt to set proration_date to start of the current period (this billing cycle) so no matter
-            # when you upgrade it has the same cost
-            proration_date=fetchedSubscription['current_period_start'],
-        )
         return JsonResponse(updatedSubscription)
     except Exception as e:
         return JsonResponse(str(e),status=403, safe=False)

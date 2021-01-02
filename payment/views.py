@@ -334,8 +334,7 @@ def update_stripe_subscription(request):
                 }],
 
                 # this should be none if we are downgrading
-                proration_behavior='always_invoice',
-                proration_date=fetchedSubscription['current_period_end'],
+                proration_behavior='none',
                 # attempt to set proration_date to start of the current period (this billing cycle) so no matter
                 # when you upgrade it has the same cost
             )

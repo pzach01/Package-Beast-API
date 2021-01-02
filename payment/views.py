@@ -95,9 +95,9 @@ def my_webhook_view(request):
                     raise Exception("unknown case where there are 2 positive or 2 negative prices")
                 # pass the product_id to the subscription
                 if invoice1['amount']>0:
-                    stripeSub.subscription.upgrade_or_downgrade(invoice1['plan']['product'])
+                    stripeSub.subscription.upgrade_subscription(invoice1['plan']['product'])
                 else:
-                    stripeSub.subscription.upgrade_or_downgrade(invoice2['plan']['product'])
+                    stripeSub.subscription.upgrade_subscription(invoice2['plan']['product'])
 
             else:
                 raise Exception("unknown case where there are 3 or more subscriptions")
@@ -334,11 +334,12 @@ def update_stripe_subscription(request):
                 }],
 
                 # this should be none if we are downgrading
-                proration_behavior='none',
+                proration_behavior='always_invoice',
+                proration_date=fetchedSubscription['current_period_end'],
                 # attempt to set proration_date to start of the current period (this billing cycle) so no matter
                 # when you upgrade it has the same cost
             )
-
+            sub.downgrade_subscription(data['priceId'])
 
         return JsonResponse(updatedSubscription)
     except Exception as e:

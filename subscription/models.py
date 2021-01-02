@@ -83,18 +83,19 @@ class Subscription(models.Model):
     # DESIGN DECISION: subscriptionType holds the type corresponding to last paid invoice, but because we dont limit
     # permissions immediately upon downgrading sub type, this may not correspond to the permissions profile (ie. requests allowed)
     # for the subscription until next month (in general case)
-    def upgrade_or_downgrade(self, productId):
+    def upgrade_subscription(self, productId):
         nextSubProfile=[sub for sub in SUBSCRIPTION_PROFILES if sub[3]==productId][0]
-
-        upgrade=self.choose_upgrade_or_downgrade_with_product_id(productId)
-
-        # upgrade
-        if upgrade:
-            self.shipmentsAllowed=nextSubProfile[5]
-            self.itemsAllowed=nextSubProfile[6]
-            self.containersAllowed=nextSubProfile[7]
+        self.shipmentsAllowed=nextSubProfile[5]
+        self.itemsAllowed=nextSubProfile[6]
+        self.containersAllowed=nextSubProfile[7]
         # update subscriptionType
         self.subscriptionType=nextSubProfile[0]
+        self.save()
+
+    def downgrade_subscription(self, priceId):
+        nextSubProfile=[sub for sub in SUBSCRIPTION_PROFILES if sub[4]==priceid][0]
+        self.subscriptionType=nextSubProfile[0]
+
         self.save()
     # reset used values and set to desired
     def initialize_or_refill(self, productId):

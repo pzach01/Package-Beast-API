@@ -93,7 +93,7 @@ class Subscription(models.Model):
         self.save()
 
     def downgrade_subscription(self, priceId):
-        nextSubProfile=[sub for sub in SUBSCRIPTION_PROFILES if sub[4]==priceid][0]
+        nextSubProfile=[sub for sub in SUBSCRIPTION_PROFILES if sub[4]==priceId][0]
         self.subscriptionType=nextSubProfile[0]
 
         self.save()

@@ -322,6 +322,7 @@ def update_stripe_subscription(request):
                 # attempt to set proration_date to start of the current period (this billing cycle) so no matter
                 # when you upgrade it has the same cost
                 proration_date=fetchedSubscription['current_period_start'],
+                billing_cycle_anchor='now',
             )
 
         else:

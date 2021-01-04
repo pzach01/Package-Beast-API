@@ -122,7 +122,13 @@ def dz_test_19():
     import time
     start=time.time()
     for i in range(0, 19):
-        items.append(ItemPY3DBP(str(i),450,975,793))
+        if i%3==0:  
+            items.append(ItemPY3DBP(str(i),450,975,793))
+        if i%3==1:
+            items.append(ItemPY3DBP(str(i),975,450,793))
+        if i%3==2:
+            items.append(ItemPY3DBP(str(i),450,793,975))
+
     packer=single_pack.single_pack(container,items,volumeSafeGuard=True, printIteration=False,timeout=1000)
     assert( packer.isOptimal)
 
@@ -222,6 +228,8 @@ def hard_test_case():
     print('Hard test case:'+str(end-start))
     assert( packer.isOptimal)
 print('testing_single_pack.py')
+dz_test_19()
+
 hard_test_case()
 dz_test_12_12_2020()
 test_overfitting_one_item_one_container()
@@ -232,7 +240,6 @@ test_2()
 test_3()
 kleenex_test()
 dz_test_18()
-dz_test_19()
 kleenex_test_overfitting()
 test_doublefitting_raises_exception()
 test_not_multibinpack()

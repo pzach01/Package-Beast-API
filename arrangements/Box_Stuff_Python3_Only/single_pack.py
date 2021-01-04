@@ -387,10 +387,13 @@ class DimensionalMixupBigSetsGenerator():
         return switches
 
     def __init__(self, item_permutation):
-        self.item_permutation=item_permutation
+        newItemPerm=[]
         for item in item_permutation:
             # default to xDim>=yDim>=zDim
-            item.xDim,item.yDim,item.zDim=list(reversed(sorted([item.xDim,item.yDim,item.zDim])))
+            sortedList=copy.deepcopy(list(reversed(sorted([item.xDim,item.yDim,item.zDim]))))
+            newItemPerm.append(ItemPY3DBP(item.name,sortedList[0],sortedList[1],sortedList[2]))
+        self.item_permutation=newItemPerm
+
         self.count=0
         self.max=6**3*(len(item_permutation)**3)
         self.partitionArrangment=(len(item_permutation),0,0)
@@ -476,7 +479,12 @@ class DimensionalMixupsGenerator():
         return switches
 
     def __init__(self, item_permutation):
-        self.item_permutation=item_permutation
+        newItemPerm=[]
+        for item in item_permutation:
+            # default to xDim>=yDim>=zDim
+            sortedList=copy.deepcopy(list(reversed(sorted([item.xDim,item.yDim,item.zDim]))))
+            newItemPerm.append(ItemPY3DBP(item.name,sortedList[0],sortedList[1],sortedList[2]))
+        self.item_permutation=newItemPerm
         self.count=0
         self.max=6**(len(item_permutation))
     def next(self):

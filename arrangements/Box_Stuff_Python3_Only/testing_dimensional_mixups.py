@@ -226,6 +226,7 @@ def test_base_6_switches():
     items=[ItemPY3DBP('unit',1,1,1) for ele in range(0, numItems)]
     d=DimensionalMixupsGenerator(items)
     switchesToFind=[random.randint(0,5) for ele in range(0, numItems)]
+    foundOnceAlready=False
     while(True):
 
         try:
@@ -239,9 +240,15 @@ def test_base_6_switches():
                     found=False
                     break
             if found:
-                break
+                if foundOnceAlready:
+                    raise Exception('double count base 6')
+                foundOnceAlready=True
+                
         except StopIteration:
-            raise Exception('unfound base 6 switch')
+            if foundOnceAlready:
+                break
+            else:
+                raise Exception('unfound base 6 switch')
 
           
 for ele in range(0, 100000):

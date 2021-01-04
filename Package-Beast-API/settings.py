@@ -167,10 +167,10 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'ebdb',
-            'USER': 'packageBeastDB',
-            'PASSWORD': 'peanutbutter!',
-            'HOST': 'aa1v4xof18ve31u.cg1crfkuftt1.us-east-1.rds.amazonaws.com',
+            'NAME': os.getenv('DATABASE_NAME'),
+            'USER': os.getenv('DATABASE_USER'),
+            'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+            'HOST': os.getenv('DATABASE_HOST'),
             'PORT': '5432'
         }
     }

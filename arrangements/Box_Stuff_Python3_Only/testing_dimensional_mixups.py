@@ -1,6 +1,6 @@
 from . import testing_imports
 from .testing_imports import *
-from .single_pack import DimensionalMixupBigSetsGenerator,DimensionalMixupBigSetsGeneratorWithExhaustiveEnds
+from .single_pack import DimensionalMixupBigSetsGenerator,DimensionalMixupBigSetsGeneratorWithExhaustiveEnds,DimensionalMixupsGenerator
 
 # doesnt test that partitions are optimal, merely that they enumerate all combinations
 def test_2_partition():
@@ -219,9 +219,36 @@ def test_3_partition_with_exhaustive_ending():
             break
     assert(permutationObserved)
 
+
+def test_base_6_switches():
+    import random
+    numItems=random.randint(1,7)
+    items=[ItemPY3DBP('unit',1,1,1) for ele in range(0, numItems)]
+    d=DimensionalMixupsGenerator(items)
+    switchesToFind=[random.randint(0,5) for ele in range(0, numItems)]
+    while(True):
+
+        try:
+            d.next()
+            switchesFound=d.base_6_as_switches(d.count, len(items))
+            found=True
+            for index in range(0, len(switchesFound)):
+                if switchesFound[index]==switchesToFind[index]:
+                    pass
+                else:
+                    found=False
+                    break
+            if found:
+                break
+        except StopIteration:
+            raise Exception('unfound base 6 switch')
+
+          
 for ele in range(0, 100000):
     test_3_partition()
     test_2_partition()
+    test_base_6_switches()
+
 
     #test_3_partition_with_exhaustive_ending()
     print(ele)

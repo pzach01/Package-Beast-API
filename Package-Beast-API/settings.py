@@ -26,7 +26,7 @@ SECRET_KEY = '05^q)gef3f(*a^u3-e2b4of@5uh^^#i@roi*54^c2kft*r+*sq'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'api.packagebeast.com']
+    '127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'api.packagebeast.com', 'development.api.packagebeast.com']
 
 CORS_ORIGIN_ALLOW_ALL = True
 

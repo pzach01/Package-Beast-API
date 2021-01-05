@@ -25,8 +25,33 @@ SECRET_KEY = '05^q)gef3f(*a^u3-e2b4of@5uh^^#i@roi*54^c2kft*r+*sq'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    '127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'api.packagebeast.com', 'development.api.packagebeast.com']
+if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.getenv('DATABASE_NAME'),
+            'USER': os.getenv('DATABASE_USER'),
+            'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+            'HOST': os.getenv('DATABASE_HOST'),
+            'PORT': '5432'
+        }
+    }
+    ALLOWED_HOSTS = ['api.packagebeast.com']
+
+    
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'ebdb',
+            'USER': 'packageBeastDB',
+            'PASSWORD': 'peanutbutter!',
+            'HOST': 'aauh312xer0ff8.cg1crfkuftt1.us-east-1.rds.amazonaws.com',
+            'PORT': '5432'
+        }
+    }
+    ALLOWED_HOSTS = ['127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'api.packagebeast.com', 'developmentapi.packagebeast.com']
+
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -163,30 +188,7 @@ WSGI_APPLICATION = 'Package-Beast-API.wsgi.application'
 #     }
 # }
 
-if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.getenv('DATABASE_NAME'),
-            'USER': os.getenv('DATABASE_USER'),
-            'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-            'HOST': os.getenv('DATABASE_HOST'),
-            'PORT': '5432'
-        }
-    }
-    
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'ebdb',
-            'USER': 'packageBeastDB',
-            'PASSWORD': 'peanutbutter!',
-            'HOST': 'aauh312xer0ff8.cg1crfkuftt1.us-east-1.rds.amazonaws.com',
-            'PORT': '5432'
-        }
-}
-    
+  
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

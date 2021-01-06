@@ -23,7 +23,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '05^q)gef3f(*a^u3-e2b4of@5uh^^#i@roi*54^c2kft*r+*sq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
     DATABASES = {
@@ -37,6 +36,7 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
         }
     }
     ALLOWED_HOSTS = ['api.packagebeast.com']
+    DEBUG = False
 
     
 else:
@@ -51,6 +51,7 @@ else:
         }
     }
     ALLOWED_HOSTS = ['127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'api.packagebeast.com', 'developmentapi.packagebeast.com']
+    DEBUG = True
 
 
 CORS_ORIGIN_ALLOW_ALL = True

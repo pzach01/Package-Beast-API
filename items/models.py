@@ -32,4 +32,3 @@ class Item(models.Model):
     xCenter = models.FloatField(default=0.0, blank=True, null=True)
     yCenter = models.FloatField(default=0.0, blank=True, null=True)
     zCenter = models.FloatField(default=0.0, blank=True, null=True)
-    dummyField2 = models.CharField(max_length=255, blank=False, default='howdy!')

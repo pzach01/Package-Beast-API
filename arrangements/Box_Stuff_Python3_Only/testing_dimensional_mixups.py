@@ -249,13 +249,98 @@ def test_base_6_switches():
                 break
             else:
                 raise Exception('unfound base 6 switch')
+def test_3_partition_with_packer_forwarding():
+    # disqualify as much as possible unless it would disqualify optimalItemPermutation
+    def get_depth_safe_to_pack_to(optimalItemPermutation, currentItemPermutation):
+        depthAchieved=0
+        for index in range(0, len(currentItemPermutation)):
+            currentItem=currentItemPermutation[index]
+            optimalItem=optimalItemPermutation[index]
+            sameDimensions=False
+            if currentItem.xDim==optimalItem.xDim:
+                if currentItem.yDim==optimalItem.yDim:
+                    if currentItem.zDim==optimalItem.zDim:
+                        depthAchieved+=1
 
-          
-for ele in range(0, 100000):
+                        sameDimensions=True
+            if not sameDimensions:
+                break
+        return depthAchieved
+
+    numCoinFlips=random.randint(1,10)
+    frequencyToAccept=1
+    for ele in range(0, numCoinFlips):
+        frequencyToAccept*=random.random()
+    n=random.randint(1,20)
+    count=0
+    item_permutation=[]
+    for ele in range(0,n):
+        item=ItemPY3DBP(count,count+1,count+2,count+3)
+        count+=4
+        item_permutation.append(item)
+    
+    itemFlips=[random.randint(0,5),random.randint(0,5),random.randint(0,5)]
+
+    first=random.randint(0,n)
+    second=random.randint(0,n-first)
+    third=n-(first+second)
+    assert((first+second+third)==n)
+    # get nonbiased distribution over sample
+    mix=random.randint(0,5)
+    if mix==0:
+        partition=(first, second,third)
+    elif mix==1:
+        partition=(first, third, second)
+    elif mix==2:
+        partition=(second, first, third)
+    elif mix==3:
+        partition=(second, third, first)
+    elif mix==4:
+        partition=(third, first, second)
+    elif mix==5:
+        partition=(third, second, first)
+
+    permutationToObserve=convert_to_item_permutation(item_permutation, itemFlips,partition)
+
+    mixer=DimensionalMixupBigSetsGenerator(item_permutation)
+    permutationObserved=False
+    while(True):
+        try:
+            res=mixer.next()
+            # a depth that doesnt disqualify the arrangment we are looking for
+
+            if res is None:
+                foundIt=False
+            else:
+                # cant update in None case
+                if random.random()<frequencyToAccept:
+                    depthAchieved=get_depth_safe_to_pack_to(permutationToObserve,res)
+                    mixer.update_generator(depthAchieved)
+
+                assert(len(res)==len(item_permutation))
+                foundIt=True
+                # check if all the items are equal
+                for index in range(0, len(res)):
+                    if not permutationToObserve[index].name==res[index].name:
+                        foundIt=False
+                    if not permutationToObserve[index].xDim==res[index].xDim:
+                        foundIt=False
+                    if not permutationToObserve[index].yDim==res[index].yDim:
+                        foundIt=False
+                    if not permutationToObserve[index].zDim==res[index].zDim:
+                        foundIt=False
+
+            if foundIt:
+                permutationObserved=True
+                break
+        except StopIteration:
+            break
+    assert(permutationObserved)          
+for ele in range(0, 1000000):
     test_3_partition()
     test_2_partition()
     test_base_6_switches()
-
+    test_3_partition_with_packer_forwarding()
 
     #test_3_partition_with_exhaustive_ending()
     print(ele)

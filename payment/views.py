@@ -168,6 +168,9 @@ def create_stripe_subscription(request):
     stripeCustomerId=sub.stripeCustomerId
     data = request.data
     # Attach the payment method to the customer
+    import os
+    assert(os.getenv('STRIPE_API_SECRET')=='sk_test_51I76dqE5mpXPYa9nHYN046OuGpuQdNihI2JNfZHPYb05YbGtcr4EXDwytftg6MEgOk6SOvstWxMvFcFtyH67nrEN00xQKQQ6Jv')
+    assert(os.getenv('STRIPE_WEBHOOK_SECRET')=='whsec_sp9erCWYVqUqRZpj3Z99jFrWKtlJNKQO')
     stripe.PaymentMethod.attach(
         data['paymentMethodId'],
         customer=stripeCustomerId,

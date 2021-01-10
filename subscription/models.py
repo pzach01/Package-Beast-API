@@ -10,12 +10,22 @@ stripe.api_key = os.getenv('STRIPE_API_SECRET')
 # THIS IS TIED TO CURRENT PRODUCTS; WONT BEHAVE CORRECTLY IF THESE FIELDS ARE WRONG
 # type, ordering, cost, product id, price id, shipmentsAllowed, itemsAllowed, containersAllowed
 # these 'emptyFields' are such to prevent reverse engineering
-SUBSCRIPTION_PROFILES=[
-    ('trial',0,0,'emptyField741130','emptyField372215',10,10,10),
-    ('standard',1,1000,'prod_HzHvyINf9uyaxv','price_1HPJLlJWFTMXIZUoMH26j2EB',2,2,2),
-    ('premium',2,3000,'prod_HzHxDGJSZDQ8GI','price_1HPJNoJWFTMXIZUo60gNaXlm',2,4,4),
-    ('beastMode',3,5000,'prod_HzHy8kP263Pqzp','price_1HPJOLJWFTMXIZUoGcXhTnax',200,60,60),
-]
+
+# production settings and test settings, respectively
+if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):  
+    SUBSCRIPTION_PROFILES=[
+        ('trial',0,0,'emptyField741130','emptyField372215',10,10,10),
+        ('standard',1,1000,'prod_HzHvyINf9uyaxv','price_1HPJLlJWFTMXIZUoMH26j2EB',2,2,2),
+        ('premium',2,3000,'prod_HzHxDGJSZDQ8GI','price_1HPJNoJWFTMXIZUo60gNaXlm',2,4,4),
+        ('beastMode',3,5000,'prod_HzHy8kP263Pqzp','price_1HPJOLJWFTMXIZUoGcXhTnax',200,60,60),
+    ]
+else:
+    SUBSCRIPTION_PROFILES=[
+        ('trial',0,0,'emptyField137824','emptyField329271',10,10,10),
+        ('standard',1,1000,'prod_IiXkLvo2tLRuCi','price_1I76eoE5mpXPYa9nlFHK60Ge',2,2,2),
+        ('premium',2,3000,'prod_IiXkKw7qe4Dt7l','price_1I76fUE5mpXPYa9ncmIy6tbY',2,4,4),
+        ('beastMode',3,5000,'prod_IiXlcdTHpmbQHR','price_1I76gPE5mpXPYa9nzbdm3s9f',200,60,60),
+    ]
 
 class SubscriptionManager(models.Manager):
     def create_subscription(self,user):

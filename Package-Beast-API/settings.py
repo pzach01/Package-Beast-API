@@ -52,6 +52,9 @@ else:
     }
     ALLOWED_HOSTS = ['127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'api.packagebeast.com', 'developmentapi.packagebeast.com']
     DEBUG = True
+    # test keys
+    os.environ['STRIPE_API_SECRET']='sk_test_51I76dqE5mpXPYa9nHYN046OuGpuQdNihI2JNfZHPYb05YbGtcr4EXDwytftg6MEgOk6SOvstWxMvFcFtyH67nrEN00xQKQQ6Jv'
+    os.environ['STRIPE_WEBHOOK_SECRET']='whsec_sp9erCWYVqUqRZpj3Z99jFrWKtlJNKQO'
 
 
 CORS_ORIGIN_ALLOW_ALL = True

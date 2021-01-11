@@ -10,9 +10,8 @@ This document is intended to document database operations such as
 ## Migrations Procedure
 
 ### Make migrations: 
-```
-Database migrations are required when any model is changed. Changes to a serializer do NOT require new migrations. Migrations define database operations from application models. These are made with the development database credentials with the following command prior to pushing to development branch:
-```
+
+Database migrations are required when any model is changed.<br> Changes to a serializer do NOT require new migrations.<br> Migrations define database operations from application models. These are made with the development database credentials with the following command prior to pushing to development branch:
 
 ```
 Activate virtual environment: source venv/bin/activate
@@ -23,7 +22,6 @@ python manage.py makemigrations
 ```
 Both production and development databases migrate database migrations automatically according to .ebextensions/django.config. Production migrations should (generally) not be made from localhost as the migrations will be automatically applied by production elastic beanstalk environment. Development migrations may be made with the following command below:
 ```
-
 ```
 Activate virtual environment: source venv/bin/activate
 python manage.py migrate

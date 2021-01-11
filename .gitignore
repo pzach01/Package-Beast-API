@@ -1,3 +1,4 @@
+set_production_environment_variables.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -333,6 +333,7 @@ def update_stripe_subscription(request):
                 # when you upgrade it has the same cost
                 proration_date=fetchedSubscription['current_period_start'],
                 billing_cycle_anchor='now',
+                payment_behavior='error_if_incomplete',
             )
 
         else:

@@ -77,6 +77,8 @@ def my_webhook_view(request):
         #check against priceIds and prices to find out if we should do a full refill or a partial refill
 
         try:
+            if not data['object']['status'] =='paid':
+                return JsonResponse('Invoice status is not paid!',status=400,safe=False)
             stripeSub=StripeSubscription.objects.get(stripeSubscriptionId=str(subId))
             # should be a totally indepedent invoice
             # refill and refresh subscriptionType (), refill time

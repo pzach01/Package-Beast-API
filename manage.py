@@ -2,7 +2,11 @@
 import os
 import sys
 
+useProductionDatabase=False
+
 if __name__ == '__main__':
+    if useProductionDatabase:
+        import set_production_environment_variables
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Package-Beast-API.settings')
     try:
         from django.core.management import execute_from_command_line

@@ -79,6 +79,8 @@ def my_webhook_view(request):
         try:
             if not data['object']['status'] =='paid':
                 return JsonResponse('Invoice status is not paid!',status=400,safe=False)
+            if data['object']['amount_paid']==0:
+                return JsonResponse('Invoice generated due to downgrade', safe=False)
             stripeSub=StripeSubscription.objects.get(stripeSubscriptionId=str(subId))
             # should be a totally indepedent invoice
             # refill and refresh subscriptionType (), refill time

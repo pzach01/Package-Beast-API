@@ -193,6 +193,8 @@ def create_stripe_subscription(request):
             }
         ],
         expand=['latest_invoice.payment_intent'],
+        payment_behavior='error_if_incomplete',
+
     )
     # need to store fields here; such as id, items.data.price.id,customer,currentPeriodEnd
     

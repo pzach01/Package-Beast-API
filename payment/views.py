@@ -77,6 +77,10 @@ def my_webhook_view(request):
         #check against priceIds and prices to find out if we should do a full refill or a partial refill
 
         try:
+            if not data['object']['status'] =='paid':
+                return JsonResponse('Invoice status is not paid!',status=400,safe=False)
+            if data['object']['amount_paid']==0:
+                return JsonResponse('Invoice generated due to downgrade', safe=False)
             stripeSub=StripeSubscription.objects.get(stripeSubscriptionId=str(subId))
             # should be a totally indepedent invoice
             # refill and refresh subscriptionType (), refill time
@@ -189,6 +193,8 @@ def create_stripe_subscription(request):
             }
         ],
         expand=['latest_invoice.payment_intent'],
+        payment_behavior='error_if_incomplete',
+
     )
     # need to store fields here; such as id, items.data.price.id,customer,currentPeriodEnd
     
@@ -329,6 +335,7 @@ def update_stripe_subscription(request):
                 # when you upgrade it has the same cost
                 proration_date=fetchedSubscription['current_period_start'],
                 billing_cycle_anchor='now',
+                payment_behavior='error_if_incomplete',
             )
 
         else:
@@ -342,6 +349,8 @@ def update_stripe_subscription(request):
 
                 # this should be none if we are downgrading
                 proration_behavior='none',
+                payment_behavior='error_if_incomplete',
+
                 # attempt to set proration_date to start of the current period (this billing cycle) so no matter
                 # when you upgrade it has the same cost
             )

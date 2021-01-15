@@ -5,7 +5,7 @@ class SubscriptionSerializer(serializers.Serializer):
 
     class Meta:
         model=Subscription  
-        fields=['id','subscriptionType','numRequestsLeft','numItemsCanAdd','numContainersCanAdd','lastUpdateAbsoluteTime', 'itemsUsed']
+        fields=['id','subscriptionType','numRequestsLeft','numItemsCanAdd','numContainersCanAdd','lastUpdateAbsoluteTime', 'itemsUsed','subscriptionUpdateInProgress']
 
 
 class InvoiceIdSerializer(serializers.Serializer):

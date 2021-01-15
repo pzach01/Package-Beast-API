@@ -82,6 +82,10 @@ def my_webhook_view(request):
             if data['object']['amount_paid']==0:
                 return JsonResponse('Invoice generated due to downgrade', safe=False)
             stripeSub=StripeSubscription.objects.get(stripeSubscriptionId=str(subId))
+
+            stripeSub.subscription.subscriptionUpdateInProgress=False
+            stripeSub.subscription.save()
+
             # should be a totally indepedent invoice
             # refill and refresh subscriptionType (), refill time
             if data['object']['lines']['total_count']==1:
@@ -185,6 +189,7 @@ def create_stripe_subscription(request):
     )
 
     # Create the subscription
+    sub.subscriptionUpdateInProgress=False
     subscription = stripe.Subscription.create(
         customer=stripeCustomerId,
         items=[
@@ -196,6 +201,8 @@ def create_stripe_subscription(request):
         payment_behavior='error_if_incomplete',
 
     )
+    sub.subscriptionUpdateInProgress=True
+
     # need to store fields here; such as id, items.data.price.id,customer,currentPeriodEnd
     
 
@@ -321,6 +328,8 @@ def update_stripe_subscription(request):
         fetchedSubscription = stripe.Subscription.retrieve(stripeSubscriptionId)
         upgrade= sub.choose_upgrade_or_downgrade_with_price_id(data['priceId'])
         if upgrade:
+            sub.subscriptionUpdateInProgress=False
+
             updatedSubscription = stripe.Subscription.modify(
                 stripeSubscriptionId,
                 cancel_at_period_end=False,
@@ -337,6 +346,7 @@ def update_stripe_subscription(request):
                 billing_cycle_anchor='now',
                 payment_behavior='error_if_incomplete',
             )
+            sub.subscriptionUpdateInProgress=True
 
         else:
             updatedSubscription = stripe.Subscription.modify(

@@ -49,7 +49,7 @@ class Subscription(models.Model):
 
     itemsAllowed=models.IntegerField(default=10)
     containersAllowed=models.IntegerField(default=10)
-
+    subscriptionUpdateInProgress=models.BooleanField(default=False)
     def getItemsUsed(self):
         return Item.objects.filter(owner=self.owner, arrangement__isnull=True).count()
     

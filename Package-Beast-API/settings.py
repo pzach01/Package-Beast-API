@@ -32,7 +32,7 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
     }
     ALLOWED_HOSTS = ['api.packagebeast.com']
     # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = False
+    DEBUG = True
     # SECURITY WARNING: keep the secret key used in production secret!
     SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 

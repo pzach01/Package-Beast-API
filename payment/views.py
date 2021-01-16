@@ -190,17 +190,41 @@ def create_stripe_subscription(request):
 
     # Create the subscription
     sub.subscriptionUpdateInProgress=False
-    subscription = stripe.Subscription.create(
-        customer=stripeCustomerId,
-        items=[
-            {
-                'price': data['priceId']
-            }
-        ],
-        expand=['latest_invoice.payment_intent'],
-        payment_behavior='error_if_incomplete',
+    try:
+        subscription = stripe.Subscription.create(
+            customer=stripeCustomerId,
+            items=[
+                {
+                    'price': data['priceId']
+                }
+            ],
+            expand=['latest_invoice.payment_intent'],
+            payment_behavior='error_if_incomplete',
 
-    )
+        )
+    except stripe.error.CardError as e:
+        # Since it's a decline, stripe.error.CardError will be caught
+        return JsonResponse(str(e.user_message), status=500, safe=False)
+    except stripe.error.RateLimitError as e:
+        # Too many requests made to the API too quickly
+        return JsonResponse("Too many requests made to our payment system too quickly. Please wait and try again.", status=500, safe=False)
+    except stripe.error.InvalidRequestError as e:
+        # Invalid parameters were supplied to Stripe's API
+        return JsonResponse("InvalidRequestError.", status=500, safe=False)
+    except stripe.error.AuthenticationError as e:
+        # Authentication with Stripe's API failed
+        # (maybe you changed API keys recently)
+        return JsonResponse("Contact support. Error type 1", status=500, safe=False)
+    except stripe.error.APIConnectionError as e:
+        # Network communication with Stripe failed
+        return JsonResponse("Contact support. Error type 2", status=500, safe=False)
+    except stripe.error.StripeError as e:
+        # Display a very generic error to the user, and maybe send
+        # yourself an email
+        return JsonResponse("Contact support. Error type 3", status=500, safe=False)
+    except Exception as e:
+        # Something else happened, completely unrelated to Stripe
+        return JsonResponse("Contact support. Error type 4", status=500, safe=False)
     sub.subscriptionUpdateInProgress=True
 
     # need to store fields here; such as id, items.data.price.id,customer,currentPeriodEnd
@@ -330,23 +354,48 @@ def update_stripe_subscription(request):
         upgrade= sub.choose_upgrade_or_downgrade_with_price_id(data['priceId'])
         if upgrade:
             sub.subscriptionUpdateInProgress=False
+            try:
+                updatedSubscription = stripe.Subscription.modify(
+                    stripeSubscriptionId,
+                    cancel_at_period_end=False,
+                    items=[{
+                        'id': fetchedSubscription['items']['data'][0].id,
+                        'price': data['priceId'],
+                    }],
 
-            updatedSubscription = stripe.Subscription.modify(
-                stripeSubscriptionId,
-                cancel_at_period_end=False,
-                items=[{
-                    'id': fetchedSubscription['items']['data'][0].id,
-                    'price': data['priceId'],
-                }],
+                    # this should be none if we are downgrading
+                    proration_behavior='always_invoice',
+                    # attempt to set proration_date to start of the current period (this billing cycle) so no matter
+                    # when you upgrade it has the same cost
+                    proration_date=fetchedSubscription['current_period_start'],
+                    billing_cycle_anchor='now',
+                    payment_behavior='error_if_incomplete',
+                )
 
-                # this should be none if we are downgrading
-                proration_behavior='always_invoice',
-                # attempt to set proration_date to start of the current period (this billing cycle) so no matter
-                # when you upgrade it has the same cost
-                proration_date=fetchedSubscription['current_period_start'],
-                billing_cycle_anchor='now',
-                payment_behavior='error_if_incomplete',
-            )
+            except stripe.error.CardError as e:
+                # Since it's a decline, stripe.error.CardError will be caught
+                return JsonResponse(str(e.user_message), status=500, safe=False)
+            except stripe.error.RateLimitError as e:
+                # Too many requests made to the API too quickly
+                return JsonResponse("Too many requests made to our payment system too quickly. Please wait and try again.", status=500, safe=False)
+            except stripe.error.InvalidRequestError as e:
+                # Invalid parameters were supplied to Stripe's API
+                return JsonResponse("InvalidRequestError.", status=500, safe=False)
+            except stripe.error.AuthenticationError as e:
+                # Authentication with Stripe's API failed
+                # (maybe you changed API keys recently)
+                return JsonResponse("Contact support. Error type 1", status=500, safe=False)
+            except stripe.error.APIConnectionError as e:
+                # Network communication with Stripe failed
+                return JsonResponse("Contact support. Error type 2", status=500, safe=False)
+            except stripe.error.StripeError as e:
+                # Display a very generic error to the user, and maybe send
+                # yourself an email
+                return JsonResponse("Contact support. Error type 3", status=500, safe=False)
+            except Exception as e:
+                # Something else happened, completely unrelated to Stripe
+                return JsonResponse("Contact support. Error type 4", status=500, safe=False)
+
             sub.subscriptionUpdateInProgress=True
 
         else:

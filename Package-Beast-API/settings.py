@@ -34,7 +34,7 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
     }
     ALLOWED_HOSTS = ['api.packagebeast.com', 'packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com']
     # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = True
+    DEBUG = False
 
 else:
     SECRET_KEY = '05^q)gef3f(*a^u3-e2b4of@5uh^^#i@roi*54^c2kft*r+*sq'
@@ -43,12 +43,12 @@ else:
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': 'ebdb',
             'USER': 'packageBeastDB',
-            'PASSWORD': 'peanutbutter!',
+            'PASSWORD': 'mNREQKk4oe4th1V76hRbiRRbYk6ugV9PinlAmJ2oNnaSvujh3NUGSTMkm1RaAH4nHVCMDO90np5r5LDKcQQIKTL5Rz9rLjsjZfaD',
             'HOST': 'aauh312xer0ff8.cg1crfkuftt1.us-east-1.rds.amazonaws.com',
             'PORT': '5432'
         }
     }
-    ALLOWED_HOSTS = ['127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'api.packagebeast.com', 'developmentapi.packagebeast.com']
+    ALLOWED_HOSTS = ['127.0.0.1', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'developmentapi.packagebeast.com']
     DEBUG = True
 
     # test keys

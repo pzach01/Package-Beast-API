@@ -34,7 +34,7 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
     }
     ALLOWED_HOSTS = ['api.packagebeast.com', 'packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com']
     # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = True
+    DEBUG = False
 
 else:
     SECRET_KEY = '05^q)gef3f(*a^u3-e2b4of@5uh^^#i@roi*54^c2kft*r+*sq'
@@ -48,7 +48,7 @@ else:
             'PORT': '5432'
         }
     }
-    ALLOWED_HOSTS = ['127.0.0.1', 'Packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'api.packagebeast.com', 'developmentapi.packagebeast.com']
+    ALLOWED_HOSTS = ['127.0.0.1', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'developmentapi.packagebeast.com']
     DEBUG = True
 
     # test keys

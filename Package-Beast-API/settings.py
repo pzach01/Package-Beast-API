@@ -43,7 +43,7 @@ else:
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'NAME': 'ebdb',
             'USER': 'packageBeastDB',
-            'PASSWORD': 'peanutbutter!',
+            'PASSWORD': 'mNREQKk4oe4th1V76hRbiRRbYk6ugV9PinlAmJ2oNnaSvujh3NUGSTMkm1RaAH4nHVCMDO90np5r5LDKcQQIKTL5Rz9rLjsjZfaD',
             'HOST': 'aauh312xer0ff8.cg1crfkuftt1.us-east-1.rds.amazonaws.com',
             'PORT': '5432'
         }

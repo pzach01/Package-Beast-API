@@ -176,17 +176,65 @@ def create_stripe_subscription(request):
     stripeCustomerId=sub.stripeCustomerId
     data = request.data
     # Attach the payment method to the customer
-    stripe.PaymentMethod.attach(
-        data['paymentMethodId'],
-        customer=stripeCustomerId,
-    )
+    try:
+        stripe.PaymentMethod.attach(
+            data['paymentMethodId'],
+            customer=stripeCustomerId,
+        )
+    except stripe.error.CardError as e:
+        # Since it's a decline, stripe.error.CardError will be caught
+        return JsonResponse(str(e.user_message), status=500, safe=False)
+    except stripe.error.RateLimitError as e:
+        # Too many requests made to the API too quickly
+        return JsonResponse("Too many requests made to our payment system too quickly. Please wait and try again.", status=500, safe=False)
+    except stripe.error.InvalidRequestError as e:
+        # Invalid parameters were supplied to Stripe's API
+        return JsonResponse("InvalidRequestError.", status=500, safe=False)
+    except stripe.error.AuthenticationError as e:
+        # Authentication with Stripe's API failed
+        # (maybe you changed API keys recently)
+        return JsonResponse("Contact support. Error code 1", status=500, safe=False)
+    except stripe.error.APIConnectionError as e:
+        # Network communication with Stripe failed
+        return JsonResponse("Contact support. Error code 2", status=500, safe=False)
+    except stripe.error.StripeError as e:
+        # Display a very generic error to the user, and maybe send
+        # yourself an email
+        return JsonResponse("Contact support. Error code 3", status=500, safe=False)
+    except Exception as e:
+        # Something else happened, completely unrelated to Stripe
+        return JsonResponse("Contact support. Error code 4", status=500, safe=False)
     # Set the default payment method on the customer
-    stripe.Customer.modify(
-        stripeCustomerId,
-        invoice_settings={
-            'default_payment_method': data['paymentMethodId'],
-        },
-    )
+    try:
+        stripe.Customer.modify(
+            stripeCustomerId,
+            invoice_settings={
+                'default_payment_method': data['paymentMethodId'],
+            },
+        )
+    except stripe.error.CardError as e:
+        # Since it's a decline, stripe.error.CardError will be caught
+        return JsonResponse(str(e.user_message), status=500, safe=False)
+    except stripe.error.RateLimitError as e:
+        # Too many requests made to the API too quickly
+        return JsonResponse("Too many requests made to our payment system too quickly. Please wait and try again.", status=500, safe=False)
+    except stripe.error.InvalidRequestError as e:
+        # Invalid parameters were supplied to Stripe's API
+        return JsonResponse("InvalidRequestError.", status=500, safe=False)
+    except stripe.error.AuthenticationError as e:
+        # Authentication with Stripe's API failed
+        # (maybe you changed API keys recently)
+        return JsonResponse("Contact support. Error code 5", status=500, safe=False)
+    except stripe.error.APIConnectionError as e:
+        # Network communication with Stripe failed
+        return JsonResponse("Contact support. Error code 6", status=500, safe=False)
+    except stripe.error.StripeError as e:
+        # Display a very generic error to the user, and maybe send
+        # yourself an email
+        return JsonResponse("Contact support. Error code 7", status=500, safe=False)
+    except Exception as e:
+        # Something else happened, completely unrelated to Stripe
+        return JsonResponse("Contact support. Error code 8", status=500, safe=False)
 
     # Create the subscription
     sub.subscriptionUpdateInProgress=False
@@ -204,7 +252,7 @@ def create_stripe_subscription(request):
         )
     except stripe.error.CardError as e:
         # Since it's a decline, stripe.error.CardError will be caught
-        return JsonResponse(str(e.message), status=500, safe=False)
+        return JsonResponse(str(e.user_message), status=500, safe=False)
     except stripe.error.RateLimitError as e:
         # Too many requests made to the API too quickly
         return JsonResponse("Too many requests made to our payment system too quickly. Please wait and try again.", status=500, safe=False)
@@ -214,17 +262,17 @@ def create_stripe_subscription(request):
     except stripe.error.AuthenticationError as e:
         # Authentication with Stripe's API failed
         # (maybe you changed API keys recently)
-        return JsonResponse("Contact support. Error type 1", status=500, safe=False)
+        return JsonResponse("Contact support. Error code 9", status=500, safe=False)
     except stripe.error.APIConnectionError as e:
         # Network communication with Stripe failed
-        return JsonResponse("Contact support. Error type 2", status=500, safe=False)
+        return JsonResponse("Contact support. Error code 10", status=500, safe=False)
     except stripe.error.StripeError as e:
         # Display a very generic error to the user, and maybe send
         # yourself an email
-        return JsonResponse("Contact support. Error type 3", status=500, safe=False)
+        return JsonResponse("Contact support. Error code 11", status=500, safe=False)
     except Exception as e:
         # Something else happened, completely unrelated to Stripe
-        return JsonResponse("Contact support. Error type 4", status=500, safe=False)
+        return JsonResponse("Contact support. Error code 12", status=500, safe=False)
     sub.subscriptionUpdateInProgress=True
 
     # need to store fields here; such as id, items.data.price.id,customer,currentPeriodEnd
@@ -399,21 +447,25 @@ def update_stripe_subscription(request):
             sub.subscriptionUpdateInProgress=True
 
         else:
-            updatedSubscription = stripe.Subscription.modify(
-                stripeSubscriptionId,
-                cancel_at_period_end=False,
-                items=[{
-                    'id': fetchedSubscription['items']['data'][0].id,
-                    'price': data['priceId'],
-                }],
+            try:
+                updatedSubscription = stripe.Subscription.modify(
+                    stripeSubscriptionId,
+                    cancel_at_period_end=False,
+                    items=[{
+                        'id': fetchedSubscription['items']['data'][0].id,
+                        'price': data['priceId'],
+                    }],
 
-                # this should be none if we are downgrading
-                proration_behavior='none',
-                payment_behavior='error_if_incomplete',
+                    # this should be none if we are downgrading
+                    proration_behavior='none',
+                    payment_behavior='error_if_incomplete',
 
-                # attempt to set proration_date to start of the current period (this billing cycle) so no matter
-                # when you upgrade it has the same cost
-            )
+                    # attempt to set proration_date to start of the current period (this billing cycle) so no matter
+                    # when you upgrade it has the same cost
+                )
+            except Exception as e:
+                return JsonResponse("Contact support. Error canceling subscription.", status=500, safe=False)
+
             sub.downgrade_subscription(data['priceId'])
 
         return JsonResponse(updatedSubscription)

@@ -423,7 +423,7 @@ def update_stripe_subscription(request):
 
             except stripe.error.CardError as e:
                 # Since it's a decline, stripe.error.CardError will be caught
-                return JsonResponse(str(e.message), status=500, safe=False)
+                return JsonResponse(str(e.user_message), status=500, safe=False)
             except stripe.error.RateLimitError as e:
                 # Too many requests made to the API too quickly
                 return JsonResponse("Too many requests made to our payment system too quickly. Please wait and try again.", status=500, safe=False)

@@ -170,7 +170,7 @@ class IsOwner(permissions.BasePermission):
 def create_stripe_subscription(request):
     sub = Subscription.objects.get(owner=request.user)
     sub.subscriptionUpdateInProgress=False
-
+    sub.save()
     stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub).order_by('-created')
     if len(stripeSubscriptions)>0:
         if stripeSubscriptions[0].deleted==False:
@@ -275,6 +275,7 @@ def create_stripe_subscription(request):
         # Something else happened, completely unrelated to Stripe
         return JsonResponse("Contact support. Error code 12", status=500, safe=False)
     sub.subscriptionUpdateInProgress=True
+    sub.save()
 
     # need to store fields here; such as id, items.data.price.id,customer,currentPeriodEnd
     
@@ -403,6 +404,7 @@ def update_stripe_subscription(request):
         upgrade= sub.choose_upgrade_or_downgrade_with_price_id(data['priceId'])
         if upgrade:
             sub.subscriptionUpdateInProgress=False
+            sub.save()
             try:
                 updatedSubscription = stripe.Subscription.modify(
                     stripeSubscriptionId,
@@ -446,7 +448,7 @@ def update_stripe_subscription(request):
                 return JsonResponse("Contact support. Error type 4", status=500, safe=False)
 
             sub.subscriptionUpdateInProgress=True
-
+            sub.save()
         else:
             try:
                 updatedSubscription = stripe.Subscription.modify(

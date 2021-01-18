@@ -169,6 +169,8 @@ class IsOwner(permissions.BasePermission):
 @permission_classes([permissions.IsAuthenticated])
 def create_stripe_subscription(request):
     sub = Subscription.objects.get(owner=request.user)
+    sub.subscriptionUpdateInProgress=False
+
     stripeSubscriptions=StripeSubscription.objects.filter(subscription=sub).order_by('-created')
     if len(stripeSubscriptions)>0:
         if stripeSubscriptions[0].deleted==False:
@@ -237,7 +239,6 @@ def create_stripe_subscription(request):
         return JsonResponse("Contact support. Error code 8", status=500, safe=False)
 
     # Create the subscription
-    sub.subscriptionUpdateInProgress=False
     try:
         subscription = stripe.Subscription.create(
             customer=stripeCustomerId,

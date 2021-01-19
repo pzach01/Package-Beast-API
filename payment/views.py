@@ -302,18 +302,69 @@ def retry_invoice(request):
     stripeCustomerId=sub.stripeCustomerId
 
     data = request.data
+    try:
+        stripe.PaymentMethod.attach(
+            data['paymentMethodId'],
+            customer=stripeCustomerId,
+        )
 
-    stripe.PaymentMethod.attach(
-        data['paymentMethodId'],
-        customer=stripeCustomerId,
-    )
-    # Set the default payment method on the customer
-    stripe.Customer.modify(
-        stripeCustomerId,
-        invoice_settings={
-            'default_payment_method': data['paymentMethodId'],
-        },
-    )
+    except stripe.error.CardError as e:
+        # Since it's a decline, stripe.error.CardError will be caught
+        return JsonResponse(str(e.user_message), status=500, safe=False)
+    except stripe.error.RateLimitError as e:
+        # Too many requests made to the API too quickly
+        return JsonResponse("Too many requests made to our payment system too quickly. Please wait and try again.", status=500, safe=False)
+    except stripe.error.InvalidRequestError as e:
+        # Invalid parameters were supplied to Stripe's API
+        return JsonResponse("InvalidRequestError.", status=500, safe=False)
+    except stripe.error.AuthenticationError as e:
+        # Authentication with Stripe's API failed
+        # (maybe you changed API keys recently)
+        return JsonResponse("Contact support. Error code 13", status=500, safe=False)
+    except stripe.error.APIConnectionError as e:
+        # Network communication with Stripe failed
+        return JsonResponse("Contact support. Error code 14", status=500, safe=False)
+    except stripe.error.StripeError as e:
+        # Display a very generic error to the user, and maybe send
+        # yourself an email
+        return JsonResponse("Contact support. Error code 15", status=500, safe=False)
+    except Exception as e:
+        # Something else happened, completely unrelated to Stripe
+        return JsonResponse("Contact support. Error code 16", status=500, safe=False)
+
+    try:
+        # Set the default payment method on the customer
+        stripe.Customer.modify(
+            stripeCustomerId,
+            invoice_settings={
+                'default_payment_method': data['paymentMethodId'],
+            },
+        )
+    except stripe.error.CardError as e:
+        # Since it's a decline, stripe.error.CardError will be caught
+        return JsonResponse(str(e.user_message), status=500, safe=False)
+    except stripe.error.RateLimitError as e:
+        # Too many requests made to the API too quickly
+        return JsonResponse("Too many requests made to our payment system too quickly. Please wait and try again.", status=500, safe=False)
+    except stripe.error.InvalidRequestError as e:
+        # Invalid parameters were supplied to Stripe's API
+        return JsonResponse("InvalidRequestError.", status=500, safe=False)
+    except stripe.error.AuthenticationError as e:
+        # Authentication with Stripe's API failed
+        # (maybe you changed API keys recently)
+        return JsonResponse("Contact support. Error code 17", status=500, safe=False)
+    except stripe.error.APIConnectionError as e:
+        # Network communication with Stripe failed
+        return JsonResponse("Contact support. Error code 18", status=500, safe=False)
+    except stripe.error.StripeError as e:
+        # Display a very generic error to the user, and maybe send
+        # yourself an email
+        return JsonResponse("Contact support. Error code 19", status=500, safe=False)
+    except Exception as e:
+        # Something else happened, completely unrelated to Stripe
+        return JsonResponse("Contact support. Error code 20", status=500, safe=False)
+
+
 
     stripeSubscription=StripeSubscription.objects.filter(subscription=sub).order_by('-created')[0]
     #TODO: fix possibility to bug out here

@@ -15,9 +15,9 @@ stripe.api_key = os.getenv('STRIPE_API_SECRET')
 if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):  
     SUBSCRIPTION_PROFILES=[
         ('trial',0,0,'emptyField741130','emptyField372215',10,10,10),
-        ('standard',1,1000,'prod_HzHvyINf9uyaxv','price_1HPJLlJWFTMXIZUoMH26j2EB',50,50,50),
-        ('premium',2,3000,'prod_HzHxDGJSZDQ8GI','price_1HPJNoJWFTMXIZUo60gNaXlm',300,300,300),
-        ('beastMode',3,5000,'prod_HzHy8kP263Pqzp','price_1HPJOLJWFTMXIZUoGcXhTnax',1000,5000,5000),
+        ('standard',1,1000,'prod_Io5vXJKuoSljSG','price_1ICTjaJWFTMXIZUonP0TRYCm',50,50,50),
+        ('premium',2,3000,'prod_Io5wQO8TZN0K8V','price_1ICTkBJWFTMXIZUoULj8wGsz',300,300,300),
+        ('beastMode',3,5000,'prod_Io5w0g0GolhS70','price_1ICTkQJWFTMXIZUoyuuGwYpc',1000,5000,5000),
     ]
 else:
     SUBSCRIPTION_PROFILES=[

@@ -35,6 +35,8 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
     ALLOWED_HOSTS = ['api.packagebeast.com', 'packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com']
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = False
+    os.environ['STRIPE_TAX_RATE_ID']='txr_1ICsUoJWFTMXIZUo9c5KbCFS'
+
 
 else:
     SECRET_KEY = '05^q)gef3f(*a^u3-e2b4of@5uh^^#i@roi*54^c2kft*r+*sq'

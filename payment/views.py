@@ -250,6 +250,7 @@ def create_stripe_subscription(request):
             expand=['latest_invoice.payment_intent'],
             payment_behavior='error_if_incomplete',
 
+
         )
     except stripe.error.CardError as e:
         # Since it's a decline, stripe.error.CardError will be caught

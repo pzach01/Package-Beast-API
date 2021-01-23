@@ -30,7 +30,7 @@ else:
 class SubscriptionManager(models.Manager):
     def create_subscription(self,user):
         stripeCustomer = stripe.Customer.create(
-            email=user.email
+            email=user.email,
         )
         subscription=self.create(owner=user,stripeCustomerId=stripeCustomer.id)
 

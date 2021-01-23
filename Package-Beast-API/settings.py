@@ -54,7 +54,8 @@ else:
     # test keys
     os.environ['STRIPE_API_SECRET']='sk_test_51I76dqE5mpXPYa9nHYN046OuGpuQdNihI2JNfZHPYb05YbGtcr4EXDwytftg6MEgOk6SOvstWxMvFcFtyH67nrEN00xQKQQ6Jv'
     os.environ['STRIPE_WEBHOOK_SECRET']='whsec_sp9erCWYVqUqRZpj3Z99jFrWKtlJNKQO'
-
+    os.environ['STRIPE_TAX_RATE_ID']='txr_1ICrg3E5mpXPYa9nYpguvzzc'
+'
 
 CORS_ORIGIN_ALLOW_ALL = True
 

@@ -249,8 +249,7 @@ def create_stripe_subscription(request):
             ],
             expand=['latest_invoice.payment_intent'],
             payment_behavior='error_if_incomplete',
-
-
+            default_tax_rates=[os.getenv('STRIPE_TAX_RATE_ID')],
         )
     except stripe.error.CardError as e:
         # Since it's a decline, stripe.error.CardError will be caught

@@ -249,6 +249,8 @@ def create_stripe_subscription(request):
             ],
             expand=['latest_invoice.payment_intent'],
             payment_behavior='error_if_incomplete',
+            default_tax_rates=['txr_1ICrg3E5mpXPYa9nYpguvzzc'],
+
 
         )
     except stripe.error.CardError as e:

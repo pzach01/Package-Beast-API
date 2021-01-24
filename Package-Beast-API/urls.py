@@ -29,8 +29,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.contrib.auth.views import PasswordResetView
 from rest_auth.registration.views import VerifyEmailView
-# myapp/urls.py
-
+from .views import CustomPasswordChangeView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -68,6 +67,7 @@ urlpatterns = [
     path('', include('items.urls')),
     path('', include('users.urls')),
     path('', include('payment.urls')),
+    path('accounts/password/change/', CustomPasswordChangeView.as_view()),
     path('accounts/', include('rest_auth.urls')),
     path('accounts/registration/', include('rest_auth.registration.urls')),
     re_path(r'^account-confirm-email/', VerifyEmailView.as_view(),
@@ -75,4 +75,5 @@ urlpatterns = [
     re_path(
         r'^reset-password/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', PasswordResetView, name='password_reset_confirm'),
     re_path(r'^.*$', RedirectView.as_view(url='/accounts/login/', permanent=False)),
+
 ]

@@ -15,22 +15,23 @@ from subscription.models import Subscription,StripeSubscription
 from rest_framework.test import APITestCase
 
 class ArrangmentTests(APITestCase):
-    def generic_logic(self,inputData):
-        u = User.objects.create(email='a@a.com')
-        u.set_password('a')
-        u.save()
-        sub=Subscription.objects.create(owner=u)
-        sub.shipmentsAllowed=500
-        sub.itemsAllowed=500
-        sub.containersAllowed=500
+    def generic_logic(self,inputData,createUser=True):
+        if createUser:
+            u = User.objects.create(email='a@a.com')
+            u.set_password('a')
+            u.save()
+            sub=Subscription.objects.create(owner=u)
+            sub.shipmentsAllowed=500
+            sub.itemsAllowed=500
+            sub.containersAllowed=500
 
-        sub.save()
+            sub.save()
 
 
-        stripeSub=StripeSubscription.objects.create(subscription=sub)
-        import time
-        stripeSub.currentPeriodEnd=time.time()+(60*60*24*2)
-        stripeSub.save()
+            stripeSub=StripeSubscription.objects.create(subscription=sub)
+            import time
+            stripeSub.currentPeriodEnd=time.time()+(60*60*24*2)
+            stripeSub.save()
 
         # url = reverse('account-list')
         self.client.login(email="a@a.com", password="a")
@@ -1096,6 +1097,86 @@ class ArrangmentTests(APITestCase):
             if container['id']==foundContainerId:
                 selectedContainer=container   
         foundContainerString=(str(selectedContainer['xDim'])+'x'+str(selectedContainer['yDim'])+'x'+str(selectedContainer['zDim']))
-        print(foundContainerString)
         assert(foundContainerString=='18.0x18.0x24.0')
         print('Arrangments test 8 Passed')
+
+
+    def test_9(self):
+        try:
+            inputDataOverfit={
+            "multiBinPack": False,
+            "timeoutDuration": 30,
+            "containers": [
+                {
+                "sku": "unit",
+                "description": "string",
+                "xDim": 1,
+                "yDim": 1,
+                "zDim": 1,
+                "units": "in"
+                }
+            ],
+            "items": [
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 10,
+                "width": 10,
+                "height": 10,
+                "units": "in"
+                }
+            ]
+            }
+
+
+
+            import time
+            startWithOverfit=time.time()
+            data=self.generic_logic(inputDataOverfit)
+            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+            endWithOverfit=time.time()
+            assert(endWithOverfit-startWithOverfit<3)
+
+
+            inputDataFit={
+            "multiBinPack": False,
+            "timeoutDuration": 30,
+            "containers": [
+                {
+                "sku": "unit",
+                "description": "string",
+                "xDim": 1,
+                "yDim": 1,
+                "zDim": 1,
+                "units": "in"
+                }
+            ],
+            "items": [
+                {
+                "id": 1,
+                "sku": "string",
+                "description": "string",
+                "length": 10,
+                "width": 10,
+                "height": 10,
+                "units": "in"
+                }
+            ]
+            }
+
+            startWithFit=time.time()
+            data=self.generic_logic(inputDataFit,False)
+            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+            endWithFit=time.time()
+            assert(data['arrangementPossible']==False)
+            assert(data['multiBinPack']==False)
+
+
+            selectedContainer=data['containers'][0]
+            assert(selectedContainer['xDim']==1)
+            assert(selectedContainer['yDim']==1)
+            assert(selectedContainer['zDim']==1)
+            print("Arrangments test 9 Passed")
+        except:
+            print("---------------Arrangments test 9 Failed")

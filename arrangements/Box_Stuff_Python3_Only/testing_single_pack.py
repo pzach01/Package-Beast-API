@@ -16,7 +16,7 @@ def test_overfitting_one_item_one_container():
     items=['10x10x10']
     containers=['5x5x5']
     containerList,timedOut, arrangmentPossible=box_stuff2.master_calculate_optimal_solution(containers,items,35,False)
-    assert(timedOut)    
+    assert(not timedOut)    
 
 # tests for overfitting when we are packing items into a single container
 

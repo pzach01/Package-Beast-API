@@ -50,7 +50,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
         itemStrings = []
         itemIds=[]
         for container in containers:
-            x,y,z = container['xDim'], container['yDim'], container['zDim']
+            x,y,z,u = self.convert_to_inches(container['xDim'], container['yDim'], container['zDim'], container['units'])
             as_string=self.format_as_dimensions(x,y,z)
 
             containerStrings.append(as_string)

@@ -21,7 +21,7 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
     ]
 else:
     SUBSCRIPTION_PROFILES=[
-        ('trial',0,0,'emptyField137824','emptyField329271',10,10,10),
+        ('trial',0,0,'emptyField137824','emptyField329271',50,50,50),
         ('standard',1,1000,'prod_IiXkLvo2tLRuCi','price_1I76eoE5mpXPYa9nlFHK60Ge',50,50,50),
         ('premium',2,3000,'prod_IiXkKw7qe4Dt7l','price_1I76fUE5mpXPYa9ncmIy6tbY',300,300,300),
         ('beastMode',3,5000,'prod_IiXlcdTHpmbQHR','price_1I76gPE5mpXPYa9nzbdm3s9f',1000,5000,5000),

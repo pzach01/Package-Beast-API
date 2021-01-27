@@ -11,6 +11,27 @@ import math
 import itertools
 import time
 
+# run a global check that is it at least maybe possible to fit a box into a container before we start packing
+def get_possible_to_fit_one_box(bins1,boxs1):
+    possibleToFitOneBox=False
+    # run a global check that you can fit at least one box
+    for box in boxs1:
+        xBox,yBox,zBox=float(box.split('x')[0]),float(box.split('x')[1]),float(box.split('x')[2])
+        boxList=sorted([xBox,yBox,zBox])
+        for container in bins1:
+            xContainer,yContainer,zContainer=float(container.split('x')[0]),float(container.split('x')[1]),float(container.split('x')[2])
+            containerList=sorted([xContainer,yContainer,zContainer])
+            couldFit=True
+            for index in range(0, 3):
+                if containerList[index]<boxList[index]:
+                    couldFit=False
+                    break
+
+            if couldFit:
+                possibleToFitOneBox=True
+                break
+    return possibleToFitOneBox
+
 
 def lock_recursion_and_increase_timeout(container,packer,timeout, testMode):
     if timeout<5:
@@ -226,10 +247,22 @@ def hypothetical_binpack(numBins, boxs1, timeout=0, costList=None, binWeightCapa
     
     
     # then try to reduce dimensions by 1 (this gurantees that at least 1 dimension (x y or z) is tight against the boxes)
-    
+
+
+
+
+
+
+
+
+
 # attempt to fill all boxes in one of the bins
 # Note to self: the backend code actually uses the API here 
 def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys=None, boxWeights=None):
+    possibleToFitOneBox=get_possible_to_fit_one_box(bins1,boxs1)
+    if not possibleToFitOneBox:
+        return None, False, False
+                   
     import math
     minCost=math.inf
     minArrangment=None

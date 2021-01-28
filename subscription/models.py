@@ -8,6 +8,7 @@ import os
 stripe.api_key = os.getenv('STRIPE_API_SECRET')
 
 # THIS IS TIED TO CURRENT PRODUCTS; WONT BEHAVE CORRECTLY IF THESE FIELDS ARE WRONG
+# 0,          1,   2,       3,          4,         5,             6,             7
 # type, ordering, cost, product id, price id, shipmentsAllowed, itemsAllowed, containersAllowed
 # these 'emptyFields' are such to prevent reverse engineering
 
@@ -46,10 +47,10 @@ class Subscription(models.Model):
     subscriptionType=models.CharField(max_length=20,default='trial')
     
     shipmentsUsed=models.IntegerField(default=0)
-    shipmentsAllowed=models.IntegerField(default=10)
+    shipmentsAllowed=models.IntegerField(default=SUBSCRIPTION_PROFILES[0][5])
 
-    itemsAllowed=models.IntegerField(default=10)
-    containersAllowed=models.IntegerField(default=10)
+    itemsAllowed=models.IntegerField(default=SUBSCRIPTION_PROFILES[0][6])
+    containersAllowed=models.IntegerField(default=SUBSCRIPTION_PROFILES[0][7])
     subscriptionUpdateInProgress=models.BooleanField(default=False)
     def getItemsUsed(self):
         return Item.objects.filter(owner=self.owner, arrangement__isnull=True).count()

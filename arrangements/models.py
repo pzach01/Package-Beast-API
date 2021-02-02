@@ -10,7 +10,7 @@ class Arrangement(models.Model):
     multiBinPack = models.BooleanField(default=False)
     arrangementPossible = models.BooleanField(default=False)
     timeout = models.BooleanField(default=False)
-
+    title=models.CharField(max_length=255,default='My shipment')
     class Meta:
         ordering = ['created']
 

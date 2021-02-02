@@ -23,7 +23,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Arrangement
-        fields = ['id', 'created', 'owner', 'arrangementPossible', 'timeout', 'multiBinPack', 'timeoutDuration', 'containers', 'items']
+        fields = ['id', 'created', 'owner', 'arrangementPossible', 'timeout', 'multiBinPack', 'timeoutDuration', 'containers', 'items','title']
         read_only_fields = ['arrangementPossible', 'timeout']       
     def format_as_dimensions(self,x,y,z):
         return str(x)+'x'+str(y)+'x'+str(z)

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.timezone import now
 from arrangements.models import Arrangement
+from django.contrib import admin
 
 
 # Create your models here.
@@ -18,3 +19,5 @@ class Container(models.Model):
     cost = models.FloatField(default=0.0)
     arrangement = models.ForeignKey(
         Arrangement, related_name='containers', on_delete=models.CASCADE, blank=True, null=True)
+
+admin.site.register(Container)

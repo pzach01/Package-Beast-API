@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.timezone import now
 from containers.models import Container
 from arrangements.models import Arrangement
+from django.contrib import admin
 
 # Create your models here.
 
@@ -32,3 +33,5 @@ class Item(models.Model):
     xCenter = models.FloatField(default=0.0, blank=True, null=True)
     yCenter = models.FloatField(default=0.0, blank=True, null=True)
     zCenter = models.FloatField(default=0.0, blank=True, null=True)
+
+admin.site.register(Item)

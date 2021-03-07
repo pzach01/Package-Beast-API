@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     'allauth',  # New-PZ
     'allauth.account',  # New-PZ
     'allauth.socialaccount',  # New-PZ 2-9-20
+    'allauth.socialaccount.providers.google', # New PZ 3-6-21
     'rest_auth.registration',  # New-PZ
     'django.contrib.sites',  # New-PZ
     'drf_yasg',  # 2-7-20 New PZ
@@ -88,7 +89,6 @@ INSTALLED_APPS = [
     'users',
     'subscription',
     'payment',
-
 ]
 
 # User registration errors out if you remove this. I think its used with django.contrib.sites
@@ -124,7 +124,6 @@ REST_FRAMEWORK = {
         # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication'
-
     ],
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
@@ -142,7 +141,6 @@ SWAGGER_SETTINGS = {
             'in': 'header'
         }
     },
-
 }
 
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

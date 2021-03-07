@@ -31,6 +31,12 @@ from django.contrib.auth.views import PasswordResetView
 from rest_auth.registration.views import VerifyEmailView
 from .views import CustomPasswordChangeView
 
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from rest_auth.registration.views import SocialLoginView
+
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+
 schema_view = get_schema_view(
     openapi.Info(
         title="Package Beast API",
@@ -70,6 +76,7 @@ urlpatterns = [
     path('accounts/password/change/', CustomPasswordChangeView.as_view()),
     path('accounts/', include('rest_auth.urls')),
     path('accounts/registration/', include('rest_auth.registration.urls')),
+    path('social-login/google/', GoogleLogin.as_view(), name='google_login'),
     re_path(r'^account-confirm-email/', VerifyEmailView.as_view(),
             name='account_email_verification_sent'),
     re_path(

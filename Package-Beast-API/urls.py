@@ -77,6 +77,7 @@ urlpatterns = [
     path('accounts/', include('rest_auth.urls')),
     path('accounts/registration/', include('rest_auth.registration.urls')),
     path('social-login/google/', GoogleLogin.as_view(), name='google_login'),
+    url(r'^accounts/', include('allauth.urls'), name='socialaccount_signup'),
     re_path(r'^account-confirm-email/', VerifyEmailView.as_view(),
             name='account_email_verification_sent'),
     re_path(

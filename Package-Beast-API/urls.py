@@ -33,9 +33,18 @@ from .views import CustomPasswordChangeView
 
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
+from subscription.models import Subscription
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
+
+class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
+    def save_user(self, request, sociallogin, form=None):
+        user = super(CustomSocialAccountAdapter, self).save_user(request, sociallogin, form)
+        Subscription.objects.create_subscription(user)
+        return user
 
 schema_view = get_schema_view(
     openapi.Info(

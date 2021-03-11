@@ -71,8 +71,6 @@ class RegisterSerializer(serializers.Serializer):
         self.cleaned_data = self.get_cleaned_data()
         adapter.save_user(request, user, self)
         setup_user_email(request, user, [])
-
-
         user.save()
         Subscription.objects.create_subscription(user)
 

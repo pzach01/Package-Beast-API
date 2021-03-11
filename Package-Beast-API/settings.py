@@ -234,3 +234,4 @@ STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
 
 AUTH_USER_MODEL = 'users.User'
+SOCIALACCOUNT_ADAPTER = 'Package-Beast-API.urls.CustomSocialAccountAdapter'

@@ -8,7 +8,7 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id', 'container', 'arrangement', 'sku', 'description', 'length', 'width', 'height', 'xDim',
-                  'yDim', 'zDim', 'volume', 'xCenter', 'yCenter', 'zCenter', 'units', 'masterItemId']
+                  'yDim', 'zDim', 'volume', 'xCenter', 'yCenter', 'zCenter', 'units', 'masterItemId', 'weight', 'weightUnits']
         read_only_fields = ['container', 'arrangement',
                             'volume', 'xCenter', 'yCenter', 'zCenter', 'xDim', 'yDim', 'zDim', 'masterItemId']
 
@@ -33,6 +33,8 @@ class ItemSerializer(serializers.ModelSerializer):
         instance.height = validated_data.get('height', instance.height)
         instance.volume = instance.length * instance.width * instance.height
         instance.units = validated_data.get('units', instance.units)
+        instance.weight = validated_data.get('weight', instance.weight)
+        instance.weightUnits = validated_data.get('weightUnits', instance.units)
         instance.save()
         return instance
 

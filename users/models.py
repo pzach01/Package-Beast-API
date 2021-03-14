@@ -58,6 +58,13 @@ class User(AbstractUser):
     disablePreviousNextItemAnimation = models.BooleanField(default=False)
     animationSpeed = models.IntegerField(default=100)
     usersTermsOfServiceRevision = models.IntegerField(default=0)
+    addressLine1 = models.CharField(max_length=100, blank=False, default='')
+    addressLine2 = models.CharField(max_length=100, blank=False, default='')
+    city = models.CharField(max_length=100, blank=False, default='')
+    stateProvince = models.CharField(max_length=50, blank=False, default='')
+    country = models.CharField(max_length=50, blank=False, default='')
+    postalCode = models.CharField(max_length=20, blank=False, default='')
+
     @property
     def termsOfServiceRevision(self):
         termsOfServiceRevision = 2

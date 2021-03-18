@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'drf_yasg',  # 2-7-20 New PZ
     'items',
     'containers',
+    'shipments',
     'arrangements',
     'users',
     'subscription',

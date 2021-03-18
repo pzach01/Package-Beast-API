@@ -38,7 +38,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
         if not(userSubscription.getUserCanCreateArrangment()):
-            raise Http404('user doesnt have right to create arrangment')
+            raise Http404('user doesnt have right to create arrangement')
 
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')

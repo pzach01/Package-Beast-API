@@ -1,8 +1,8 @@
 from django.shortcuts import render
 
 # Create your views here.
-from containers.models import Container
-from containers.serializers import ContainerSerializer
+from shipments.models import Shipment
+from shipments.serializers import ShipmentSerializer
 from rest_framework import generics, viewsets, permissions
 
 
@@ -11,20 +11,20 @@ class IsOwner(permissions.BasePermission):
         return obj.owner == request.user
 
 
-class ContainerList(generics.ListCreateAPIView):
+class ShipmentList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         user = self.request.user
-        return Container.objects.filter(owner=user, arrangement__isnull=True, shipment_isnull=True)
+        return Shipment.objects.filter(owner=user)
 
-    serializer_class = ContainerSerializer
+    serializer_class = ShipmentSerializer
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 
-class ContainerDetail(generics.RetrieveUpdateDestroyAPIView):
+class ShipmentDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
-    queryset = Container.objects.all()
-    serializer_class = ContainerSerializer
+    queryset = Shipment.objects.all()
+    serializer_class = ShipmentSerializer

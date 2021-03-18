@@ -1,8 +1,8 @@
 from django.shortcuts import render
 
 # Create your views here.
-from items.models import Item
-from items.serializers import ItemSerializer
+from quotes.models import Quote
+from quotes.serializers import QuoteSerializer
 from rest_framework import generics, viewsets, permissions
 
 
@@ -11,20 +11,20 @@ class IsOwner(permissions.BasePermission):
         return obj.owner == request.user
 
 
-class ItemList(generics.ListCreateAPIView):
+class QuoteList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
 
     def get_queryset(self):
         user = self.request.user
-        return Item.objects.filter(owner=user, arrangement__isnull=True)
+        return Quote.objects.filter(owner=user)
 
-    serializer_class = ItemSerializer
+    serializer_class = QuoteSerializer
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 
-class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
+class QuoteDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
+    queryset = Quote.objects.all()
+    serializer_class = QuoteSerializer

@@ -116,6 +116,7 @@ urlpatterns = [
     path('', include('containers.urls')),
     path('', include('items.urls')),
     path('', include('shipments.urls')),
+    path('', include('quotes.urls')),
     path('', include('users.urls')),
     path('', include('payment.urls')),
     path('accounts/password/change/', CustomPasswordChangeView.as_view()),

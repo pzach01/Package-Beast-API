@@ -86,6 +86,7 @@ INSTALLED_APPS = [
     'items',
     'containers',
     'shipments',
+    'quotes',
     'arrangements',
     'users',
     'subscription',

@@ -10,7 +10,7 @@ class Quote(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(
         'users.User', related_name='quotes', on_delete=models.CASCADE)
-    carrier = models.CharField(max_length=255,default='My shipment')
+    carrier = models.CharField(max_length=255,default='My carrier')
     daysToShip = models.IntegerField(blank=True, null=True, default=0)
     arrangement = models.ForeignKey(Arrangement, related_name='quotes', on_delete=models.CASCADE, blank=True, null=True)
 admin.site.register(Quote)

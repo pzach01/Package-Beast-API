@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib import admin
-from shipments.models import Shipment
 
 # Create your models here.
 
@@ -14,6 +13,4 @@ class Address(models.Model):
     stateProvince = models.CharField(max_length=50, blank=True, default='')
     country = models.CharField(max_length=50, blank=True, default='')
     postalCode = models.CharField(max_length=20, blank=True, default='')
-    fromOrTo = models.CharField(max_length=4, blank=True, default='from')
-    shipment = models.ForeignKey(Shipment, related_name='addresses', on_delete=models.CASCADE, blank=True, null=True)
 admin.site.register(Address)

@@ -7,17 +7,20 @@ from items.serializers import ItemSerializerWithId
 from containers.models import Container
 from items.models import Item
 from addresses.serializers import AddressSerializer
+from addresses.models import Address
+from rest_framework import serializers
+from addresses.serializers import AddressSerializer
 
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     containers = ContainerSerializer(many=True)
     items = ItemSerializerWithId(many=True)
-    # shipFrom = AddressSerializer().filter(fromOrTo='from')
-    # shipTo = AddressSerializer().filter(fromOrTo='to')
+
     class Meta:
         model = Shipment
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers', 'multiBinPack', 'arrangementPossible', 'timeout']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers', 'multiBinPack', 'arrangementPossible', 'timeout', 'shipFromAddress', 'shipToAddress']
         read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeout']
+
     def create(self, validated_data):
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')

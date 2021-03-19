@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.timezone import now
 from arrangements.models import Arrangement
 from django.contrib import admin
+from addresses.models import Address
 
 # Create your models here.
 
@@ -15,4 +16,6 @@ class Shipment(models.Model):
     multiBinPack = models.BooleanField(default=False)
     arrangementPossible = models.BooleanField(default=False)
     timeout = models.BooleanField(default=False)
+    shipFromAddress = models.ForeignKey(Address, related_name='shipFromAddress', on_delete=models.CASCADE, blank=True, null=True)
+    shipToAddress = models.ForeignKey(Address, related_name='shipToAddress', on_delete=models.CASCADE, blank=True, null=True)
 admin.site.register(Shipment)

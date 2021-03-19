@@ -6,11 +6,14 @@ from containers.serializers import ContainerSerializer
 from items.serializers import ItemSerializerWithId
 from containers.models import Container
 from items.models import Item
+from addresses.serializers import AddressSerializer
 
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     containers = ContainerSerializer(many=True)
     items = ItemSerializerWithId(many=True)
+    # shipFrom = AddressSerializer().filter(fromOrTo='from')
+    # shipTo = AddressSerializer().filter(fromOrTo='to')
     class Meta:
         model = Shipment
         fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers', 'multiBinPack', 'arrangementPossible', 'timeout']

@@ -119,6 +119,7 @@ urlpatterns = [
     path('', include('quotes.urls')),
     path('', include('users.urls')),
     path('', include('payment.urls')),
+    path('', include('addresses.urls')),
     path('accounts/password/change/', CustomPasswordChangeView.as_view()),
     path('accounts/', include('rest_auth.urls')),
     path('accounts/registration/', include('rest_auth.registration.urls')),

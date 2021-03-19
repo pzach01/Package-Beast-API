@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.timezone import now
 from arrangements.models import Arrangement
 from django.contrib import admin
+from shipments.models import Shipment
 
 # Create your models here.
 
@@ -12,5 +13,6 @@ class Quote(models.Model):
         'users.User', related_name='quotes', on_delete=models.CASCADE)
     carrier = models.CharField(max_length=255,default='My carrier')
     daysToShip = models.IntegerField(blank=True, null=True, default=0)
+    shipment = models.ForeignKey(Shipment, related_name='quotes', on_delete=models.CASCADE, blank=True, null=True)
     arrangement = models.ForeignKey(Arrangement, related_name='quotes', on_delete=models.CASCADE, blank=True, null=True)
 admin.site.register(Quote)

@@ -14,5 +14,4 @@ class Arrangement(models.Model):
     class Meta:
         ordering = ['created']
 
-
 admin.site.register(Arrangement)

@@ -8,8 +8,8 @@ class ContainerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Container
         fields = ['id', 'arrangement', 'sku', 'description',
-                  'xDim', 'yDim', 'zDim', 'volume', 'units']
-        read_only_fields = ['arrangement', 'volume']
+                  'xDim', 'yDim', 'zDim', 'volume', 'units', 'shipment']
+        read_only_fields = ['arrangement', 'volume', 'shipment']
 
     def create(self, validated_data):
         userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]

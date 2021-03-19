@@ -53,10 +53,10 @@ class Subscription(models.Model):
     containersAllowed=models.IntegerField(default=SUBSCRIPTION_PROFILES[0][7])
     subscriptionUpdateInProgress=models.BooleanField(default=False)
     def getItemsUsed(self):
-        return Item.objects.filter(owner=self.owner, arrangement__isnull=True).filter(owner=user, shipment__isnull=True).count()
+        return Item.objects.filter(owner=self.owner, arrangement__isnull=True, shipment__isnull=True).count()
     
     def getContainersUsed(self):
-        return Container.objects.filter(owner=self.owner, arrangement__isnull=True).filter(owner=user, shipment__isnull=True).count()
+        return Container.objects.filter(owner=self.owner, arrangement__isnull=True, shipment__isnull=True).count()
     def getPaymentUpToDate(self):
         if not (self.subscriptionType == 'trial'):
             stripeSubscriptions=StripeSubscription.objects.filter(subscription=self).order_by('-created')

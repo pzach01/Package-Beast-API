@@ -9,8 +9,8 @@ from items.models import Item
 
 class QuoteSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
-
     class Meta:
         model = Quote
+        # depth = 1 #this setting expands the depth of the serialized fields
         fields = ['id', 'owner', 'created', 'daysToShip', 'arrangement']
         read_only_fields = ['owner', 'created']

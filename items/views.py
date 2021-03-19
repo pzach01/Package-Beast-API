@@ -16,7 +16,7 @@ class ItemList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Item.objects.filter(owner=user, arrangement__isnull=True)
+        return Item.objects.filter(owner=user, arrangement__isnull=True).filter(owner=user, shipment__isnull=True)
 
     serializer_class = ItemSerializer
 

@@ -16,6 +16,6 @@ class Shipment(models.Model):
     multiBinPack = models.BooleanField(default=False)
     arrangementPossible = models.BooleanField(default=False)
     timeout = models.BooleanField(default=False)
-    shipFromAddress = models.ForeignKey(Address, related_name='shipFromAddress', on_delete=models.CASCADE, blank=True, null=True)
-    shipToAddress = models.ForeignKey(Address, related_name='shipToAddress', on_delete=models.CASCADE, blank=True, null=True)
+    shipFromAddress = models.OneToOneField(Address, related_name='shipmentIsFromAddress', on_delete=models.CASCADE, blank=True, null=True)
+    shipToAddress = models.OneToOneField(Address, related_name='shipmentIsToAddress', on_delete=models.CASCADE, blank=True, null=True)
 admin.site.register(Shipment)

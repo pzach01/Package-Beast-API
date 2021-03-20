@@ -16,8 +16,10 @@ class ShipmentSerializer(serializers.ModelSerializer):
     containers = ContainerSerializer(many=True)
     items = ItemSerializerWithId(many=True)
 
+
     class Meta:
         model = Shipment
+        depth=1
         fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers', 'multiBinPack', 'arrangementPossible', 'timeout', 'shipFromAddress', 'shipToAddress']
         read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeout']
 

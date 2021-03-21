@@ -13,14 +13,13 @@ from addresses.serializers import AddressSerializer
 
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
-    containers = ContainerSerializer(many=True)
-    items = ItemSerializerWithId(many=True)
-
+    # containers = ContainerSerializer(many=True)
+    # items = ItemSerializerWithId(many=True)
 
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers', 'multiBinPack', 'arrangementPossible', 'timeout', 'shipFromAddress', 'shipToAddress']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers', 'multiBinPack', 'arrangementPossible', 'timeout', 'shipFromAddress', 'shipToAddress', 'quotes']
         read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeout']
 
     def create(self, validated_data):

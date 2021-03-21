@@ -12,5 +12,5 @@ class QuoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quote
         # depth = 1 #this setting expands the depth of the serialized fields
-        fields = ['id', 'owner', 'created', 'daysToShip', 'arrangement', 'shipment']
+        fields = ['id', 'owner', 'created', 'daysToShip', 'carrier', 'arrangement', 'shipment']
         read_only_fields = ['owner', 'created']

@@ -36,7 +36,6 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = False
     os.environ['STRIPE_TAX_RATE_ID']='txr_1ICsUoJWFTMXIZUo9c5KbCFS'
-    os.environ['API_ROOT_URL']='https://api.packagebeast.com/'
 
 else:
     SECRET_KEY = '05^q)gef3f(*a^u3-e2b4of@5uh^^#i@roi*54^c2kft*r+*sq'
@@ -57,13 +56,6 @@ else:
     os.environ['STRIPE_API_SECRET']='sk_test_51I76dqE5mpXPYa9nHYN046OuGpuQdNihI2JNfZHPYb05YbGtcr4EXDwytftg6MEgOk6SOvstWxMvFcFtyH67nrEN00xQKQQ6Jv'
     os.environ['STRIPE_WEBHOOK_SECRET']='whsec_sp9erCWYVqUqRZpj3Z99jFrWKtlJNKQO'
     os.environ['STRIPE_TAX_RATE_ID']='txr_1ICrg3E5mpXPYa9nYpguvzzc'
-
-    os.environ['API_ROOT_URL']='https://developmentapi.packagebeast.com/'
-
-    # If not running on development server, we must be running on localhost.
-    # Set api rool url for swagger to localhost
-    if(os.getenv('ENVIRONMENT_TYPE') != 'DEVELOPMENT'):
-        os.environ['API_ROOT_URL']='http://127.0.0.1:8000/'
 
 CORS_ORIGIN_ALLOW_ALL = True
 

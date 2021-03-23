@@ -61,9 +61,9 @@ else:
 
     os.environ['API_ROOT_URL']='https://developmentapi.packagebeast.com/'
 
-    #check if running on localhost?
-    if(sys.argv[1] == 'runserver'):
-        os.environ['API_ROOT_URL']='http://127.0.0.1:8000/'
+    # #check if running on localhost?
+    # if(sys.argv[1] == 'runserver'):
+    #     os.environ['API_ROOT_URL']='http://127.0.0.1:8000/'
 
 CORS_ORIGIN_ALLOW_ALL = True
 

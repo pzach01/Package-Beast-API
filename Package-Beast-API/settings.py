@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -62,9 +61,9 @@ else:
     os.environ['API_ROOT_URL']='https://developmentapi.packagebeast.com/'
 
     #check if running on localhost?
-    if(sys.argv[1] == 'runserver'):
+    LC = False
+    if(LC):
         os.environ['API_ROOT_URL']='http://127.0.0.1:8000/'
-        print(sys.argv)
 
 CORS_ORIGIN_ALLOW_ALL = True
 

@@ -60,9 +60,9 @@ else:
 
     os.environ['API_ROOT_URL']='https://developmentapi.packagebeast.com/'
 
-    #check if running on localhost?
-    LC = False
-    if(LC):
+    # If not running on development server, we must be running on localhost.
+    # Set api rool url for swagger to localhost
+    if(os.getenv('ENVIRONMENT_TYPE') != 'DEVELOPMENT'):
         os.environ['API_ROOT_URL']='http://127.0.0.1:8000/'
 
 CORS_ORIGIN_ALLOW_ALL = True

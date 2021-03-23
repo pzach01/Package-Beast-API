@@ -38,6 +38,9 @@ from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account.models import EmailAddress
 import os
 
+from drf_yasg import openapi
+from drf_yasg.generators import OpenAPISchemaGenerator
+
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
 
@@ -82,6 +85,14 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         Subscription.objects.create_subscription(user)
         return user
 
+class SchemaGenerator(OpenAPISchemaGenerator):
+  def get_schema(self, request=None, public=False):
+    schema = super(SchemaGenerator, self).get_schema(request, public)
+    schema.basePath = os.getenv('API_ROOT_URL')
+    return schema
+
+
+# a = os.getenv('API_ROOT_URL')
 schema_view = get_schema_view(
     openapi.Info(
         title="Package Beast API",
@@ -92,7 +103,7 @@ schema_view = get_schema_view(
         license=openapi.License(
             name="Copyright - Package Beast. All rights reserved"),
     ),
-    url=os.getenv('API_ROOT_URL'), # Important bit
+    # url=a, # Important bit
     public=True,
     permission_classes=(permissions.IsAdminUser,),
 )

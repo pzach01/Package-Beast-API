@@ -58,7 +58,7 @@ else:
     os.environ['STRIPE_WEBHOOK_SECRET']='whsec_sp9erCWYVqUqRZpj3Z99jFrWKtlJNKQO'
     os.environ['STRIPE_TAX_RATE_ID']='txr_1ICrg3E5mpXPYa9nYpguvzzc'
 
-    os.environ['API_ROOT_URL']='https://developmentapi.packagebeast.com/'
+    # os.environ['API_ROOT_URL']='https://developmentapi.packagebeast.com/'
 
     # If not running on development server, we must be running on localhost.
     # Set api rool url for swagger to localhost
@@ -139,11 +139,11 @@ REST_FRAMEWORK = {
 # REST_FRAMEWORK = { 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' }
 
 SWAGGER_SETTINGS = {
-    # 'USE_SESSION_AUTH': False,
     'SECURITY_DEFINITIONS': {
         #   'Basic': {
         #         'type': 'basic'
         #   },
+
         'Token': {
             'type': 'apiKey',
             'name': 'Authorization',

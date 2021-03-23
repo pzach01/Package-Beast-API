@@ -36,6 +36,7 @@ from rest_auth.registration.views import SocialLoginView
 from subscription.models import Subscription
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account.models import EmailAddress
+import os
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
@@ -91,7 +92,7 @@ schema_view = get_schema_view(
         license=openapi.License(
             name="Copyright - Package Beast. All rights reserved"),
     ),
-    url='https://developmentapi.packagebeast.com/', # Important bit
+    url=os.getenv('API_ROOT_URL'), # Important bit
     public=True,
     permission_classes=(permissions.IsAdminUser,),
 )

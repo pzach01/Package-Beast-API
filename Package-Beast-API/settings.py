@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -36,7 +37,7 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = False
     os.environ['STRIPE_TAX_RATE_ID']='txr_1ICsUoJWFTMXIZUo9c5KbCFS'
-
+    os.environ['API_ROOT_URL']='https://api.packagebeast.com/'
 
 else:
     SECRET_KEY = '05^q)gef3f(*a^u3-e2b4of@5uh^^#i@roi*54^c2kft*r+*sq'
@@ -58,8 +59,12 @@ else:
     os.environ['STRIPE_WEBHOOK_SECRET']='whsec_sp9erCWYVqUqRZpj3Z99jFrWKtlJNKQO'
     os.environ['STRIPE_TAX_RATE_ID']='txr_1ICrg3E5mpXPYa9nYpguvzzc'
 
+    os.environ['API_ROOT_URL']='https://developmentapi.packagebeast.com/'
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    #check if running on localhost?
+    if(sys.argv[1] == 'runserver'):
+        os.environ['API_ROOT_URL']='http://127.0.0.1:8000/'
+
 CORS_ORIGIN_ALLOW_ALL = True
 
 DEFAULT_FROM_EMAIL = 'no-reply@packagebeast.com'

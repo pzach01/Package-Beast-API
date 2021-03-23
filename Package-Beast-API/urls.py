@@ -91,6 +91,7 @@ schema_view = get_schema_view(
         license=openapi.License(
             name="Copyright - Package Beast. All rights reserved"),
     ),
+    url='https://developmentapi.packagebeast.com/', # Important bit
     public=True,
     permission_classes=(permissions.IsAdminUser,),
 )

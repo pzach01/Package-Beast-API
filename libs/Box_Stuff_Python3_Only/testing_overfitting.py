@@ -1,10 +1,7 @@
 # tests related to the software's ability to 
 # identify a case where it can't fit all the
 # items into a container
-from . import testing_imports
-from .testing_imports import *
-import math
-from .box_stuff2 import master_calculate_optimal_solution
+
 import time
 def test_for_overfits_both_types_api():
     iterations=10000
@@ -245,5 +242,12 @@ def try_to_expand_in_one_direction_2(existingShape, interiorPoints, directionToE
         interiorPoints.remove(point)
         existingShape.append(point)
     return interiorPoints, existingShape
+
+'''
+from . import testing_imports
+from .testing_imports import *
+import math
+from .box_stuff2 import master_calculate_optimal_solution
 test_for_overfits_both_types_api()
 #test_for_overfits_both_types()
+'''

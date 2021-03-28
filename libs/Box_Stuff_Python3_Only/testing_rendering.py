@@ -1,5 +1,4 @@
-from . import testing_imports
-from .testing_imports import *
+
 def draw_bin(ax,bin_width, bin_height, bin_depth, bin_edge_color='black'):
     ax.plot3D([0,bin_width], [0,0], [0, 0], bin_edge_color)
     ax.plot3D([0, 0], [0,bin_height], [0, 0], bin_edge_color)
@@ -223,7 +222,12 @@ def render_antigravity():
     assert(len(packer.bestItems)==9)
     assert(packer.isOptimal)
     render(packer, container.xDim, container.yDim,container.zDim)
+'''
+from . import testing_imports
+from .testing_imports import *
+
 render_antigravity()
 recursive_bug()
 render_test()
 render_test2()
+'''

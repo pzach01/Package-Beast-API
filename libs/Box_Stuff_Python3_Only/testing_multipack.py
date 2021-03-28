@@ -1,5 +1,4 @@
-from . import testing_imports
-from .testing_imports import *
+
 
 def dz_test_case_dec_10_2020():
     items=['9.75x4.438x7.875' for ele in range(0,21)]
@@ -225,6 +224,10 @@ def weight_testing():
     assert(arrangmentPossible==True)
     usedVolume=sum([bin.volume for bin in containerList if len(bin.boxes) is not 0 ])
     assert(usedVolume==10**3) 
+
+'''
+from . import testing_imports
+from .testing_imports import *
 lz_test_case_dec_13_2020()
 dz_test_case_dec_10_2020()
 #multibinpack_test_1()
@@ -238,3 +241,4 @@ test_3()
 test_4()
 print('passed test 1-4')
 cost_testing()
+'''

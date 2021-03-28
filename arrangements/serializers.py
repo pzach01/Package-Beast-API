@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from arrangements.models import Arrangement
 from django.utils.timezone import now
-from arrangements.Box_Stuff_Python3_Only import box_stuff2 as optimize
+#from arrangements.Box_Stuff_Python3_Only import box_stuff2 as optimize
 
 from users.models import User
 from users.serializers import UserSerializer
@@ -9,7 +9,8 @@ from containers.serializers import ContainerSerializer
 from items.serializers import ItemSerializer, ItemSerializerWithId
 from items.models import Item
 from containers.models import Container
-from .Box_Stuff_Python3_Only import box_stuff2 as bp
+#from .Box_Stuff_Python3_Only import box_stuff2 as bp
+from libs.Box_Stuff_Python3_Only import box_stuff2 as bp
 from subscription.models import Subscription
 from django.http import Http404
 

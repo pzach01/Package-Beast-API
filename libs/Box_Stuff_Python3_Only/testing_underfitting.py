@@ -1,8 +1,7 @@
 
 import copy
 import math
-from . import testing_imports
-from .testing_imports import *
+
 def draw_bin(ax,bin_width, bin_height, bin_depth, bin_edge_color='black'):
     ax.plot3D([0,bin_width], [0,0], [0, 0], bin_edge_color)
     ax.plot3D([0, 0], [0,bin_height], [0, 0], bin_edge_color)
@@ -448,7 +447,10 @@ def test_underfits_multipack():
     for ele in range(0, 100000):
         print(ele)
         test_one_underfit_multipack()
-
-#test_underfits_api()
+'''
+from . import testing_imports
+from .testing_imports import *
+test_underfits_api()
 #test_underfits()
-test_underfits_multipack()
+#test_underfits_multipack()
+'''

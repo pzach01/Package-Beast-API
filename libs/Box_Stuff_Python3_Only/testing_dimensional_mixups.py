@@ -1,6 +1,4 @@
-from . import testing_imports
-from .testing_imports import *
-from .single_pack import DimensionalMixupBigSetsGenerator,DimensionalMixupBigSetsGeneratorWithExhaustiveEnds,DimensionalMixupsGenerator
+
 
 # doesnt test that partitions are optimal, merely that they enumerate all combinations
 def test_2_partition():
@@ -335,7 +333,14 @@ def test_3_partition_with_packer_forwarding():
                 break
         except StopIteration:
             break
-    assert(permutationObserved)          
+    assert(permutationObserved)   
+    
+'''
+from . import testing_imports
+from .testing_imports import *
+from .single_pack import DimensionalMixupBigSetsGenerator,DimensionalMixupBigSetsGeneratorWithExhaustiveEnds,DimensionalMixupsGenerator
+
+
 for ele in range(0, 1000000):
     test_3_partition()
     test_2_partition()
@@ -344,3 +349,4 @@ for ele in range(0, 1000000):
 
     #test_3_partition_with_exhaustive_ending()
     print(ele)
+'''

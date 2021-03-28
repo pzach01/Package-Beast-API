@@ -1,5 +1,4 @@
-from . import testing_imports
-from .testing_imports import *
+
 
 
 
@@ -27,5 +26,9 @@ def test_partial_result_2():
     #usedContainer=containerList[0]
     
     #assert(usedContainer.volume==(4*4*4))
+'''
+from . import testing_imports
+from .testing_imports import *
 test_partial_result_1()
 test_partial_result_2()
+'''

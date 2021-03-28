@@ -1,7 +1,6 @@
 
 
-from . import testing_imports
-from .testing_imports import *
+
 # (not multibinpack= singlepack), this wierd name used to avoid confusing with single_pack.py, the 
 # file used to render/pack items into a single container
 def test_not_multibinpack():
@@ -227,6 +226,11 @@ def hard_test_case():
     end=time.time()
     print('Hard test case:'+str(end-start))
     assert( packer.isOptimal)
+
+'''
+from . import testing_imports
+from .testing_imports import *
+
 print('testing_single_pack.py')
 dz_test_19()
 
@@ -243,3 +247,4 @@ dz_test_18()
 kleenex_test_overfitting()
 test_doublefitting_raises_exception()
 test_not_multibinpack()
+'''

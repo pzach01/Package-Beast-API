@@ -1,4 +1,5 @@
 
+'''
 from . import single_pack
 
 from . import py3dbp_main
@@ -113,3 +114,5 @@ def test_for_outside_container_api(apiObjects):
             assert(0<=item.x-(item.xDim/2)<=item.x+(item.xDim/2)<=container.xDim)
             assert(0<=item.y-(item.yDim/2)<=item.y+(item.yDim/2)<=container.yDim)
             assert(0<=item.z-(item.zDim/2)<=item.z+(item.zDim/2)<=container.zDim)
+
+'''

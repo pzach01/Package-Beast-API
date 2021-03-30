@@ -48,102 +48,100 @@ class ShipmentSerializer(serializers.ModelSerializer):
         if not(userSubscription.getUserCanCreateArrangment()):
             raise Http404('user doesnt have right to create arrangement')
 
+        containerStrings = []
+        itemStrings = []
+        itemIds=[]
+        for container in containers:
+            container['xDim'], container['yDim'], container['zDim'], container['units'] = self.convert_to_inches(container['xDim'], container['yDim'], container['zDim'], container['units'])
+            x,y,z = container['xDim'], container['yDim'], container['zDim']
+            as_string=self.format_as_dimensions(x,y,z)
 
-            containerStrings = []
-            itemStrings = []
-            itemIds=[]
+            containerStrings.append(as_string)
+        for item in items:
+            item['height'], item['length'], item['width'], item['units'] = self.convert_to_inches(item['height'], item['length'], item['width'], item['units'])
+            item['xDim'],item['yDim'],item['zDim'] = item['height'],item['length'],item['width']
+            x,y,z= item['xDim'], item['yDim'], item['zDim']
+            as_string=self.format_as_dimensions(x,y,z)
+
+            itemStrings.append(as_string)
+            itemIds.append(item['id'])
+        #increment the amount of shipments the user has used
+        userSubscription.increment_shipment_requests()
+        apiObjects,timedout,arrangementPossible = bp.master_calculate_optimal_solution(
+            containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
+        for ele in range(0, 2):
+            arrangement = Arrangement.objects.create(**validated_data)
+            arrangement.timeout = timedout
+            arrangement.arrangementPossible = arrangementPossible
+
+            containerList = []
+            index=0
             for container in containers:
-                container['xDim'], container['yDim'], container['zDim'], container['units'] = self.convert_to_inches(container['xDim'], container['yDim'], container['zDim'], container['units'])
-                x,y,z = container['xDim'], container['yDim'], container['zDim']
-                as_string=self.format_as_dimensions(x,y,z)
-
-                containerStrings.append(as_string)
-            for item in items:
-                item['height'], item['length'], item['width'], item['units'] = self.convert_to_inches(item['height'], item['length'], item['width'], item['units'])
-                item['xDim'],item['yDim'],item['zDim'] = item['height'],item['length'],item['width']
-                x,y,z= item['xDim'], item['yDim'], item['zDim']
-                as_string=self.format_as_dimensions(x,y,z)
-
-                itemStrings.append(as_string)
-                itemIds.append(item['id'])
-            #increment the amount of shipments the user has used
-            userSubscription.increment_shipment_requests()
-            apiObjects,timedout,arrangementPossible = bp.master_calculate_optimal_solution(
-                containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
-            for ele in range(0, 2):
-                arrangement = Arrangement.objects.create(**validated_data)
-                arrangement.timeout = timedout
-                arrangement.arrangementPossible = arrangementPossible
-
-                containerList = []
-                index=0
-                for container in containers:
-                    if (not arrangementPossible):
-                        xDim = container['xDim']
-                        yDim = container['yDim']
-                        zDim = container['zDim']
-                    else:
-                        xDim = apiObjects[index].xDim
-                        yDim = apiObjects[index].yDim
-                        zDim = apiObjects[index].zDim
-                        index+=1
-                    sku = container['sku']
-                    description = container['description']
-                    units = container['units']
-                    volume = xDim*yDim*zDim
-                    containerList.append(Container.objects.create(arrangement=arrangement, xDim=xDim, yDim=yDim, zDim=zDim, volume=volume,
-                                                                owner=validated_data['owner'], sku=sku, description=description, units=units))
-                index = 0
-
-
-                if arrangementPossible:
-                    allIds=[item['id'] for item in items]
-                    for container in apiObjects:
-                        for item in container.boxes:
-                            xDim = item.xDim
-                            yDim = item.yDim
-                            zDim = item.zDim
-                            volume = item.xDim*item.yDim*item.zDim
-                            xCenter = item.x
-                            yCenter = item.y
-                            zCenter = item.z
-                            # fields we don't want to expose to optimization code are reinitialized here
-                            itemId = item.id
-
-                            foundItem=None
-                            for lowerItem in items:
-                                if lowerItem['id']==itemId:
-                                    foundItem=lowerItem
-                                    break
-                            if foundItem==None:
-                                raise Exception("clearly a bug")
-                            assert(itemId==foundItem['id'])
-                            allIds.remove(itemId)
-                            masterItemId=foundItem['id']
-                            height = foundItem['height']
-                            width = foundItem['width']
-                            length = foundItem['length']
-                            sku = foundItem['sku']
-                            description = foundItem['description']
-                            units = foundItem['units']
-                            Item.objects.create(xDim=xDim, yDim=yDim, zDim=zDim, volume=volume, container=containerList[container.id], arrangement=arrangement,
-                                                owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units, masterItemId=masterItemId, width=width, length=length, height=height)
-                    # create items that dont fit
-                    for uniqueId in allIds:
-                        item=None
-                        for lowerItem in items:
-                            if lowerItem['id']==uniqueId:
-                                item=lowerItem
-                                break
-                        if item==None:
-                            raise Exception("clearly a bug")
-                        # note the similarity with the code below
-                        volume = item['width']*item['length']*item['height']
-                        Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], masterItemId=item['id'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
-
+                if (not arrangementPossible):
+                    xDim = container['xDim']
+                    yDim = container['yDim']
+                    zDim = container['zDim']
                 else:
-                    for item in items:
-                        volume = item['width']*item['length']*item['height']
-                        Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], masterItemId=item['id'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
+                    xDim = apiObjects[index].xDim
+                    yDim = apiObjects[index].yDim
+                    zDim = apiObjects[index].zDim
+                    index+=1
+                sku = container['sku']
+                description = container['description']
+                units = container['units']
+                volume = xDim*yDim*zDim
+                containerList.append(Container.objects.create(arrangement=arrangement, xDim=xDim, yDim=yDim, zDim=zDim, volume=volume,
+                                                            owner=validated_data['owner'], sku=sku, description=description, units=units))
+            index = 0
 
+
+            if arrangementPossible:
+                allIds=[item['id'] for item in items]
+                for container in apiObjects:
+                    for item in container.boxes:
+                        xDim = item.xDim
+                        yDim = item.yDim
+                        zDim = item.zDim
+                        volume = item.xDim*item.yDim*item.zDim
+                        xCenter = item.x
+                        yCenter = item.y
+                        zCenter = item.z
+                        # fields we don't want to expose to optimization code are reinitialized here
+                        itemId = item.id
+
+                        foundItem=None
+                        for lowerItem in items:
+                            if lowerItem['id']==itemId:
+                                foundItem=lowerItem
+                                break
+                        if foundItem==None:
+                            raise Exception("clearly a bug")
+                        assert(itemId==foundItem['id'])
+                        allIds.remove(itemId)
+                        masterItemId=foundItem['id']
+                        height = foundItem['height']
+                        width = foundItem['width']
+                        length = foundItem['length']
+                        sku = foundItem['sku']
+                        description = foundItem['description']
+                        units = foundItem['units']
+                        Item.objects.create(xDim=xDim, yDim=yDim, zDim=zDim, volume=volume, container=containerList[container.id], arrangement=arrangement,
+                                            owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units, masterItemId=masterItemId, width=width, length=length, height=height)
+                # create items that dont fit
+                for uniqueId in allIds:
+                    item=None
+                    for lowerItem in items:
+                        if lowerItem['id']==uniqueId:
+                            item=lowerItem
+                            break
+                    if item==None:
+                        raise Exception("clearly a bug")
+                    # note the similarity with the code below
+                    volume = item['width']*item['length']*item['height']
+                    Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], masterItemId=item['id'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
+
+            else:
+                for item in items:
+                    volume = item['width']*item['length']*item['height']
+                    Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], masterItemId=item['id'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
         return shipment

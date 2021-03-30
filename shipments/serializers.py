@@ -5,31 +5,145 @@ from subscription.models import Subscription
 from containers.serializers import ContainerSerializer
 from items.serializers import ItemSerializerWithId
 from containers.models import Container
+from arrangements.models import Arrangement
 from items.models import Item
 from addresses.serializers import AddressSerializer
 from addresses.models import Address
 from rest_framework import serializers
 from addresses.serializers import AddressSerializer
-
+from libs.Box_Stuff_Python3_Only import box_stuff2 as bp
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
-    # containers = ContainerSerializer(many=True)
-    # items = ItemSerializerWithId(many=True)
+    containers = ContainerSerializer(many=True)
+    items = ItemSerializerWithId(many=True)
+    # note similiarity to 'timeoutDuration' in arrangment serializers
+    timeout = serializers.IntegerField(write_only=True, min_value=1, max_value=55)
 
     class Meta:
         model = Shipment
         depth=1
         fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers', 'multiBinPack', 'arrangementPossible', 'timeout', 'shipFromAddress', 'shipToAddress', 'quotes']
         read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeout']
-
+    # note that these two methods are found in the arrangments serializer (quite sloppily)
+    def format_as_dimensions(self,x,y,z):
+        return str(x)+'x'+str(y)+'x'+str(z)
+    def convert_to_inches(self,x,y,z,units):
+        if units == "in":
+            return x,y,z,"in"
+        if units == "mm":
+            return x/25.4, y/25.4, z/25.4, "in"
+        if units == "cm":
+            return x/2.54, y/2.54, z/2.54, "in"
+      
     def create(self, validated_data):
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')
+        timeoutDuration=validated_data.pop('timeout')
+        lastSelectedQuoteId=validated_data.pop('lastSelectedQuoteId')
+        # this is actually unused (remove at future date from)
+        multiBinPack=validated_data['multiBinPack']
         shipment = Shipment.objects.create(**validated_data)
-        for container in containers:
-            volume = container['xDim']*container['yDim']*container['zDim']
-            Container.objects.create(shipment = shipment, xDim=container['xDim'], yDim=container['yDim'], zDim=container['zDim'], volume=volume, owner=validated_data['owner'], sku=container['sku'], description=container['description'], units=container['units'])
-        for item in items:
-            Item.objects.create(shipment = shipment, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
+        
+        userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
+        if not(userSubscription.getUserCanCreateArrangment()):
+            raise Http404('user doesnt have right to create arrangement')
+
+
+            containerStrings = []
+            itemStrings = []
+            itemIds=[]
+            for container in containers:
+                container['xDim'], container['yDim'], container['zDim'], container['units'] = self.convert_to_inches(container['xDim'], container['yDim'], container['zDim'], container['units'])
+                x,y,z = container['xDim'], container['yDim'], container['zDim']
+                as_string=self.format_as_dimensions(x,y,z)
+
+                containerStrings.append(as_string)
+            for item in items:
+                item['height'], item['length'], item['width'], item['units'] = self.convert_to_inches(item['height'], item['length'], item['width'], item['units'])
+                item['xDim'],item['yDim'],item['zDim'] = item['height'],item['length'],item['width']
+                x,y,z= item['xDim'], item['yDim'], item['zDim']
+                as_string=self.format_as_dimensions(x,y,z)
+
+                itemStrings.append(as_string)
+                itemIds.append(item['id'])
+            #increment the amount of shipments the user has used
+            userSubscription.increment_shipment_requests()
+            apiObjects,timedout,arrangementPossible = bp.master_calculate_optimal_solution(
+                containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
+            for ele in range(0, 2):
+                arrangement = Arrangement.objects.create(**validated_data)
+                arrangement.timeout = timedout
+                arrangement.arrangementPossible = arrangementPossible
+
+                containerList = []
+                index=0
+                for container in containers:
+                    if (not arrangementPossible):
+                        xDim = container['xDim']
+                        yDim = container['yDim']
+                        zDim = container['zDim']
+                    else:
+                        xDim = apiObjects[index].xDim
+                        yDim = apiObjects[index].yDim
+                        zDim = apiObjects[index].zDim
+                        index+=1
+                    sku = container['sku']
+                    description = container['description']
+                    units = container['units']
+                    volume = xDim*yDim*zDim
+                    containerList.append(Container.objects.create(arrangement=arrangement, xDim=xDim, yDim=yDim, zDim=zDim, volume=volume,
+                                                                owner=validated_data['owner'], sku=sku, description=description, units=units))
+                index = 0
+
+
+                if arrangementPossible:
+                    allIds=[item['id'] for item in items]
+                    for container in apiObjects:
+                        for item in container.boxes:
+                            xDim = item.xDim
+                            yDim = item.yDim
+                            zDim = item.zDim
+                            volume = item.xDim*item.yDim*item.zDim
+                            xCenter = item.x
+                            yCenter = item.y
+                            zCenter = item.z
+                            # fields we don't want to expose to optimization code are reinitialized here
+                            itemId = item.id
+
+                            foundItem=None
+                            for lowerItem in items:
+                                if lowerItem['id']==itemId:
+                                    foundItem=lowerItem
+                                    break
+                            if foundItem==None:
+                                raise Exception("clearly a bug")
+                            assert(itemId==foundItem['id'])
+                            allIds.remove(itemId)
+                            masterItemId=foundItem['id']
+                            height = foundItem['height']
+                            width = foundItem['width']
+                            length = foundItem['length']
+                            sku = foundItem['sku']
+                            description = foundItem['description']
+                            units = foundItem['units']
+                            Item.objects.create(xDim=xDim, yDim=yDim, zDim=zDim, volume=volume, container=containerList[container.id], arrangement=arrangement,
+                                                owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units, masterItemId=masterItemId, width=width, length=length, height=height)
+                    # create items that dont fit
+                    for uniqueId in allIds:
+                        item=None
+                        for lowerItem in items:
+                            if lowerItem['id']==uniqueId:
+                                item=lowerItem
+                                break
+                        if item==None:
+                            raise Exception("clearly a bug")
+                        # note the similarity with the code below
+                        volume = item['width']*item['length']*item['height']
+                        Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], masterItemId=item['id'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
+
+                else:
+                    for item in items:
+                        volume = item['width']*item['length']*item['height']
+                        Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], masterItemId=item['id'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
 
         return shipment

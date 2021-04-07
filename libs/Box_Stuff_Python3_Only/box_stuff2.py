@@ -253,6 +253,163 @@ def hypothetical_binpack(numBins, boxs1, timeout=0, costList=None, binWeightCapa
 
 
 
+# ripoff of fit_all but returns multiple containers
+
+def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys=None, boxWeights=None):
+    possibleToFitOneBox=get_possible_to_fit_one_box(bins1,boxs1)
+    if not possibleToFitOneBox:
+        return None, False, False
+                   
+    import math
+    minCost=math.inf
+    minArrangment=None
+    minPacker=None
+
+    timeSpentAtEndPacking=5
+    timeout-=timeSpentAtEndPacking
+
+    assert((binWeightCapacitys==None and boxWeights==None) or (binWeightCapacitys!=None and binWeightCapacitys!=None))
+    volumeList=[]
+    for ele in bins1:
+        x,y,z=float(ele.split('x')[0]),float(ele.split('x')[1]),float(ele.split('x')[2])
+        volume=x*y*z
+        volumeList.append(truncate_to_nth_decimal_point(volume,3))
+    if(costList==None):
+        costList=volumeList
+        # use volume
+
+    # end replication of bruteforce code
+    indexUsed=None
+    anyTimeout=False
+    bestScore=0
+
+    optimalScore=0
+    for ele in boxs1:
+        x,y,z=float(ele.split('x')[0]),float(ele.split('x')[1]),float(ele.split('x')[2])
+        volume=x*y*z
+        optimalScore+=volume
+    # so that it matches up at 3rd decimal point        
+    optimalScore=truncate_to_nth_decimal_point(optimalScore,3)
+
+    # possible bugs could result from differences in truncation for different fields in the code
+
+    numRotations=3
+    # timeout allocation fractions for each rotation:
+    # f(1)=[1]
+    # f(2)=[1/3, 1]; first gets 1/3 of time remaining, 2nd gets all of time remaining
+    # f(3)=[1/7,1/3, 1]; first gets 1/7 of time remaining, 2nd gets 1/3 of time remaining, last gets all remaining time
+    # ...
+
+    # f(n)=[1] if x==1 else [1/((2**n)-1)]+f(n-1)
+    timeProfilesLambda=lambda x: [1] if x==1 else [1/((2**x)-1)]+timeProfilesLambda(x-1)
+    timeProfiles=timeProfilesLambda(numRotations)
+    noMoreRotations=False
+
+    # best to make this a local method then repeating some code, but dont want to clutter up (already crowded) global namespace
+    def get_indices_remaining(startingIndex,bins,costList, minCost,bestScore,optimalScore,disqualifyTooLight):
+        # sometimes starting index is non-zero to reflect ignoring already searched bins
+        indicesRemaining=[index for index in range(startingIndex, len(bins))]
+        # get containers that could (be cheaper and yield same or better score) or (if not optimal yet yield a better score)
+        indicesRemaining=[index for index in indicesRemaining if ((costList[index]<minCost and volumeList[index]>=bestScore) or  (not bestScore==optimalScore and volumeList[index]>bestScore))]
+
+        # if on the last rotation only use containers that can produce optimal score
+        if (disqualifyTooLight):
+            indicesRemaining=[index for index in indicesRemaining if volumeList[ele]>=optimalScore]
+        return indicesRemaining
+
+    disqualifyTooLight=False
+    for rotation in range(0, numRotations):
+        # lot going on in this line
+        if rotation==(numRotations-1):
+            disqualifyTooLight=True
+        indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight)
+        numRemainingInitial=len(indicesRemainingInitial)
+
+        # redo if disqualifying containers that are too light leads to not searching for the full time
+        if disqualifyTooLight and numRemainingInitial==0:
+            disqualifyTooLight=False
+            indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight)
+            numRemainingInitial=len(indicesRemainingInitial)
+        # override using multiple rotations and try to pack everything in one container in first pass
+        if numRemainingInitial==1:
+            fractionToUseForThisRotation=1
+            noMoreRotations=True
+        else:
+            fractionToUseForThisRotation=timeProfiles[rotation]
+        timeForThisRotation=timeout*fractionToUseForThisRotation
+        start=time.time()
+
+        for ele in range(0, len(bins1)):
+            try:
+                indicesRemaining=get_indices_remaining(ele,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight)
+
+
+                numRemaining=len(indicesRemaining)
+                # override case where there is exactly one item remaining
+
+                # we use this non-verbose form to avoid repeating ourselves (chiefly the condition(s) above)
+                if ele in indicesRemaining:
+                    # sanity check
+                    assert(indicesRemaining[0]==ele)
+                    # cant subscript none so must use lambda
+                    miniCostList=None if costList==None else [costList[ele]]
+                    miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
+
+                    innerStart=time.time()
+                    apiFormat,timedOut,arrangmentPossible,renderingList=master_calculate_optimal_solution([bins1[ele]], boxs1,(timeForThisRotation/numRemaining),True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights,True)
+                    innerEnd=time.time()
+                    timeForThisRotation-=(innerEnd-innerStart)
+                    anyTimeout=True if (timedOut or anyTimeout) else False
+
+                    if arrangmentPossible:
+                        # 3rd decimal point
+                        score=truncate_to_nth_decimal_point(sum([box.volume for box in apiFormat[0].boxes]),3)
+
+                        # this line is still necessary because of the partial results return
+                        if ((score>bestScore) or (score==bestScore and costList[ele]<minCost)):
+                            bestScore=score
+                            # no error, update to better solution
+                            minArrangment=apiFormat
+                            minPacker=renderingList[0]
+                            minCost=costList[ele]
+                            indexUsed=ele
+                        
+            # ran out of time
+            except TimeoutError:
+                pass
+            # no solution, look for next bin
+            except NotImplementedError:
+                pass
+        end=time.time()
+        timeout-=(end-start)
+        if noMoreRotations:
+            break
+    # we have to jankily reformat the API to add a bunch of empty containers
+    containersUsed=[]
+    if indexUsed==None:
+        # no arrangment, timedout, unable to decide if arrangment is possible
+
+        return None, anyTimeout, False
+    else:
+        for ele in range(0, len(bins1)):
+            if ele==indexUsed:
+                assert(len(minArrangment)==1)
+                # update the arrangment id so that it is placed in the right place
+                container=minArrangment[0]
+                container.id=ele
+                # change minArrangment[0] to have the boxes of the packer and then resort
+                lockRecursion=True
+
+                testMode=False
+                if testMode:
+                    minPacker.bestItems=minPacker.bestItems[:max(1,(len(minPacker.bestItems)-random.randint(1,5)))]
+                tightenedContainer=lock_recursion_and_increase_timeout(container,minPacker,timeSpentAtEndPacking,testMode) if lockRecursion else container
+                containersUsed.append(tightenedContainer)
+            else:
+                x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])
+                containersUsed.append(BinAPI(ele,x,y,z,costList[ele],0,False))
+    return containersUsed,anyTimeout,True
+
 
 
 
@@ -420,6 +577,13 @@ def string_wrapper_for_item_class(itemString):
 def string_wrapper_for_container_class(itemString):
     l,w,h=float(itemString.split('x')[0]),float(itemString.split('x')[1]),float(itemString.split('x')[2])
     return ContainerPY3DBP('',l,w,h)
+
+def sieve_containers(bins1, boxs1,timeout=60,multibinpack=True,itemsIds=[],costList=None,binWeightCapacitys=None, boxWeights=None,returnRenderingList=False):
+    if len(boxs1)==0:
+        raise Exception("cant try with no items")
+    assert(not multibinpack)
+    return fit_all_sieve(bins1, boxs1, timeout,itemsIds, costList, binWeightCapacitys, boxWeights)
+
 # bin weights must be in same order, same for box weights
 def master_calculate_optimal_solution(bins1, boxs1,timeout=60,multibinpack=True,itemsIds=[],costList=None,binWeightCapacitys=None, boxWeights=None,returnRenderingList=False):
     # metaparameter, expose to API at some point

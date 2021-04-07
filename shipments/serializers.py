@@ -67,7 +67,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             itemIds.append(item['id'])
         #increment the amount of shipments the user has used
         userSubscription.increment_shipment_requests()
-        apiObjects,timedout,arrangementPossible = bp.master_calculate_optimal_solution(
+        apiObjects,timedout,arrangementPossible = bp.sieve_containers(
             containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
         for ele in range(0, 2):
             arrangement = Arrangement.objects.create(**validated_data)

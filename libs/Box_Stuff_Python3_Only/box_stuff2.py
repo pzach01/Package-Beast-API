@@ -249,7 +249,16 @@ def hypothetical_binpack(numBins, boxs1, timeout=0, costList=None, binWeightCapa
     # then try to reduce dimensions by 1 (this gurantees that at least 1 dimension (x y or z) is tight against the boxes)
 
 
+def get_indices_remaining(startingIndex,bins,costList, minCost,bestScore,optimalScore,disqualifyTooLight,volumeList):
+    # sometimes starting index is non-zero to reflect ignoring already searched bins
+    indicesRemaining=[index for index in range(startingIndex, len(bins))]
+    # get containers that could (be cheaper and yield same or better score) or (if not optimal yet yield a better score)
+    indicesRemaining=[index for index in indicesRemaining if ((costList[index]<minCost and volumeList[index]>=bestScore) or  (not bestScore==optimalScore and volumeList[index]>bestScore))]
 
+    # if on the last rotation only use containers that can produce optimal score
+    if (disqualifyTooLight):
+        indicesRemaining=[index for index in indicesRemaining if volumeList[index]>=optimalScore]
+    return indicesRemaining
 
 
 
@@ -305,30 +314,20 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
     timeProfiles=timeProfilesLambda(numRotations)
     noMoreRotations=False
 
-    # best to make this a local method then repeating some code, but dont want to clutter up (already crowded) global namespace
-    def get_indices_remaining(startingIndex,bins,costList, minCost,bestScore,optimalScore,disqualifyTooLight):
-        # sometimes starting index is non-zero to reflect ignoring already searched bins
-        indicesRemaining=[index for index in range(startingIndex, len(bins))]
-        # get containers that could (be cheaper and yield same or better score) or (if not optimal yet yield a better score)
-        indicesRemaining=[index for index in indicesRemaining if ((costList[index]<minCost and volumeList[index]>=bestScore) or  (not bestScore==optimalScore and volumeList[index]>bestScore))]
 
-        # if on the last rotation only use containers that can produce optimal score
-        if (disqualifyTooLight):
-            indicesRemaining=[index for index in indicesRemaining if volumeList[ele]>=optimalScore]
-        return indicesRemaining
 
     disqualifyTooLight=False
     for rotation in range(0, numRotations):
         # lot going on in this line
         if rotation==(numRotations-1):
             disqualifyTooLight=True
-        indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight)
+        indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight,volumeList)
         numRemainingInitial=len(indicesRemainingInitial)
 
         # redo if disqualifying containers that are too light leads to not searching for the full time
         if disqualifyTooLight and numRemainingInitial==0:
             disqualifyTooLight=False
-            indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight)
+            indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight,volumeList)
             numRemainingInitial=len(indicesRemainingInitial)
         # override using multiple rotations and try to pack everything in one container in first pass
         if numRemainingInitial==1:
@@ -341,7 +340,7 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
 
         for ele in range(0, len(bins1)):
             try:
-                indicesRemaining=get_indices_remaining(ele,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight)
+                indicesRemaining=get_indices_remaining(ele,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight,volumeList)
 
 
                 numRemaining=len(indicesRemaining)
@@ -465,30 +464,20 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
     timeProfiles=timeProfilesLambda(numRotations)
     noMoreRotations=False
 
-    # best to make this a local method then repeating some code, but dont want to clutter up (already crowded) global namespace
-    def get_indices_remaining(startingIndex,bins,costList, minCost,bestScore,optimalScore,disqualifyTooLight):
-        # sometimes starting index is non-zero to reflect ignoring already searched bins
-        indicesRemaining=[index for index in range(startingIndex, len(bins))]
-        # get containers that could (be cheaper and yield same or better score) or (if not optimal yet yield a better score)
-        indicesRemaining=[index for index in indicesRemaining if ((costList[index]<minCost and volumeList[index]>=bestScore) or  (not bestScore==optimalScore and volumeList[index]>bestScore))]
 
-        # if on the last rotation only use containers that can produce optimal score
-        if (disqualifyTooLight):
-            indicesRemaining=[index for index in indicesRemaining if volumeList[ele]>=optimalScore]
-        return indicesRemaining
 
     disqualifyTooLight=False
     for rotation in range(0, numRotations):
         # lot going on in this line
         if rotation==(numRotations-1):
             disqualifyTooLight=True
-        indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight)
+        indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight,volumeList)
         numRemainingInitial=len(indicesRemainingInitial)
 
         # redo if disqualifying containers that are too light leads to not searching for the full time
         if disqualifyTooLight and numRemainingInitial==0:
             disqualifyTooLight=False
-            indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight)
+            indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight,volumeList)
             numRemainingInitial=len(indicesRemainingInitial)
         # override using multiple rotations and try to pack everything in one container in first pass
         if numRemainingInitial==1:
@@ -501,7 +490,7 @@ def fit_all(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys
 
         for ele in range(0, len(bins1)):
             try:
-                indicesRemaining=get_indices_remaining(ele,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight)
+                indicesRemaining=get_indices_remaining(ele,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight,volumeList)
 
 
                 numRemaining=len(indicesRemaining)

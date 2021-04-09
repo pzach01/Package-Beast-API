@@ -447,10 +447,85 @@ def test_underfits_multipack():
     for ele in range(0, 100000):
         print(ele)
         test_one_underfit_multipack()
-'''
+
+# test the sieve
+def test_one_underfit_sieve(printStuff=True):
+    import random
+
+    timeout=30
+    numItems=random.randint(1,15)
+
+    container, items,coordinates=generate_bins_that_fit(numItems)
+
+
+    numContainers=random.randint(1,15)
+    containers=[container.get_dimension_string()]
+    # only save container in this code
+    for ele in range(0, numContainers):
+        container, items,coordinates=generate_bins_that_fit(numItems)
+        containers.append(container.get_dimension_string())
+
+    random.shuffle(containers)
+    if len(items)==0:
+        return 
+
+    # one container as a list
+
+    items=[item.get_dimension_string() for item in items]
+    ids=[ele for ele in range(0, len(items))]
+
+
+    optimalLength=len(items)
+    optimalContainers=[]
+    for container in containers:
+        apiObjects, timedOut, arrangmentPossible=master_calculate_optimal_solution([container],items,timeout,False,ids)
+        # why is this here?
+        if not arrangmentPossible:
+            continue
+        lengthFound=len(apiObjects[0].boxes)
+        if lengthFound==optimalLength:
+            optimalContainers.append(sorted([apiObjects[0].xDim,apiObjects[0].yDim,apiObjects[0].zDim]))
+    # wont need this line when sieve_containers work (no need to distinguish special case from nonworking case anymore)
+    if len(optimalContainers)<=1:
+        print("Nontest case:")
+        
+
+
+    keepGoing=True
+    while(keepGoing):
+        apiObjects, timedOut, arrangmentPossible=box_stuff2.sieve_containers(containers,items,timeout,False,ids)
+        if apiObjects==None:
+            # too wierd to happen during regular behavior
+            raise Exception('wierd stuff')
+        tempContainers=[]
+        for container in apiObjects:
+            lengthFound=len(container.boxes)
+            if lengthFound==optimalLength:
+                tempContainers.append(sorted([container.xDim,container.yDim,container.zDim]))
+        keepGoing=False
+        for item in tempContainers:
+            if item not in optimalContainers:
+                keepGoing=True
+        for item in optimalContainers:
+            if item not in tempContainers:
+                keepGoing=True
+        print(timeout)
+        timeout*=2
+        if timeout>1000:
+            print("Failed test case")
+            return
+    # we always double at the end (so this is the timeout that gave us the answer)
+    print('Successful timeout :'+str(timeout/2))
+
+
+def test_underfits_sieve():
+    for ele in range(0, 100000):
+        print(ele)
+        test_one_underfit_sieve()
+
 from . import testing_imports
 from .testing_imports import *
-test_underfits_api()
+#test_underfits_api()
 #test_underfits()
 #test_underfits_multipack()
-'''
+test_underfits_sieve()

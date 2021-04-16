@@ -485,14 +485,13 @@ def test_one_underfit_sieve(printStuff=True):
         lengthFound=len(apiObjects[0].boxes)
         if lengthFound==optimalLength:
             optimalContainers.append(sorted([apiObjects[0].xDim,apiObjects[0].yDim,apiObjects[0].zDim]))
-    # wont need this line when sieve_containers work (no need to distinguish special case from nonworking case anymore)
-    if len(optimalContainers)<=1:
-        print("Nontest case:")
         
 
 
     keepGoing=True
+
     while(keepGoing):
+        start=time.time()
         apiObjects, timedOut, arrangmentPossible=box_stuff2.sieve_containers(containers,items,timeout,False,ids)
         if apiObjects==None:
             # too wierd to happen during regular behavior
@@ -506,16 +505,18 @@ def test_one_underfit_sieve(printStuff=True):
         for item in tempContainers:
             if item not in optimalContainers:
                 keepGoing=True
-        for item in optimalContainers:
-            if item not in tempContainers:
-                keepGoing=True
         print(timeout)
         timeout*=2
-        if timeout>1000:
+        end=time.time()
+        if timeout>2000:
             print("Failed test case")
-            return
+            raise Exception('failed here')
+        
+    
     # we always double at the end (so this is the timeout that gave us the answer)
-    print('Successful timeout :'+str(timeout/2))
+    for item in tempContainers:
+        assert(item in optimalContainers)
+    print('Successful timeout :'+str(end-start))
 
 
 def test_underfits_sieve():
@@ -523,9 +524,11 @@ def test_underfits_sieve():
         print(ele)
         test_one_underfit_sieve()
 
+'''
 from . import testing_imports
 from .testing_imports import *
 #test_underfits_api()
 #test_underfits()
 #test_underfits_multipack()
-test_underfits_sieve()
+#test_underfits_sieve()
+'''

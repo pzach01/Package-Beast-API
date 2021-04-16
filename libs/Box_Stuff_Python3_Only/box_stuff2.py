@@ -260,7 +260,12 @@ def get_indices_remaining(startingIndex,bins,costList, minCost,bestScore,optimal
         indicesRemaining=[index for index in indicesRemaining if volumeList[index]>=optimalScore]
     return indicesRemaining
 
+def get_possibly_optimal_indices_remaining(startingIndex,bins,costList, minCost,bestScore,optimalScore,volumeList):
+    # sometimes starting index is non-zero to reflect ignoring already searched bins
+    indicesRemaining=[index for index in range(startingIndex, len(bins))]
 
+    indicesRemaining=[index for index in indicesRemaining if volumeList[index]>=optimalScore]
+    return indicesRemaining
 
 # ripoff of fit_all but returns multiple containers
 
@@ -289,6 +294,7 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
 
     # end replication of bruteforce code
     indexUsed=None
+    indicesUsed={}
     anyTimeout=False
     bestScore=0
 
@@ -316,19 +322,9 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
 
 
 
-    disqualifyTooLight=False
     for rotation in range(0, numRotations):
-        # lot going on in this line
-        if rotation==(numRotations-1):
-            disqualifyTooLight=True
-        indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight,volumeList)
-        numRemainingInitial=len(indicesRemainingInitial)
 
-        # redo if disqualifying containers that are too light leads to not searching for the full time
-        if disqualifyTooLight and numRemainingInitial==0:
-            disqualifyTooLight=False
-            indicesRemainingInitial=get_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight,volumeList)
-            numRemainingInitial=len(indicesRemainingInitial)
+        numRemainingInitial=len(get_possibly_optimal_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,volumeList))
         # override using multiple rotations and try to pack everything in one container in first pass
         if numRemainingInitial==1:
             fractionToUseForThisRotation=1
@@ -340,14 +336,14 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
 
         for ele in range(0, len(bins1)):
             try:
-                indicesRemaining=get_indices_remaining(ele,bins1,costList, minCost,bestScore,optimalScore,disqualifyTooLight,volumeList)
+                indicesRemaining=get_possibly_optimal_indices_remaining(ele,bins1,costList, minCost,bestScore,optimalScore,volumeList)
 
 
                 numRemaining=len(indicesRemaining)
                 # override case where there is exactly one item remaining
 
                 # we use this non-verbose form to avoid repeating ourselves (chiefly the condition(s) above)
-                if ele in indicesRemaining:
+                if (ele in indicesRemaining) and (ele not in indicesUsed.keys()):
                     # sanity check
                     assert(indicesRemaining[0]==ele)
                     # cant subscript none so must use lambda
@@ -363,15 +359,10 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
                     if arrangmentPossible:
                         # 3rd decimal point
                         score=truncate_to_nth_decimal_point(sum([box.volume for box in apiFormat[0].boxes]),3)
-
-                        # this line is still necessary because of the partial results return
-                        if ((score>bestScore) or (score==bestScore and costList[ele]<minCost)):
-                            bestScore=score
+                        if score==optimalScore:
                             # no error, update to better solution
-                            minArrangment=apiFormat
-                            minPacker=renderingList[0]
-                            minCost=costList[ele]
-                            indexUsed=ele
+                            indicesUsed[ele]=apiFormat
+
                         
             # ran out of time
             except TimeoutError:
@@ -385,25 +376,19 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
             break
     # we have to jankily reformat the API to add a bunch of empty containers
     containersUsed=[]
-    if indexUsed==None:
+    if len(indicesUsed.keys())==0:
         # no arrangment, timedout, unable to decide if arrangment is possible
 
         return None, anyTimeout, False
     else:
         for ele in range(0, len(bins1)):
-            if ele==indexUsed:
+            if ele in indicesUsed.keys():
+                minArrangment=indicesUsed[ele]
                 assert(len(minArrangment)==1)
                 # update the arrangment id so that it is placed in the right place
                 container=minArrangment[0]
                 container.id=ele
-                # change minArrangment[0] to have the boxes of the packer and then resort
-                lockRecursion=True
-
-                testMode=False
-                if testMode:
-                    minPacker.bestItems=minPacker.bestItems[:max(1,(len(minPacker.bestItems)-random.randint(1,5)))]
-                tightenedContainer=lock_recursion_and_increase_timeout(container,minPacker,timeSpentAtEndPacking,testMode) if lockRecursion else container
-                containersUsed.append(tightenedContainer)
+                containersUsed.append(container)
             else:
                 x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])
                 containersUsed.append(BinAPI(ele,x,y,z,costList[ele],0,False))

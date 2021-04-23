@@ -20,6 +20,5 @@ class Container(models.Model):
     cost = models.FloatField(default=0.0)
     arrangement = models.ForeignKey(
         Arrangement, related_name='containers', on_delete=models.CASCADE, blank=True, null=True)
-    shipment = models.ForeignKey(Shipment, related_name='containers', on_delete=models.CASCADE, blank=True, null=True)
 
 admin.site.register(Container)

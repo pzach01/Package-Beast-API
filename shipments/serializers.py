@@ -15,10 +15,9 @@ from addresses.serializers import AddressSerializer
 from libs.Box_Stuff_Python3_Only import box_stuff2 as bp
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
-    containers = ContainerSerializer(many=True)
-    items = ItemSerializerWithId(many=True)
-    #arrangments=ArrangementSerializer(many=True,read_only_fields=True)
-    # note similiarity to 'timeoutDuration' in arrangment serializers
+    containers = ContainerSerializer(many=True, write_only=True)
+    items = ItemSerializerWithId(many=True, write_only=True)
+    arrangements=ArrangementSerializer(many=True, required=False, read_only=True)
     timeout = serializers.IntegerField(write_only=True, min_value=1, max_value=55)
 
     class Meta:

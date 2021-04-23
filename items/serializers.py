@@ -8,9 +8,9 @@ class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ['id', 'container', 'arrangement', 'sku', 'description', 'length', 'width', 'height', 'xDim',
-                  'yDim', 'zDim', 'volume', 'xCenter', 'yCenter', 'zCenter', 'units', 'masterItemId', 'weight', 'weightUnits', 'shipment']
+                  'yDim', 'zDim', 'volume', 'xCenter', 'yCenter', 'zCenter', 'units', 'masterItemId', 'weight', 'weightUnits']
         read_only_fields = ['container', 'arrangement',
-                            'volume', 'xCenter', 'yCenter', 'zCenter', 'xDim', 'yDim', 'zDim', 'masterItemId', 'shipment']
+                            'volume', 'xCenter', 'yCenter', 'zCenter', 'xDim', 'yDim', 'zDim', 'masterItemId']
 
     def create(self, validated_data):
         userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]

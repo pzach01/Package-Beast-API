@@ -33,8 +33,6 @@ class Item(models.Model):
         Container, related_name='items', on_delete=models.CASCADE, blank=True, null=True)
     arrangement = models.ForeignKey(
         Arrangement, related_name='items', on_delete=models.CASCADE, blank=True, null=True)
-    shipment = models.ForeignKey(
-        Shipment, related_name='items', on_delete=models.CASCADE, blank=True, null=True)
     xCenter = models.FloatField(default=0.0, blank=True, null=True)
     yCenter = models.FloatField(default=0.0, blank=True, null=True)
     zCenter = models.FloatField(default=0.0, blank=True, null=True)

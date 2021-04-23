@@ -69,6 +69,9 @@ class ShipmentSerializer(serializers.ModelSerializer):
         userSubscription.increment_shipment_requests()
         apiObjects,timedout,arrangementPossible = bp.sieve_containers(
             containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
+        if not arrangementPossible:
+            raise Http404('No arrangment possible. Try again with bigger containers or smaller items.')
+
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
         for ele in range(0, len(apiObjects)):

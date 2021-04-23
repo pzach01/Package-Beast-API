@@ -78,3 +78,47 @@ class ShipmentsTests(APITestCase):
             print("Shipments test 1 Passed")
         except:
             print("-----------Shipments test 1 Failed")
+
+
+# QUESTION ASKED: what happens if you cant fit any containers?
+    def test_2(self):
+        try:
+            inputData={
+            "title": "string",
+            "lastSelectedQuoteId": 0,
+            "items": [
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 2,
+                "width": 2,
+                "height": 2,
+                "units": "in",
+                "weight": 0,
+                "weightUnits": "lb"
+                }
+            ],
+            "containers": [
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 1,
+                "yDim": 1,
+                "zDim": 1,
+                "units": "in"
+                }
+            ],
+            "multiBinPack": False,
+            "timeout": 15
+            }
+
+
+
+
+            data=self.generic_logic(inputData)
+            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+
+            print("Shipments test 2 Passed")
+        except:
+            print("-----------Shipments test 2 Failed")

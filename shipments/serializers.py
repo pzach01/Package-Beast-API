@@ -3,6 +3,7 @@ from shipments.models import Shipment
 from django.http import Http404
 from subscription.models import Subscription
 from containers.serializers import ContainerSerializer
+from arrangements.serializers import ArrangementSerializer
 from items.serializers import ItemSerializerWithId
 from containers.models import Container
 from arrangements.models import Arrangement
@@ -16,14 +17,15 @@ class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     containers = ContainerSerializer(many=True)
     items = ItemSerializerWithId(many=True)
+    #arrangments=ArrangementSerializer(many=True,read_only_fields=True)
     # note similiarity to 'timeoutDuration' in arrangment serializers
     timeout = serializers.IntegerField(write_only=True, min_value=1, max_value=55)
 
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers', 'multiBinPack', 'arrangementPossible', 'timeout', 'shipFromAddress', 'shipToAddress', 'quotes']
-        read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeout']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeout', 'shipFromAddress', 'shipToAddress', 'quotes']
+        read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeout','arrangements']
     # note that these two methods are found in the arrangments serializer (quite sloppily)
     def format_as_dimensions(self,x,y,z):
         return str(x)+'x'+str(y)+'x'+str(z)
@@ -69,15 +71,18 @@ class ShipmentSerializer(serializers.ModelSerializer):
         userSubscription.increment_shipment_requests()
         apiObjects,timedout,arrangementPossible = bp.sieve_containers(
             containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
+        shipment.arrangementPossible=arrangementPossible
         if not arrangementPossible:
-            raise Http404('No arrangment possible. Try again with bigger containers or smaller items.')
+            raise Http404('No arrangement possible. Try again with bigger containers or smaller items.')
 
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
         for ele in range(0, len(apiObjects)):
-            arrangement = Arrangement.objects.create(**validated_data)
+            arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
             arrangement.timeout = timedout
             arrangement.arrangementPossible = arrangementPossible
+            arrangement.shipment=shipment
+            arrangement.save()
 
             containerList = []
             if (len(apiObjects[ele].boxes)>0):
@@ -133,3 +138,4 @@ class ShipmentSerializer(serializers.ModelSerializer):
                     volume = item['width']*item['length']*item['height']
                     Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], masterItemId=item['id'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
         return shipment
+

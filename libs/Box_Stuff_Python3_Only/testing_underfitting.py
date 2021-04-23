@@ -496,6 +496,7 @@ def test_one_underfit_sieve(printStuff=True):
         if apiObjects==None:
             # too wierd to happen during regular behavior
             raise Exception('wierd stuff')
+        assert(arrangmentPossible)
         # check that containers are returned in same order as they were input (needed in shippments.serializer; but not strictly necessary everywhere else)
         for index in range(0,len(containers)):
             x,y,z=containers[index].split('x')[0],containers[index].split('x')[1],containers[index].split('x')[2]

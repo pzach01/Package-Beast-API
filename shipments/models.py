@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.timezone import now
-from arrangements.models import Arrangement
 from django.contrib import admin
 from addresses.models import Address
 

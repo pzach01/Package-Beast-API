@@ -24,8 +24,8 @@ class ArrangementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Arrangement
-        fields = ['id', 'created', 'owner', 'arrangementPossible', 'timeout', 'multiBinPack', 'timeoutDuration', 'containers', 'items','title']
-        read_only_fields = ['arrangementPossible', 'timeout']       
+        fields = ['id', 'created', 'owner', 'arrangementPossible', 'timeout', 'multiBinPack', 'timeoutDuration', 'containers', 'items','title','shipment']
+        read_only_fields = ['arrangementPossible', 'timeout','shipment']       
     def format_as_dimensions(self,x,y,z):
         return str(x)+'x'+str(y)+'x'+str(z)
     def convert_to_inches(self,x,y,z,units):
@@ -151,3 +151,5 @@ class ArrangementSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+

@@ -166,7 +166,18 @@ class ShipmentsTests(APITestCase):
 
         data=self.generic_logic(inputData)
         assert(data['arrangementPossible']==True)
+        
+        # check the return data for truth
+        assert(data['arrangements'][0]['items'][0]['xCenter']==.5)
+        assert(data['arrangements'][0]['items'][0]['yCenter']==.5)
+        assert(data['arrangements'][0]['items'][0]['zCenter']==.5)
+        
         arrangmentId=data['arrangements'][0]['id']
+
+
+
+
+        # check the database for truth
         arrangementData=(self.get_arrangment(arrangmentId))
         # this test will fail without saving the arrangment, very odd because item data is still returned
         assert(arrangementData['arrangementPossible']==True)
@@ -224,7 +235,18 @@ class ShipmentsTests(APITestCase):
 
 
             data=self.generic_logic(inputData)
+            # check the return data for truth
+
             assert(data['arrangementPossible']==True)
+            
+            assert(data['arrangements'][0]['items'][0]['xCenter']==.5)
+            assert(data['arrangements'][0]['items'][0]['yCenter']==.5)
+            assert(data['arrangements'][0]['items'][0]['zCenter']==.5)
+
+
+            assert(data['arrangements'][1]['items'][0]['xCenter']==.5)
+            assert(data['arrangements'][1]['items'][0]['yCenter']==.5)
+            assert(data['arrangements'][1]['items'][0]['zCenter']==.5)
             assert(len(data['arrangements'])==2)
             # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
 

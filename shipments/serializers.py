@@ -19,6 +19,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
     items = ItemSerializerWithId(many=True, write_only=True)
     arrangements=ArrangementSerializer(many=True, required=False, read_only=True)
     timeout = serializers.IntegerField(write_only=True, min_value=1, max_value=55)
+    shipToAddress = AddressSerializer()
+    shipFromAddress = AddressSerializer()
 
     class Meta:
         model = Shipment

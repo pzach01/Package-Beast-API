@@ -25,6 +25,164 @@ class ShipmentSerializer(serializers.ModelSerializer):
         depth=1
         fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeout', 'shipFromAddress', 'shipToAddress', 'quotes']
         read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeout','arrangements']
+    def make_ups_request(self,shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim):
+        # note that this is not production url
+        testUrl='https://wwwcie.ups.com/ups.app/xml/Rate'
+        testUrl=testUrl.replace('\n', '')
+
+        # no pickup type
+        # RequestOption can be changed to Rate to get a single rate for a single service, Shop specifies all
+        # should 'AttentionName' be included ?
+        # see package code for specific subtypes of packages like:
+        #00 = UNKNOWN
+        #01 = UPS Letter
+        #02 = Package
+        #03 = Tube
+        #04 = Pak
+        #21 = Express Box
+        #24 = 25KG Box
+        #25 = 10KG Box
+        #30 = Pallet
+        #2a = Small Express
+        #Box
+        #2b = Medium Express
+        #Box
+        #2c = Large Express
+        #Box.
+        # can add in some stuff to support cms
+
+        shipperName='Lucas Zach'
+        shipperPhoneNumber='5156573318'
+        shipperAddressLineOne='13178 Oakbrook Drive'
+        shipperCity='Des Moines'
+        shipperStateProvinceCode='IA'
+        shipperPostalCode='50323'
+        shipperCountryCode='US'
+
+        shipToCountryCode='US'
+
+        shipFromCountryCode='US'
+        #LBS = Pounds, KGS =Kilograms.
+        unitOfMeasurement='LBS'
+        xml='''
+        <?xml version="1.0"?>
+
+        <AccessRequest xml:lang="en-US">
+        <AccessLicenseNumber>5D9635047BCF95F2</AccessLicenseNumber>
+        <UserId>LucasZach35</UserId>
+        <Password>Letsgetit35!</Password>
+        </AccessRequest>
+
+        <?xml version="1.0"?>
+        <RatingServiceSelectionRequest xml:lang="en-US">
+
+        <Request>
+        <TransactionReference>
+        <CustomerContext>This string will be in the response</CustomerContext>
+        </TransactionReference>
+        <RequestAction>Shop</RequestAction>
+        <RequestOption>Shop</RequestOption>
+        </Request>
+        '''
+        xml+='<Shipment>'
+
+        xml+='<Shipper>'
+
+        xml+='<Name>'+shipperName+'</Name>'
+        xml+='<AttentionName></AttentionName>'
+        xml+='<PhoneNumber>'+shipperPhoneNumber+'</PhoneNumber>'
+        xml+='<FaxNumber></FaxNumber>'
+        xml+='<ShipperNumber></ShipperNumber>'
+
+        xml+='<Address>'
+        xml+='<AddressLine1>'+shipperAddressLineOne+'</AddressLine1>'
+        xml+='<City>'+shipperCity+'</City>'
+        xml+='<StateProvinceCode>'+shipperStateProvinceCode+'</StateProvinceCode>'
+        xml+='<PostalCode>'+shipperPostalCode+'</PostalCode>'
+        xml+='<CountryCode>'+shipperCountryCode+'</CountryCode>'
+        xml+='</Address>'
+
+        xml+='</Shipper>'
+
+        xml+='<ShipTo>'
+
+        xml+='<CompanyName></CompanyName>'
+        xml+='<AttentionName>'+shipToAttentionName+'</AttentionName>'
+        xml+='<PhoneNumber>'+shipToPhoneNumber+'</PhoneNumber>'
+        xml+='<FaxNumber></FaxNumber>'
+
+        xml+='<Address>'
+        xml+='<AddressLine1>'+shipToAddressLineOne+'</AddressLine1>'
+        xml+='<City>'+shipToCity+'</City>'
+        xml+='<StateProvinceCode>'+shipToStateProvinceCode+'</StateProvinceCode>'
+        xml+='<PostalCode>'+shipToPostalCode+'</PostalCode>'
+        xml+='<CountryCode>'+shipToCountryCode+'</CountryCode>'
+        xml+='</Address>'
+
+        xml+='</ShipTo>'
+
+
+        xml+='<ShipFrom>'
+        xml+='<CompanyName></CompanyName>'
+        xml+='<AttentionName>'+shipFromAttentionName+'</AttentionName>'
+        xml+='<PhoneNumber>'+shipFromPhoneNumber+'</PhoneNumber>'
+        xml+='<FaxNumber></FaxNumber>'
+        
+        xml+='<Address>'
+        xml+='<AddressLine1>'+shipFromAddressLineOne+'</AddressLine1>'
+        xml+='<City>'+shipFromCity+'</City>'
+        xml+='<StateProvinceCode>'+shipFromStateProvinceCode+'</StateProvinceCode>'
+        xml+='<PostalCode>'+shipFromPostalCode+'</PostalCode>'
+        xml+='<CountryCode>'+shipFromCountryCode+'</CountryCode>'
+        xml+='</Address>'
+
+        xml+='</ShipFrom>'
+        
+        # review what these mean
+        xml+='''
+        <Service>
+        <Code>03</Code>
+        <Description>UPS Ground</Description>
+        </Service>
+
+        <Package>
+
+        <PackagingType>
+        <Code>02</Code>
+        <Description>UPS Package</Description>
+        </PackagingType>
+        '''
+
+        xml+='<PackageWeight>'
+        xml+='<UnitOfMeasurement>'
+        xml+='<Code>'+unitOfMeasurement+'</Code>'
+        xml+='</UnitOfMeasurement>'
+        xml+='<Weight>'+weight+'</Weight>'
+        xml+='</PackageWeight>'
+
+        xml+='<Dimensions>'
+        xml+='<Length>'+xDim+'</Length>'
+        xml+='<Width>'+yDim+'</Width>'
+        xml+='<Height>'+zDim+'</Height>'
+        xml+='</Dimensions>'
+        xml+='</Package>'
+
+        xml+='</Shipment>'
+        xml+='</RatingServiceSelectionRequest>'
+        
+
+        import requests
+        # 21.90
+        #r = requests.get(get_shipping_cost_info_string('10','2','LG FLAT RATE BOX','','',''))
+
+        # 15.55
+        r = requests.post(testUrl,data=xml)
+
+        dataAsText=(r.text)
+        import xmltodict
+        import json
+        o = xmltodict.parse(dataAsText)
+        return o
     # note that these two methods are found in the arrangments serializer (quite sloppily)
     def format_as_dimensions(self,x,y,z):
         return str(x)+'x'+str(y)+'x'+str(z)
@@ -37,6 +195,10 @@ class ShipmentSerializer(serializers.ModelSerializer):
             return x/2.54, y/2.54, z/2.54, "in"
       
     def create(self, validated_data):
+        # make no more then 10 api requests
+        requestLimit=10
+        requestsMade=0
+
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')
         timeoutDuration=validated_data.pop('timeout')
@@ -73,7 +235,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
         shipment.arrangementPossible=arrangementPossible
         if not arrangementPossible:
             raise Http404('No arrangement possible. Try again with bigger containers or smaller items.')
-
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
         for ele in range(0, len(apiObjects)):
@@ -136,5 +297,11 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 for item in items:
                     volume = item['width']*item['length']*item['height']
                     Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], masterItemId=item['id'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
+
+            if requestsMade<requestLimit:
+                try:
+                    quotesAsTuples=self.make_ups_request(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim)
+                except:
+                    pass    
         return shipment
 

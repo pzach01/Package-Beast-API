@@ -11,8 +11,8 @@ from items.models import Item
 from addresses.serializers import AddressSerializer
 from addresses.models import Address
 from rest_framework import serializers
-from addresses.serializers import AddressSerializer
 from libs.Box_Stuff_Python3_Only import box_stuff2 as bp
+
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     containers = ContainerSerializer(many=True, write_only=True)
@@ -207,8 +207,18 @@ class ShipmentSerializer(serializers.ModelSerializer):
         lastSelectedQuoteId=validated_data.pop('lastSelectedQuoteId')
         # this is actually unused (remove at future date from)
         multiBinPack=validated_data['multiBinPack']
-        shipment = Shipment.objects.create(**validated_data)
-        
+
+        # shipFromAddress=Address.objects.create(validated_data.pop('shipFromAddress'))
+        # shipToAddress=Address.objects.create(validated_data.pop('shipToAddress'))
+        # print(shipToAddress)
+        shipFromAddress_data = validated_data.pop('shipFromAddress')
+        shipFromAddress=Address.objects.create(owner=validated_data['owner'], **shipFromAddress_data)
+
+        shipToAddress_data = validated_data.pop('shipToAddress')
+        shipToAddress=Address.objects.create(owner=validated_data['owner'], **shipToAddress_data)
+
+        shipment = Shipment.objects.create(shipFromAddress=shipFromAddress, shipToAddress=shipToAddress, **validated_data)
+
         userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
         if not(userSubscription.getUserCanCreateArrangment()):
             raise Http404('user doesnt have right to create arrangement')

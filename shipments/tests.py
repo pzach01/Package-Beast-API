@@ -72,7 +72,23 @@ class ShipmentsTests(APITestCase):
                 }
             ],
             "multiBinPack": False,
-            "timeout": 15
+            "timeout": 15,
+            "shipFromAddress": {
+                "addressLine1": "string",
+                "addressLine2": "string",
+                "city": "string",
+                "stateProvince": "string",
+                "country": "string",
+                "postalCode": "string"
+            },
+            "shipToAddress": {
+                "addressLine1": "string",
+                "addressLine2": "string",
+                "city": "string",
+                "stateProvince": "string",
+                "country": "string",
+                "postalCode": "string"
+            }
             }
 
 
@@ -116,7 +132,23 @@ class ShipmentsTests(APITestCase):
                 }
             ],
             "multiBinPack": False,
-            "timeout": 15
+            "timeout": 15,
+            "shipFromAddress": {
+                "addressLine1": "string",
+                "addressLine2": "string",
+                "city": "string",
+                "stateProvince": "string",
+                "country": "string",
+                "postalCode": "string"
+            },
+            "shipToAddress": {
+                "addressLine1": "string",
+                "addressLine2": "string",
+                "city": "string",
+                "stateProvince": "string",
+                "country": "string",
+                "postalCode": "string"
+            }
             }
 
 
@@ -158,7 +190,23 @@ class ShipmentsTests(APITestCase):
             }
         ],
         "multiBinPack": False,
-        "timeout": 15
+        "timeout": 15,
+        "shipFromAddress": {
+            "addressLine1": "string",
+            "addressLine2": "string",
+            "city": "string",
+            "stateProvince": "string",
+            "country": "string",
+            "postalCode": "string"
+        },
+        "shipToAddress": {
+            "addressLine1": "string",
+            "addressLine2": "string",
+            "city": "string",
+            "stateProvince": "string",
+            "country": "string",
+            "postalCode": "string"
+        }
         }
 
 
@@ -228,8 +276,25 @@ class ShipmentsTests(APITestCase):
                 }
             ],
             "multiBinPack": False,
-            "timeout": 15
+            "timeout": 15,
+            "shipFromAddress": {
+                "addressLine1": "string",
+                "addressLine2": "string",
+                "city": "string",
+                "stateProvince": "string",
+                "country": "string",
+                "postalCode": "string"
+            },
+            "shipToAddress": {
+                "addressLine1": "string",
+                "addressLine2": "string",
+                "city": "string",
+                "stateProvince": "string",
+                "country": "string",
+                "postalCode": "string"
             }
+            }
+
 
 
 

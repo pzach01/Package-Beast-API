@@ -74,19 +74,21 @@ class ShipmentsTests(APITestCase):
             "multiBinPack": False,
             "timeout": 15,
             "shipFromAddress": {
+                "name":"Lucas Z",
+                "phoneNumber":"5156573318",
                 "addressLine1": "string",
                 "addressLine2": "string",
                 "city": "string",
                 "stateProvince": "string",
-                "country": "string",
                 "postalCode": "string"
             },
-            "shipToAddress": {
+            "shipToAddress":{
+                "name":"Lucas Z",
+                "phoneNumber":"5156573318",
                 "addressLine1": "string",
                 "addressLine2": "string",
                 "city": "string",
                 "stateProvince": "string",
-                "country": "string",
                 "postalCode": "string"
             }
             }
@@ -134,19 +136,21 @@ class ShipmentsTests(APITestCase):
             "multiBinPack": False,
             "timeout": 15,
             "shipFromAddress": {
+                "name":"Lucas Z",
+                "phoneNumber":"5156573318",
                 "addressLine1": "string",
                 "addressLine2": "string",
                 "city": "string",
                 "stateProvince": "string",
-                "country": "string",
                 "postalCode": "string"
             },
-            "shipToAddress": {
+            "shipToAddress":{
+                "name":"Lucas Z",
+                "phoneNumber":"5156573318",
                 "addressLine1": "string",
                 "addressLine2": "string",
                 "city": "string",
                 "stateProvince": "string",
-                "country": "string",
                 "postalCode": "string"
             }
             }
@@ -192,19 +196,21 @@ class ShipmentsTests(APITestCase):
         "multiBinPack": False,
         "timeout": 15,
         "shipFromAddress": {
+            "name":"Lucas Z",
+            "phoneNumber":"5156573318",
             "addressLine1": "string",
             "addressLine2": "string",
             "city": "string",
             "stateProvince": "string",
-            "country": "string",
             "postalCode": "string"
         },
-        "shipToAddress": {
+        "shipToAddress":{
+            "name":"Lucas Z",
+            "phoneNumber":"5156573318",
             "addressLine1": "string",
             "addressLine2": "string",
             "city": "string",
             "stateProvince": "string",
-            "country": "string",
             "postalCode": "string"
         }
         }
@@ -278,19 +284,21 @@ class ShipmentsTests(APITestCase):
             "multiBinPack": False,
             "timeout": 15,
             "shipFromAddress": {
+                "name":"Lucas Z",
+                "phoneNumber":"5156573318",
                 "addressLine1": "string",
                 "addressLine2": "string",
                 "city": "string",
                 "stateProvince": "string",
-                "country": "string",
                 "postalCode": "string"
             },
-            "shipToAddress": {
+            "shipToAddress":{
+                "name":"Customer1",
+                "phoneNumber":"5156573318",
                 "addressLine1": "string",
                 "addressLine2": "string",
                 "city": "string",
                 "stateProvince": "string",
-                "country": "string",
                 "postalCode": "string"
             }
             }

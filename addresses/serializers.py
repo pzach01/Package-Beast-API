@@ -6,5 +6,5 @@ class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
         # depth = 1 #this setting expands the depth of the serialized fields
-        fields = ['id', 'owner', 'name','phoneNumber','addressLine1', 'addressLine2', 'city', 'stateProvince', 'postalCode']
+        fields = ['id', 'owner', 'name','phoneNumber','addressLine1', 'addressLine2', 'city', 'stateProvinceCode', 'postalCode']
         read_only_fields = ['owner', 'created']

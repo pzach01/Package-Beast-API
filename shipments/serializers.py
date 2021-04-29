@@ -312,7 +312,21 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
             if requestsMade<requestLimit:
                 try:
-                    quotesAsTuples=self.make_ups_request(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim)
+                    shipToAttentionName=shipToAddress.name
+                    shipToPhoneNumber=shipToAddress.phoneNumber
+                    shipToAddressLineOne=shipToAddress.addressLine1
+                    shipToCity=shipToAddress.city
+                    shipToStateProvinceCode=shipToAddress.stateProvinceCode
+                    shipToPostalCode=shipToAddress.postalCode
+
+
+                    shipFromAttentionName=shipFromAddress.name
+                    shipFromPhoneNumber=shipFromAddress.phoneNumber
+                    shipFromAddressLineOne=shipFromAddress.addressLine1
+                    shipFromCity=shipFromAddress.city
+                    shipFromStateProvinceCode=shipFromAddress.stateProvinceCode
+                    shipFromPostalCode=shipFromAddress.postalCode
+                    #quotesAsTuples=self.make_ups_request(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim)
                 except:
                     pass    
         return shipment

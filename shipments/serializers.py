@@ -2,6 +2,7 @@ from rest_framework import serializers
 from shipments.models import Shipment
 from django.http import Http404
 from subscription.models import Subscription
+from quotes.models import Quote
 from containers.serializers import ContainerSerializer
 from arrangements.serializers import ArrangementSerializer
 from items.serializers import ItemSerializerWithId
@@ -210,6 +211,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 serviceDescription='3 Day Select'
             if serviceCode=='13':
                 serviceDescription='Next Day Air Saver'
+            if serviceCode=='14':
+                serviceDescription='UPS Next Day Air Early'
             if serviceCode=='59':
                 serviceDescription='2nd Day Air A.M.'
             #Valid international values:
@@ -386,6 +389,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 zDim=str(zDim)
                 quotesAsTuples=self.make_ups_request(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim)
                 for quote in quotesAsTuples:
-                    pass
+                    #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
+                    Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4])
         return shipment
 

@@ -12,7 +12,10 @@ class Quote(models.Model):
     owner = models.ForeignKey(
         'users.User', related_name='quotes', on_delete=models.CASCADE)
     carrier = models.CharField(max_length=255,default='My carrier')
-    daysToShip = models.IntegerField(blank=True, null=True, default=0)
+    cost=models.DecimalField(max_digits=7,decimal_places=2,default=-1)
+    serviceDescription= models.CharField(max_length=255,default='SERVICE DESCRIPTION')
+    daysToShip = models.CharField(max_length=255,blank=True, null=True, default="DAYS TO SHIP")
+    scheduledDeliveryTime=models.CharField(max_length=255,blank=True,null=True,default='SCHEDULED DELIVERY TIME')
     shipment = models.ForeignKey(Shipment, related_name='quotes', on_delete=models.CASCADE, blank=True, null=True)
     arrangement = models.ForeignKey(Arrangement, related_name='quotes', on_delete=models.CASCADE, blank=True, null=True)
 admin.site.register(Quote)

@@ -87,7 +87,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
         </Request>
         '''
         xml+='<Shipment>'
-
         xml+='<Shipper>'
 
         xml+='<Name>'+shipperName+'</Name>'
@@ -141,6 +140,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         xml+='</ShipFrom>'
         
         # review what these mean
+        # ignored because of shopping
         xml+='''
         <Service>
         <Code>03</Code>
@@ -183,8 +183,48 @@ class ShipmentSerializer(serializers.ModelSerializer):
         dataAsText=(r.text)
         import xmltodict
         import json
-        o = xmltodict.parse(dataAsText)
-        return o
+        dataDict = xmltodict.parse(dataAsText)
+        nestOne=dataDict['RatingServiceSelectionResponse']
+        assert(nestOne['Response']['ResponseStatusDescription']=="Success")
+
+        ratedShipments=nestOne['RatedShipment']
+        tupleList=[]
+        for r in ratedShipments:
+            carrier='UPS'
+            if not r['TotalCharges']['CurrencyCode']=='USD':
+                raise Exception("unsupported currency")
+            cost=r['TotalCharges']['MonetaryValue']
+            guranteedDaysToDelivery=r['GuaranteedDaysToDelivery']
+            serviceCode=r['Service']['Code']
+            scheduledDeliveryTime=r['ScheduledDeliveryTime']
+            serviceDescription='Error'
+
+            # couldnt find how to force response to include serviceDescription 
+            if serviceCode=='01':
+                serviceDescription='Next Day Air'
+            if serviceCode=='02':
+                serviceDescription='2nd Day Air'
+            if serviceCode=='03':
+                serviceDescription='Ground'
+            if serviceCode=='12':
+                serviceDescription='3 Day Select'
+            if serviceCode=='13':
+                serviceDescription='Next Day Air Saver'
+            if serviceCode=='59':
+                serviceDescription='2nd Day Air A.M.'
+            #Valid international values:
+            #07 = Worldwide Express
+            #08 = Worldwide Expedited
+            #11= Standard
+            #54 = Worldwide Express Plus
+            #65 = Saver
+            #96 = UPS Worldwide Express
+            #Freight
+            #71 = UPS Worldwide
+            if (serviceCode=='07') or (serviceCode=='08') or (serviceCode=='11') or (serviceCode=='54') or (serviceCode=='65') or (serviceCode=='96') or (serviceCode=='71'):
+                serviceDescription='International service, not supported'
+            tupleList.append((carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime))
+        return tupleList
     # note that these two methods are found in the arrangments serializer (quite sloppily)
     def format_as_dimensions(self,x,y,z):
         return str(x)+'x'+str(y)+'x'+str(z)
@@ -257,12 +297,17 @@ class ShipmentSerializer(serializers.ModelSerializer):
             arrangement.save()
 
             containerList = []
+
+            xDim=0
+            yDim=0
+            zDim=0
             if (len(apiObjects[ele].boxes)>0):
                 xDim = apiObjects[ele].xDim
                 yDim = apiObjects[ele].yDim
                 zDim = apiObjects[ele].zDim
 
             else:
+                raise Exception('not sure why you are in this code, doesnt necessarily bug besides this line')
                 xDim = containers[ele]['xDim']
                 yDim = containers[ele]['yDim']
                 zDim = containers[ele]['zDim']
@@ -273,8 +318,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             volume = xDim*yDim*zDim
             containerList.append(Container.objects.create(arrangement=arrangement, xDim=xDim, yDim=yDim, zDim=zDim, volume=volume,
                                                         owner=validated_data['owner'], sku=sku, description=description, units=units))
-
-
+            totalWeight=0
             if (len(apiObjects[ele].boxes)>0):
                 for item in apiObjects[ele].boxes:
                     xDim = item.xDim
@@ -302,32 +346,46 @@ class ShipmentSerializer(serializers.ModelSerializer):
                     sku = foundItem['sku']
                     description = foundItem['description']
                     units = foundItem['units']
+                    weight=foundItem['weight']
+                    weightUnits=foundItem['weightUnits']
                     Item.objects.create(xDim=xDim, yDim=yDim, zDim=zDim, volume=volume, container=containerList[0], arrangement=arrangement,
-                                        owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, sku=sku, description=description, units=units, masterItemId=masterItemId, width=width, length=length, height=height)
+                                        owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, weight=weight,weightUnits=weightUnits, sku=sku, description=description, units=units, masterItemId=masterItemId, width=width, length=length, height=height)
 
+                    totalWeight+=weight
             else:
+                raise Exception('not sure why you are in this code, doesnt necessarily bug besides this line')
                 for item in items:
                     volume = item['width']*item['length']*item['height']
-                    Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], masterItemId=item['id'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
+                    Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'],weight=item['weight'],weightUnits=item['weightUnits'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], masterItemId=item['id'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
+
+                    # this line maybe shouldnt be here
+                    totalWeight+=item['weightUnits']
 
             if requestsMade<requestLimit:
-                try:
-                    shipToAttentionName=shipToAddress.name
-                    shipToPhoneNumber=shipToAddress.phoneNumber
-                    shipToAddressLineOne=shipToAddress.addressLine1
-                    shipToCity=shipToAddress.city
-                    shipToStateProvinceCode=shipToAddress.stateProvinceCode
-                    shipToPostalCode=shipToAddress.postalCode
+                shipToAttentionName=shipToAddress.name
+                shipToPhoneNumber=shipToAddress.phoneNumber
+                shipToAddressLineOne=shipToAddress.addressLine1
+                shipToCity=shipToAddress.city
+                shipToStateProvinceCode=shipToAddress.stateProvinceCode
+                shipToPostalCode=shipToAddress.postalCode
 
 
-                    shipFromAttentionName=shipFromAddress.name
-                    shipFromPhoneNumber=shipFromAddress.phoneNumber
-                    shipFromAddressLineOne=shipFromAddress.addressLine1
-                    shipFromCity=shipFromAddress.city
-                    shipFromStateProvinceCode=shipFromAddress.stateProvinceCode
-                    shipFromPostalCode=shipFromAddress.postalCode
-                    #quotesAsTuples=self.make_ups_request(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim)
-                except:
-                    pass    
+                shipFromAttentionName=shipFromAddress.name
+                shipFromPhoneNumber=shipFromAddress.phoneNumber
+                shipFromAddressLineOne=shipFromAddress.addressLine1
+                shipFromCity=shipFromAddress.city
+                shipFromStateProvinceCode=shipFromAddress.stateProvinceCode
+                shipFromPostalCode=shipFromAddress.postalCode
+                weight=str(totalWeight)
+                assert(not xDim==0)
+                assert(not yDim==0)
+                assert(not zDim==0)
+
+                xDim=str(xDim)
+                yDim=str(yDim)
+                zDim=str(zDim)
+                quotesAsTuples=self.make_ups_request(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim)
+                for quote in quotesAsTuples:
+                    pass
         return shipment
 

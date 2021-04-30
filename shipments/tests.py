@@ -57,7 +57,7 @@ class ShipmentsTests(APITestCase):
                 "width": 1,
                 "height": 1,
                 "units": "in",
-                "weight": 0,
+                "weight": 5,
                 "weightUnits": "lb"
                 }
             ],
@@ -76,20 +76,20 @@ class ShipmentsTests(APITestCase):
             "shipFromAddress": {
                 "name":"Lucas Z",
                 "phoneNumber":"5156573318",
-                "addressLine1": "string",
+                "addressLine1": "314 North Clinton Street",
                 "addressLine2": "string",
-                "city": "string",
-                "stateProvince": "string",
-                "postalCode": "string"
+                "city": "Iowa City",
+                "stateProvince": "IA",
+                "postalCode": "52245"
             },
             "shipToAddress":{
-                "name":"Lucas Z",
+                "name":"John Doe",
                 "phoneNumber":"5156573318",
-                "addressLine1": "string",
+                "addressLine1": "13178 Oakbrook Drive",
                 "addressLine2": "string",
-                "city": "string",
-                "stateProvince": "string",
-                "postalCode": "string"
+                "city": "Des Moines",
+                "stateProvince": "IA",
+                "postalCode": "50323"
             }
             }
 
@@ -119,7 +119,7 @@ class ShipmentsTests(APITestCase):
                 "width": 2,
                 "height": 2,
                 "units": "in",
-                "weight": 0,
+                "weight": 5,
                 "weightUnits": "lb"
                 }
             ],
@@ -138,20 +138,20 @@ class ShipmentsTests(APITestCase):
             "shipFromAddress": {
                 "name":"Lucas Z",
                 "phoneNumber":"5156573318",
-                "addressLine1": "string",
+                "addressLine1": "314 North Clinton Street",
                 "addressLine2": "string",
-                "city": "string",
-                "stateProvince": "string",
-                "postalCode": "string"
+                "city": "Iowa City",
+                "stateProvince": "IA",
+                "postalCode": "52245"
             },
             "shipToAddress":{
-                "name":"Lucas Z",
+                "name":"John Doe",
                 "phoneNumber":"5156573318",
-                "addressLine1": "string",
+                "addressLine1": "13178 Oakbrook Drive",
                 "addressLine2": "string",
-                "city": "string",
-                "stateProvince": "string",
-                "postalCode": "string"
+                "city": "Des Moines",
+                "stateProvince": "IA",
+                "postalCode": "50323"
             }
             }
 
@@ -179,7 +179,7 @@ class ShipmentsTests(APITestCase):
             "width": 1,
             "height": 1,
             "units": "in",
-            "weight": 0,
+            "weight": 5,
             "weightUnits": "lb"
             }
         ],
@@ -198,20 +198,20 @@ class ShipmentsTests(APITestCase):
         "shipFromAddress": {
             "name":"Lucas Z",
             "phoneNumber":"5156573318",
-            "addressLine1": "string",
+            "addressLine1": "314 North Clinton Street",
             "addressLine2": "string",
-            "city": "string",
-            "stateProvince": "string",
-            "postalCode": "string"
+            "city": "Iowa City",
+            "stateProvince": "IA",
+            "postalCode": "52245"
         },
         "shipToAddress":{
-            "name":"Lucas Z",
+            "name":"John Doe",
             "phoneNumber":"5156573318",
-            "addressLine1": "string",
+            "addressLine1": "13178 Oakbrook Drive",
             "addressLine2": "string",
-            "city": "string",
-            "stateProvince": "string",
-            "postalCode": "string"
+            "city": "Des Moines",
+            "stateProvince": "IA",
+            "postalCode": "50323"
         }
         }
 
@@ -259,7 +259,7 @@ class ShipmentsTests(APITestCase):
                 "width": 1,
                 "height": 1,
                 "units": "in",
-                "weight": 0,
+                "weight": 5,
                 "weightUnits": "lb"
                 }
             ],
@@ -286,20 +286,20 @@ class ShipmentsTests(APITestCase):
             "shipFromAddress": {
                 "name":"Lucas Z",
                 "phoneNumber":"5156573318",
-                "addressLine1": "string",
+                "addressLine1": "314 North Clinton Street",
                 "addressLine2": "string",
-                "city": "string",
-                "stateProvince": "string",
-                "postalCode": "string"
+                "city": "Iowa City",
+                "stateProvince": "IA",
+                "postalCode": "52245"
             },
             "shipToAddress":{
-                "name":"Customer1",
+                "name":"John Doe",
                 "phoneNumber":"5156573318",
-                "addressLine1": "string",
+                "addressLine1": "13178 Oakbrook Drive",
                 "addressLine2": "string",
-                "city": "string",
-                "stateProvince": "string",
-                "postalCode": "string"
+                "city": "Des Moines",
+                "stateProvince": "IA",
+                "postalCode": "50323"
             }
             }
 

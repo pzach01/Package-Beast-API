@@ -228,6 +228,47 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 serviceDescription='International service, not supported'
             tupleList.append((carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime))
         return tupleList
+    
+    def make_usps_request(self,shipToPostalCode,shipFromPostalCode,weight,xDim,yDim,zDim):
+        boxType='VARIABLE'
+        # assumes weight is in pounds as decimal
+        weightOunces=round(weight*16)
+        weightPounds=weightOunces//16
+        weightOunces=weightOunces-(16*weightPounds)
+
+        weightPounds=str(weightPounds)
+        weightOunces=str(weightOunces)
+        # not a USPS special box; reexamine this in the docs
+        endpoint='https://secure.shippingapis.com/ShippingAPI.dll?API=RateV4 &XML='
+        xml='<RateV4Request USERID="571PACKA3117"><Revision>2</Revision><Package ID="0"><Service>ALL</Service>'
+        xml+='<ZipOrigination>'+shipFromPostalCode+'</ZipOrigination>'
+        xml+='<ZipDestination>'+shipToPostalCode+'</ZipDestination>'
+        xml+='<Pounds>'+weightPounds+'</Pounds>'
+        xml+='<Ounces>'+weightOunces+'</Ounces>'
+        xml+='<Container>'+boxType+'</Container>'
+        xml+='<Width>'+xDim+'</Width>'
+        xml+='<Length>'+yDim+'</Length>'
+        xml+='<Height>'+zDim+'</Height>'
+        xml+='<Girth></Girth><Machinable>TRUE</Machinable></Package></RateV4Request>'
+        testUrl= endpoint+xml
+
+        import requests
+        r = requests.post(testUrl,data=xml)
+
+        dataAsText=(r.text)
+        import xmltodict
+        import json
+        dataDict = xmltodict.parse(dataAsText)
+        nestOne=dataDict['RateV4Response']
+        nestTwo=nestOne['Package']
+        data=nestTwo['Postage']
+        #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
+
+        tupleList=[]
+        for d in data:
+            t=('USPS',d['Rate'],d['MailService'],'','')
+            tupleList.append(t)
+        return tupleList
     # note that these two methods are found in the arrangments serializer (quite sloppily)
     def format_as_dimensions(self,x,y,z):
         return str(x)+'x'+str(y)+'x'+str(z)
@@ -379,7 +420,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 shipFromCity=shipFromAddress.city
                 shipFromStateProvinceCode=shipFromAddress.stateProvinceCode
                 shipFromPostalCode=shipFromAddress.postalCode
-                weight=str(totalWeight)
+                weight=totalWeight
                 assert(not xDim==0)
                 assert(not yDim==0)
                 assert(not zDim==0)
@@ -387,9 +428,16 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 xDim=str(xDim)
                 yDim=str(yDim)
                 zDim=str(zDim)
-                quotesAsTuples=self.make_ups_request(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim)
-                for quote in quotesAsTuples:
+
+                quotesAsTuplesUPS=self.make_ups_request(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
+                for quote in quotesAsTuplesUPS:
                     #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
                     Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4])
+
+                quotesAsTuplesUSPS=self.make_usps_request(shipToPostalCode,shipFromPostalCode,weight,xDim,yDim,zDim)
+                for quote in quotesAsTuplesUSPS:
+                    #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
+                    Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4])
+
         return shipment
 

@@ -19,15 +19,15 @@ class ShipmentSerializer(serializers.ModelSerializer):
     containers = ContainerSerializer(many=True, write_only=True)
     items = ItemSerializerWithId(many=True, write_only=True)
     arrangements=ArrangementSerializer(many=True, required=False, read_only=True)
-    timeout = serializers.IntegerField(write_only=True, min_value=1, max_value=55)
+    timeoutDuration = serializers.IntegerField(write_only=True, min_value=1, max_value=55)
     shipToAddress = AddressSerializer()
     shipFromAddress = AddressSerializer()
 
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeout', 'shipFromAddress', 'shipToAddress', 'quotes']
-        read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeout','arrangements']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout']
+        read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeoutDuration','arrangements', 'timeout']
     def make_ups_request(self,shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim):
         # note that this is not production url
         testUrl='https://wwwcie.ups.com/ups.app/xml/Rate'
@@ -287,7 +287,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')
-        timeoutDuration=validated_data.pop('timeout')
+        timeoutDuration=validated_data.pop('timeoutDuration')
         lastSelectedQuoteId=validated_data.pop('lastSelectedQuoteId')
         # this is actually unused (remove at future date from)
         multiBinPack=validated_data['multiBinPack']

@@ -72,7 +72,7 @@ class ShipmentsTests(APITestCase):
                 }
             ],
             "multiBinPack": False,
-            "timeout": 15,
+            "timeoutDuration": 15,
             "shipFromAddress": {
                 "name":"Lucas Z",
                 "phoneNumber":"5156573318",
@@ -92,9 +92,6 @@ class ShipmentsTests(APITestCase):
                 "postalCode": "50323"
             }
             }
-
-
-
 
             data=self.generic_logic(inputData)
             # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
@@ -134,7 +131,7 @@ class ShipmentsTests(APITestCase):
                 }
             ],
             "multiBinPack": False,
-            "timeout": 15,
+            "timeoutDuration": 15,
             "shipFromAddress": {
                 "name":"Lucas Z",
                 "phoneNumber":"5156573318",
@@ -194,7 +191,7 @@ class ShipmentsTests(APITestCase):
             }
         ],
         "multiBinPack": False,
-        "timeout": 15,
+        "timeoutDuration": 15,
         "shipFromAddress": {
             "name":"Lucas Z",
             "phoneNumber":"5156573318",
@@ -282,7 +279,7 @@ class ShipmentsTests(APITestCase):
                 }
             ],
             "multiBinPack": False,
-            "timeout": 15,
+            "timeoutDuration": 15,
             "shipFromAddress": {
                 "name":"Lucas Z",
                 "phoneNumber":"5156573318",
@@ -326,3 +323,251 @@ class ShipmentsTests(APITestCase):
             print("Shipments test 4 Passed")
         except:
             print("-----------Shipments test 4 Failed")
+
+# QUESTION ASKED: how do we do with 10 containers and 10 small items?
+# This test fails. Bug caused by too many containers?
+    def test_5(self):
+        try:
+            inputData={
+            "title": "string",
+            "lastSelectedQuoteId": 0,
+            "items": [
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 1,
+                "width": 1,
+                "height": 1,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                },
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 1,
+                "width": 1,
+                "height": 1,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                },
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 1,
+                "width": 1,
+                "height": 1,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                },
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 1,
+                "width": 1,
+                "height": 1,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                },
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 1,
+                "width": 1,
+                "height": 1,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                },
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 1,
+                "width": 1,
+                "height": 1,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                },
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 1,
+                "width": 1,
+                "height": 1,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                },
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 1,
+                "width": 1,
+                "height": 1,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                },
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 1,
+                "width": 1,
+                "height": 1,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                },
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 1,
+                "width": 1,
+                "height": 1,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                }
+            ],
+            "containers": [
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 1,
+                "yDim": 1,
+                "zDim": 1,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 2,
+                "yDim": 2,
+                "zDim": 2,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 3,
+                "yDim": 3,
+                "zDim": 3,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 8,
+                "yDim": 8,
+                "zDim": 8,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 20,
+                "yDim": 20,
+                "zDim": 20,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 30,
+                "yDim": 30,
+                "zDim": 30,
+                "units": "in"
+                },
+                                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 20,
+                "yDim": 20,
+                "zDim": 20,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 30,
+                "yDim": 30,
+                "zDim": 30,
+                "units": "in"
+                },
+                                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 20,
+                "yDim": 20,
+                "zDim": 20,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 30,
+                "yDim": 30,
+                "zDim": 30,
+                "units": "in"
+                }
+            ],
+            "multiBinPack": False,
+            "timeoutDuration": 15,
+            "shipFromAddress": {
+                "name":"Lucas Z",
+                "phoneNumber":"5156573318",
+                "addressLine1": "314 North Clinton Street",
+                "addressLine2": "string",
+                "city": "Iowa City",
+                "stateProvince": "IA",
+                "postalCode": "52245"
+            },
+            "shipToAddress":{
+                "name":"John Doe",
+                "phoneNumber":"5156573318",
+                "addressLine1": "13178 Oakbrook Drive",
+                "addressLine2": "string",
+                "city": "Des Moines",
+                "stateProvince": "IA",
+                "postalCode": "50323"
+            }
+            }
+
+
+
+
+
+            data=self.generic_logic(inputData)
+            # check the return data for truth
+            print(data)
+
+            assert(data['arrangementPossible']==True)
+            
+            assert(data['arrangements'][0]['items'][0]['xCenter']==.5)
+            assert(data['arrangements'][0]['items'][0]['yCenter']==.5)
+            assert(data['arrangements'][0]['items'][0]['zCenter']==.5)
+
+
+            assert(data['arrangements'][1]['items'][0]['xCenter']==.5)
+            assert(data['arrangements'][1]['items'][0]['yCenter']==.5)
+            assert(data['arrangements'][1]['items'][0]['zCenter']==.5)
+            assert(len(data['arrangements'])==2)
+            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+
+            print("Shipments test 5 Passed")
+        except:
+            print("-----------Shipments test 5 Failed")

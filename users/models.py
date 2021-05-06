@@ -58,6 +58,7 @@ class User(AbstractUser):
     disablePreviousNextItemAnimation = models.BooleanField(default=False)
     animationSpeed = models.IntegerField(default=100)
     usersTermsOfServiceRevision = models.IntegerField(default=0)
+    phoneNumber=models.CharField(max_length=100, blank=True, default='')
     addressLine1 = models.CharField(max_length=100, blank=True, default='')
     addressLine2 = models.CharField(max_length=100, blank=True, default='')
     city = models.CharField(max_length=100, blank=True, default='')

@@ -389,9 +389,6 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
                 container=minArrangment[0]
                 container.id=ele
                 containersUsed.append(container)
-            else:
-                x,y,z=float(bins1[ele].split('x')[0]),float(bins1[ele].split('x')[1]),float(bins1[ele].split('x')[2])
-                containersUsed.append(BinAPI(ele,x,y,z,costList[ele],0,False))
     return containersUsed,anyTimeout,True
 
 

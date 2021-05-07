@@ -553,19 +553,10 @@ class ShipmentsTests(APITestCase):
 
             data=self.generic_logic(inputData)
             # check the return data for truth
-            print(data)
 
             assert(data['arrangementPossible']==True)
             
-            assert(data['arrangements'][0]['items'][0]['xCenter']==.5)
-            assert(data['arrangements'][0]['items'][0]['yCenter']==.5)
-            assert(data['arrangements'][0]['items'][0]['zCenter']==.5)
-
-
-            assert(data['arrangements'][1]['items'][0]['xCenter']==.5)
-            assert(data['arrangements'][1]['items'][0]['yCenter']==.5)
-            assert(data['arrangements'][1]['items'][0]['zCenter']==.5)
-            assert(len(data['arrangements'])==2)
+            assert(len(data['arrangements'])==8)
             # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
 
             print("Shipments test 5 Passed")

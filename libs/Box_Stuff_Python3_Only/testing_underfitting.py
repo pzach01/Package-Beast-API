@@ -498,12 +498,17 @@ def test_one_underfit_sieve(printStuff=True):
             raise Exception('wierd stuff')
         assert(arrangmentPossible)
         # check that containers are returned in same order as they were input (needed in shippments.serializer; but not strictly necessary everywhere else)
+        sortedInputList=[]
         for index in range(0,len(containers)):
             x,y,z=containers[index].split('x')[0],containers[index].split('x')[1],containers[index].split('x')[2]
             x,y,z=float(x),float(y),float(z)
-            sortedInputList=sorted([x,y,z])
-            sortedOutputList=sorted([apiObjects[index].xDim,apiObjects[index].yDim,apiObjects[index].zDim])
-            assert(sortedInputList==sortedOutputList)
+            sortedInputList.append(sorted([x,y,z]))
+        sortedOutputList=[]
+        for index in range(0, len(apiObjects)):
+            sortedOutputList.append(sorted([apiObjects[index].xDim,apiObjects[index].yDim,apiObjects[index].zDim]))
+        # cut down to subset
+        sortedInputList=[ele for ele in sortedInputList if ele in sortedOutputList]
+        assert(sortedInputList==sortedOutputList)
 
 
         # check for optimality
@@ -541,5 +546,5 @@ from .testing_imports import *
 #test_underfits_api()
 #test_underfits()
 #test_underfits_multipack()
-#test_underfits_sieve()
+test_underfits_sieve()
 '''

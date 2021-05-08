@@ -65,6 +65,8 @@ class User(AbstractUser):
     stateProvince = models.CharField(max_length=50, blank=True, default='')
     country = models.CharField(max_length=50, blank=True, default='')
     postalCode = models.CharField(max_length=20, blank=True, default='')
+    includeUpsContainers = models.BooleanField(default=True)
+    includeUspsContainers = models.BooleanField(default=True)
 
     @property
     def termsOfServiceRevision(self):

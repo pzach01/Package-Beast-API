@@ -293,6 +293,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
         lastSelectedQuoteId=validated_data.pop('lastSelectedQuoteId')
         # this is actually unused (remove at future date from)
         multiBinPack=validated_data['multiBinPack']
+        includeUpsContainers = validated_data.pop('includeUpsContainers')
+        includeUspsContainers = validated_data.pop('includeUspsContainers')
 
         # shipFromAddress=Address.objects.create(validated_data.pop('shipFromAddress'))
         # shipToAddress=Address.objects.create(validated_data.pop('shipToAddress'))

@@ -90,7 +90,9 @@ class ShipmentsTests(APITestCase):
                 "city": "Des Moines",
                 "stateProvince": "IA",
                 "postalCode": "50323"
-            }
+            },
+            "includeUpsContainers":False,
+            "includeUspsContainers":False,
             }
 
             data=self.generic_logic(inputData)
@@ -149,7 +151,9 @@ class ShipmentsTests(APITestCase):
                 "city": "Des Moines",
                 "stateProvince": "IA",
                 "postalCode": "50323"
-            }
+            },
+            "includeUpsContainers":False,
+            "includeUspsContainers":False,
             }
 
 
@@ -209,7 +213,9 @@ class ShipmentsTests(APITestCase):
             "city": "Des Moines",
             "stateProvince": "IA",
             "postalCode": "50323"
-        }
+        },
+        "includeUpsContainers":False,
+        "includeUspsContainers":False,
         }
 
 
@@ -297,7 +303,9 @@ class ShipmentsTests(APITestCase):
                 "city": "Des Moines",
                 "stateProvince": "IA",
                 "postalCode": "50323"
-            }
+            },
+            "includeUpsContainers":False,
+            "includeUspsContainers":False,
             }
 
 
@@ -544,7 +552,9 @@ class ShipmentsTests(APITestCase):
                 "city": "Des Moines",
                 "stateProvince": "IA",
                 "postalCode": "50323"
-            }
+            },
+            "includeUpsContainers":False,
+            "includeUspsContainers":False,
             }
 
 

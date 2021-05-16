@@ -334,7 +334,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
         shipment.arrangementPossible=arrangementPossible
         if not arrangementPossible:
-            raise Http404('No arrangement possible. Try again with bigger containers or smaller items.')
+            return shipment
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
         for ele in range(0, len(apiObjects)):

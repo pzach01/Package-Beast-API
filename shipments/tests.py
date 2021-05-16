@@ -160,6 +160,7 @@ class ShipmentsTests(APITestCase):
 
 
             data=self.generic_logic(inputData)
+            assert(data['arrangementPossible']==False)
             # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
 
             print("Shipments test 2 Passed")

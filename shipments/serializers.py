@@ -242,7 +242,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         weightOunces=str(weightOunces)
         # not a USPS special box; reexamine this in the docs
         endpoint='https://secure.shippingapis.com/ShippingAPI.dll?API=RateV4 &XML='
-        xml='<RateV4Request USERID="571PACKA3117"><Revision>2</Revision><Package ID="0"><Service>ALL</Service>'
+        xml='<RateV4Request USERID="106PACKA2149"><Revision>2</Revision><Package ID="0"><Service>ALL</Service>'
         xml+='<ZipOrigination>'+shipFromPostalCode+'</ZipOrigination>'
         xml+='<ZipDestination>'+shipToPostalCode+'</ZipDestination>'
         xml+='<Pounds>'+weightPounds+'</Pounds>'
@@ -437,11 +437,11 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 for quote in quotesAsTuplesUPS:
                     #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
                     Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4])
-                '''
+                
                 quotesAsTuplesUSPS=self.make_usps_request(shipToPostalCode,shipFromPostalCode,weight,xDim,yDim,zDim)
                 for quote in quotesAsTuplesUSPS:
                     #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
                     Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4])
-                '''
+                
         return shipment
 

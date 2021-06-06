@@ -216,7 +216,7 @@ class ShipmentsTests(APITestCase):
             "postalCode": "50323"
         },
         "includeUpsContainers":False,
-        "includeUspsContainers":False,
+        "includeUspsContainers":False
         }
 
 

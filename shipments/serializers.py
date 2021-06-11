@@ -30,6 +30,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
         depth=1
         fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout', 'includeUpsContainers', 'includeUspsContainers']
         read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeoutDuration','arrangements', 'timeout']
+    """
+    # used before integration with Shippo API
     def make_ups_request(self,shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim):
         # note that this is not production url
         testUrl='https://wwwcie.ups.com/ups.app/xml/Rate'
@@ -230,7 +232,10 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 serviceDescription='International service, not supported'
             tupleList.append((carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime))
         return tupleList
-    
+    """
+
+    """
+    # used before Shippo integration
     def make_usps_request(self,shipToPostalCode,shipFromPostalCode,weight,xDim,yDim,zDim):
         boxType='VARIABLE'
         # assumes weight is in pounds as decimal
@@ -271,6 +276,75 @@ class ShipmentSerializer(serializers.ModelSerializer):
             t=('USPS',d['Rate'],d['MailService'],'','')
             tupleList.append(t)
         return tupleList
+    """
+
+
+    def get_shippo_rates(self,shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim):
+        import shippo
+        shippo.config.api_key = "shippo_test_41c916402deba95527751c894fd23fc03d7d8198"
+
+        address_from = shippo.Address.create(
+            name = shipFromAttentionName,
+            street1 = shipFromAddressLineOne,
+            city = shipFromCity,
+            state = shipFromStateProvinceCode,
+            zip = shipFromPostalCode,
+            country = "US",
+            validate = True
+        )
+
+        address_to = shippo.Address.create(
+            name = shipToAttentionName,
+            street1 = shipToAddressLineOne,
+            city = shipToCity,
+            state = shipToStateProvinceCode,
+            zip = shipToPostalCode,
+            country = "US",
+            validate = True
+        )
+
+        """
+        address_from = {
+            "name": "Shawn Ippotle",
+            "street1": "215 Clayton St.",
+            "city": "San Francisco",
+            "state": "CA",
+            "zip": "94117",
+            "country": "US"
+        }
+
+        address_to = {
+            "name": "Mr Hippo",
+            "street1": "Broadway 1",
+            "city": "New York",
+            "state": "NY",
+            "zip": "10007",
+            "country": "US"
+        }
+        """
+        parcel = {
+            "length": xDim,
+            "width": yDim,
+            "height": zDim,
+            "distance_unit": "in",
+            "weight": weight,
+            "mass_unit": "lb"
+        }
+
+        shipment = shippo.Shipment.create(
+            address_from = address_from,
+            address_to = address_to,
+            parcels = [parcel],
+            asynchronous = False
+        )
+        rates=shipment['rates']
+
+        tupleList=[]
+        for rate in rates:
+            #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
+            t=(rate['provider'],rate['amount'],rate['servicelevel']['name'],rate['estimated_days'],rate['duration_terms'])
+            tupleList.append(t)
+        return tupleList    
     # note that these two methods are found in the arrangments serializer (quite sloppily)
     def format_as_dimensions(self,x,y,z):
         return str(x)+'x'+str(y)+'x'+str(z)
@@ -432,7 +506,11 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 xDim=str(xDim)
                 yDim=str(yDim)
                 zDim=str(zDim)
-
+                quotesAsTuplesShippo=self.get_shippo_rates(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
+                for quote in quotesAsTuplesShippo:
+                    #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
+                    Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4])
+                '''
                 quotesAsTuplesUPS=self.make_ups_request(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
                 for quote in quotesAsTuplesUPS:
                     #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
@@ -442,6 +520,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 for quote in quotesAsTuplesUSPS:
                     #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
                     Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4])
-                
+                '''
         return shipment
 

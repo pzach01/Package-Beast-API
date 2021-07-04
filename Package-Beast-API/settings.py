@@ -56,6 +56,8 @@ else:
     os.environ['STRIPE_API_SECRET']='sk_test_51I76dqE5mpXPYa9nHYN046OuGpuQdNihI2JNfZHPYb05YbGtcr4EXDwytftg6MEgOk6SOvstWxMvFcFtyH67nrEN00xQKQQ6Jv'
     os.environ['STRIPE_WEBHOOK_SECRET']='whsec_sp9erCWYVqUqRZpj3Z99jFrWKtlJNKQO'
     os.environ['STRIPE_TAX_RATE_ID']='txr_1ICrg3E5mpXPYa9nYpguvzzc'
+    os.environ['SHIPPO_CLIENT_ID']='bf2c8e4685b44c3dbf35b8aa3cb2df5e'
+    os.environ['SHIPPO_CLIENT_SECRET']='LC9N-5-HnySDwsSGbG1PCSvuaTve1WMf0HyEXXu-t_g'
 
 CORS_ORIGIN_ALLOW_ALL = True
 

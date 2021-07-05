@@ -5,6 +5,8 @@ from shipments.models import Shipment
 from shipments.serializers import ShipmentSerializer
 from rest_framework import generics, viewsets, permissions
 import requests
+from django.http import JsonResponse
+
 
 class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -20,7 +22,7 @@ def generate_shippo_oauth_token(request):
     shippoRequest['grant_type']='authorization_code'
     resp = requests.post('https://goshippo.com/oauth/access_token', data=shippoRequest)
     # can't do any additional data processing until I know what the response looks like
-    return resp.json()
+    return JsonResponse(resp.json())
 
 class ShipmentList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]

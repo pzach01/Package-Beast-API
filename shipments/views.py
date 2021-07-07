@@ -14,7 +14,7 @@ from rest_framework import status
 class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.owner == request.user
-
+@csrf_exempt
 @api_view(['post'])
 @permission_classes([])
 def generate_shippo_oauth_token(request):

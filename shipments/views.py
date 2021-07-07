@@ -6,6 +6,7 @@ from shipments.serializers import ShipmentSerializer
 from rest_framework import generics, viewsets, permissions
 import requests
 from django.http import JsonResponse
+from rest_framework.decorators import api_view, permission_classes
 
 
 class IsOwner(permissions.BasePermission):

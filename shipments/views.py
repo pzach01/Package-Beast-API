@@ -7,6 +7,8 @@ from rest_framework import generics, viewsets, permissions
 import requests
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
+from users.models import User
+from rest_framework import status
 
 
 class IsOwner(permissions.BasePermission):
@@ -21,9 +23,16 @@ def generate_shippo_oauth_token(request):
     shippoRequest['client_secret']=os.getenv('SHIPPO_CLIENT_SECRET')
     shippoRequest['code']=request.data['code']
     shippoRequest['grant_type']='authorization_code'
+    
     resp = requests.post('https://goshippo.com/oauth/access_token', data=shippoRequest)
+    
+    shippoAccessToken=resp.data['access_token']
+
+    user=User.objects.get(request.user)
+    user.shippoAccessToken=shippoAccessToken
+    user.save()
     # can't do any additional data processing until I know what the response looks like
-    return JsonResponse(resp.json())
+    return JsonResponse('Access token: '+str(shippoAccessToken),status=200)
 
 class ShipmentList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]

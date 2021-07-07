@@ -67,7 +67,7 @@ class User(AbstractUser):
     postalCode = models.CharField(max_length=20, blank=True, default='')
     includeUpsContainers = models.BooleanField(default=True)
     includeUspsContainers = models.BooleanField(default=True)
-
+    shippoAccessToken=models.CharField(max_length=100,blank=True,default='')
     @property
     def termsOfServiceRevision(self):
         termsOfServiceRevision = 2

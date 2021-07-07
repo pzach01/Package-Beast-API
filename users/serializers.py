@@ -82,5 +82,5 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name', 'arrangements', 'units', 'weightUnits', 'dateTimeFormat', 'multiBinPack', 'disableFillContainerAnimation', 'disablePreviousNextItemAnimation', 'animationSpeed', 'usersTermsOfServiceRevision', 'termsOfServiceRevision', 'addressLine1', 'addressLine2', 'city', 'stateProvince', 'country', 'postalCode', 'phoneNumber', 'includeUpsContainers', 'includeUspsContainers']
+        fields = ['id', 'email', 'first_name', 'last_name', 'arrangements', 'units', 'weightUnits', 'dateTimeFormat', 'multiBinPack', 'disableFillContainerAnimation', 'disablePreviousNextItemAnimation', 'animationSpeed', 'usersTermsOfServiceRevision', 'termsOfServiceRevision', 'addressLine1', 'addressLine2', 'city', 'stateProvince', 'country', 'postalCode', 'phoneNumber', 'includeUpsContainers', 'includeUspsContainers','shippoAccessToken']
         read_only_fields = ['arrangements', 'email', 'termsOfServiceRevision']

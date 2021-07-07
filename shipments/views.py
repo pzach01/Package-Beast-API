@@ -41,7 +41,7 @@ def generate_shippo_oauth_token(request):
     user.shippoAccessToken=shippoAccessToken
     user.save()
     # can't do any additional data processing until I know what the response looks like
-    return JsonResponse('Access token: '+str(shippoAccessToken),status=200)
+    return JsonResponse('Access token: '+str(shippoAccessToken),status=200,safe=False)
 
 class ShipmentList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]

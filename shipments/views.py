@@ -37,7 +37,7 @@ def generate_shippo_oauth_token(request):
     resp = requests.post('https://goshippo.com/oauth/access_token', data=shippoRequest)
     data=resp.json()
     shippoAccessToken=data['access_token']
-    user=User.objects.get(emailaddress=request.user)
+    user=User.objects.get(email=request.user)
     user.shippoAccessToken=shippoAccessToken
     user.save()
     # can't do any additional data processing until I know what the response looks like

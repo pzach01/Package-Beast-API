@@ -16,7 +16,7 @@ class IsOwner(permissions.BasePermission):
         return obj.owner == request.user
 
 @api_view(['post'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([])
 def generate_shippo_oauth_token(request):
     shippoRequest={}
     shippoRequest['client_id']=os.getenv('SHIPPO_CLIENT_ID')

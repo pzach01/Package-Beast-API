@@ -35,8 +35,8 @@ def generate_shippo_oauth_token(request):
     shippoRequest['grant_type']='authorization_code'
     
     resp = requests.post('https://goshippo.com/oauth/access_token', data=shippoRequest)
-    
-    shippoAccessToken=resp.data['access_token']
+    data=resp.json()
+    shippoAccessToken=data['access_token']
 
     user=User.objects.get(request.user)
     user.shippoAccessToken=shippoAccessToken

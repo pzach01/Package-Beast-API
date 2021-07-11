@@ -18,7 +18,6 @@ from drf_yasg.utils import swagger_auto_schema
 class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.owner == request.user
-@csrf_exempt
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={

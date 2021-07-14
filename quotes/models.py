@@ -18,4 +18,5 @@ class Quote(models.Model):
     scheduledDeliveryTime=models.CharField(max_length=255,blank=True,null=True,default='SCHEDULED DELIVERY TIME')
     shipment = models.ForeignKey(Shipment, related_name='quotes', on_delete=models.CASCADE, blank=True, null=True)
     arrangement = models.ForeignKey(Arrangement, related_name='quotes', on_delete=models.CASCADE, blank=True, null=True)
+    shippoRateId=models.CharField(max_length=255,default='')
 admin.site.register(Quote)

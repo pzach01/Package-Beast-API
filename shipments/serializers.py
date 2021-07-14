@@ -341,8 +341,9 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         tupleList=[]
         for rate in rates:
+            rateId=rate['object_id']
             #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
-            t=(rate['provider'],rate['amount'],rate['servicelevel']['name'],rate['estimated_days'],rate['duration_terms'])
+            t=(rate['provider'],rate['amount'],rate['servicelevel']['name'],rate['estimated_days'],rate['duration_terms'],rateId)
             tupleList.append(t)
         return tupleList    
     # note that these two methods are found in the arrangments serializer (quite sloppily)
@@ -509,7 +510,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 quotesAsTuplesShippo=self.get_shippo_rates(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
                 for quote in quotesAsTuplesShippo:
                     #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
-                    Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4])
+                    Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4],shippoRateId=quote[5])
                 '''
                 quotesAsTuplesUPS=self.make_ups_request(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
                 for quote in quotesAsTuplesUPS:

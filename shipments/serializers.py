@@ -280,6 +280,16 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
 
     def get_shippo_rates(self,shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim):
+        if '.' in weight:
+            weight=weight[0: (weight.index('.')+5)]
+        if '.' in xDim:
+            xDim=xDim[0: (xDim.index('.')+5)]
+        if '.' in yDim:
+            yDim=yDim[0: (yDim.index('.')+5)]
+        if '.' in zDim:
+            zDim=zDim[0: (zDim.index('.')+5)]
+
+
         import shippo
         shippo.config.api_key = "shippo_test_41c916402deba95527751c894fd23fc03d7d8198"
 

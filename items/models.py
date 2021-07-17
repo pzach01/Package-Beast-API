@@ -4,7 +4,7 @@ from containers.models import Container
 from arrangements.models import Arrangement
 from shipments.models import Shipment
 from django.contrib import admin
-
+from django.core.validators import MinValueValidator
 # Create your models here.
 
 
@@ -23,7 +23,7 @@ class Item(models.Model):
     volume = models.FloatField(default=0.0)
     units = models.CharField(max_length=2, blank=False, default='in')
     cost = models.FloatField(default=0.0)
-    weight = models.FloatField(default=0.0)
+    weight = models.FloatField(default=0.0000001,validators=[MinValueValidator(.0000001)])
     weightUnits = models.CharField(max_length=2, blank=False, default='lb')
     # We could do it like this but we just need a reference to the item id
     # This reduces db calls in arrangements serializer

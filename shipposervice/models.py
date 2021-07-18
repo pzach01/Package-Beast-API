@@ -7,7 +7,7 @@ from quotes.models import Quote
 class ShippoTransaction(models.Model):
     owner = models.ForeignKey(
         'users.User', related_name='shippo_transactions', on_delete=models.CASCADE)
-    label_url = models.CharField(max_length=255, default='', null=True, blank=True)
+    label_url = models.CharField(max_length=1012, default='', null=True, blank=True)
     quote = models.ForeignKey(Quote, related_name='shippo_transactions', on_delete=models.CASCADE)
 
 admin.site.register(ShippoTransaction)

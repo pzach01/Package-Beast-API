@@ -6,12 +6,14 @@ import os
 from rest_framework import generics, viewsets, permissions
 import requests
 from django.http import JsonResponse
+from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from users.models import User
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg import openapi
 from shipposervice.models import ShippoTransaction
+from shipposervice.serializers import ShippoTransactionSerializer
 from quotes.models import Quote
 from drf_yasg.utils import swagger_auto_schema
 
@@ -58,9 +60,9 @@ def generate_shippo_transaction(request):
     shippoTransaction.test=str(transaction['test'])
     shippoTransaction.rateId=transaction['rate']
     shippoTransaction.save()
+    serializer=ShippoTransactionSerializer(shippoTransaction)
 
-
-    return JsonResponse(shippoTransaction,status=200)
+    return Response(serializer.data)
 
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated,IsOwner])

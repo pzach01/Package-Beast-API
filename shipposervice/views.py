@@ -40,7 +40,7 @@ def generate_shippo_transaction(request):
         label_file_type="PDF", 
         asynchronous=False)
 
-    return transaction
+    return JsonResponse(transaction,status=200)
 
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated,IsOwner])

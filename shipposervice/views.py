@@ -35,18 +35,20 @@ def generate_shippo_transaction(request):
     shippo.config.api_key = "shippo_test_41c916402deba95527751c894fd23fc03d7d8198"
 
     rateId=request.data['rateId']
+
+    foundQuote=None
     try:
         foundQuote=Quote.objects.filter(owner=request.user).filter(shippoRateId=rateId)[0]
-        transaction = shippo.Transaction.create( 
-            rate=rateId, 
-            label_file_type="PDF", 
-            asynchronous=False)
-        shippoTransaction=ShippoTransaction.objects.create(label_url=transaction['label_url'],quote=foundQuote)
-
-        return JsonResponse(transaction,status=200)
     except:
         return JsonResponse('Couldnt find rate in generate_shippo_transaction',safe=False,status=400)
 
+    transaction = shippo.Transaction.create( 
+        rate=rateId, 
+        label_file_type="PDF", 
+        asynchronous=False)
+    shippoTransaction=ShippoTransaction.objects.create(owner=request.user,label_url=transaction['label_url'],quote=foundQuote)
+
+    return JsonResponse(transaction,status=200)
 
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated,IsOwner])

@@ -58,7 +58,7 @@ def generate_shippo_transaction(request):
     shippoTransaction.objectOwner=transaction['object_owner']
     # cast from a boolean
     shippoTransaction.test=str(transaction['test'])
-    shippoTransaction.rateId=transaction['rate']
+    shippoTransaction.shippoRateId=transaction['rate']
     shippoTransaction.save()
     serializer=ShippoTransactionSerializer(shippoTransaction)
 

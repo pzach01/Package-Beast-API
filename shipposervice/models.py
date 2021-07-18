@@ -17,6 +17,6 @@ class ShippoTransaction(models.Model):
     objectId=models.CharField(max_length=256,default='',null=True,blank=True)
     objectOwner=models.CharField(max_length=256,default='',null=True,blank=True)
     # cast from a boolean
-    wasTest=models.CharField(max_length=256,default='',null=True,blank=True)
+    test=models.CharField(max_length=256,default='',null=True,blank=True)
     rateId=models.CharField(max_length=256,default='',null=True,blank=True)
 admin.site.register(ShippoTransaction)

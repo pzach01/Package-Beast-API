@@ -24,6 +24,21 @@ class IsOwner(permissions.BasePermission):
         'code': openapi.Schema(type=openapi.TYPE_STRING),
     }
 ))
+
+
+
+@api_view(['post'])
+@permission_classes([permissions.IsAuthenticated,IsOwner])
+def generate_shippo_transaction(request):
+    rateId=request.data['rateId']
+
+    transaction = shippo.Transaction.create( 
+        rate=rateId, 
+        label_file_type="PDF", 
+        asynchronous=False)
+
+    return transaction
+
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated,IsOwner])
 def generate_shippo_oauth_token(request):

@@ -48,7 +48,19 @@ def generate_shippo_transaction(request):
         asynchronous=False)
     shippoTransaction=ShippoTransaction.objects.create(owner=request.user,label_url=transaction['label_url'],quote=foundQuote)
 
-    return JsonResponse(transaction,status=200)
+    shippoTransaction.objectState=transaction['object_state']
+    shippoTransaction.status=transaction['status']
+    shippoTransaction.objectCreated=transaction['object_created']
+    shippoTransaction.objectUpdated=transaction['object_updated']
+    shippoTransaction.objectId=transaction['object_id']
+    shippoTransaction.objectOwner=transaction['object_owner']
+    # cast from a boolean
+    shippoTransaction.wasTest=str(transaction['was_test'])
+    shippoTransaction.rateId=transaction['rate']
+    shippoTransaction.save()
+
+
+    return JsonResponse(shippoTransaction,status=200)
 
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated,IsOwner])

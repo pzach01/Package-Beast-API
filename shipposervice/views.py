@@ -30,6 +30,7 @@ class IsOwner(permissions.BasePermission):
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated,IsOwner])
 def generate_shippo_transaction(request):
+    import shippo
     shippo.config.api_key = "shippo_test_41c916402deba95527751c894fd23fc03d7d8198"
 
     rateId=request.data['rateId']

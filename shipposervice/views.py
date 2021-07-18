@@ -11,7 +11,8 @@ from users.models import User
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg import openapi
-
+from shipposervice.models import ShippoTransaction
+from quotes.models import Quote
 from drf_yasg.utils import swagger_auto_schema
 
 
@@ -34,11 +35,15 @@ def generate_shippo_transaction(request):
     shippo.config.api_key = "shippo_test_41c916402deba95527751c894fd23fc03d7d8198"
 
     rateId=request.data['rateId']
-
+    try:
+        foundQuote=Quote.objects.filter(owner=request.user).filter(shippoRateId=rateId)[0]
+    except:
+        return JsonResponse('Couldnt find rate in generate_shippo_transaction',safe=False,status=400)
     transaction = shippo.Transaction.create( 
         rate=rateId, 
         label_file_type="PDF", 
         asynchronous=False)
+    shippoTransaction=ShippoTransaction.objects.create(label_url=transaction['label_url'],quote=foundQuote)
 
     return JsonResponse(transaction,status=200)
 

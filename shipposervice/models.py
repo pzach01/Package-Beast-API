@@ -6,9 +6,9 @@ from quotes.models import Quote
 
 class ShippoTransaction(models.Model):
     owner = models.ForeignKey(
-        'users.User', related_name='shippo_transactions', on_delete=models.CASCADE)
+        'users.User', related_name='shippo_transaction', on_delete=models.CASCADE)
     label_url = models.CharField(max_length=1012, default='', null=True, blank=True)
-    quote = models.ForeignKey(Quote, related_name='shippo_transactions', on_delete=models.CASCADE)
+    quote = models.OneToOneField(Quote, related_name='shippo_transaction', on_delete=models.CASCADE, blank=True, null=True)
 
     objectState=models.CharField(max_length=256,default='',null=True,blank=True)
     status=models.CharField(max_length=256,default='',null=True,blank=True)

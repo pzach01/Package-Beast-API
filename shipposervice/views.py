@@ -16,7 +16,7 @@ from shipposervice.models import ShippoTransaction
 from shipposervice.serializers import ShippoTransactionSerializer
 from quotes.models import Quote
 from drf_yasg.utils import swagger_auto_schema
-
+from django.core.exceptions import ObjectDoesNotExist
 
 class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -51,8 +51,10 @@ def generate_shippo_transaction(request):
     try:
         ShippoTransaction.objects.get(quote=foundQuote)
         return JsonResponse('This quote already has a shippo transaction',safe=False,status=400)
-    except:
+    except ObjectDoesNotExist:
         pass
+    except ShippoTransaction.MultipleObjectsReturned:
+        return JsonResponse('This quote already has created multiple shippo transactions, contact admin',safe=False,status=400)
     transaction = shippo.Transaction.create( 
         rate=rateId, 
         label_file_type="PDF", 

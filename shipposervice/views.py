@@ -48,7 +48,11 @@ def generate_shippo_transaction(request):
         foundQuote=Quote.objects.filter(owner=request.user).filter(shippoRateId=rateId)[0]
     except:
         return JsonResponse('Couldnt find rate in generate_shippo_transaction',safe=False,status=400)
-
+    try:
+        ShippoTransaction.objects.get(quote=foundQuote)
+        return JsonResponse('This quote already has a shippo transaction',safe=False,status=400)
+    except:
+        pass
     transaction = shippo.Transaction.create( 
         rate=rateId, 
         label_file_type="PDF", 

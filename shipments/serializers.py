@@ -291,7 +291,13 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
 
         import shippo
-        shippo.config.api_key = "shippo_test_41c916402deba95527751c894fd23fc03d7d8198"
+        import os
+
+        user=User.objects.get(email=request.user)
+        if user.userHasShippoAccount():
+            shippo.config.api_key=user.shippoAccessToken
+        else:
+            shippo.config.api_key = os.getenv('SHIPPO_API_KEY')
 
         address_from = shippo.Address.create(
             name = shipFromAttentionName,

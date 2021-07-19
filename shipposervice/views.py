@@ -34,7 +34,12 @@ class IsOwner(permissions.BasePermission):
 @permission_classes([permissions.IsAuthenticated,IsOwner])
 def generate_shippo_transaction(request):
     import shippo
-    shippo.config.api_key = "shippo_test_41c916402deba95527751c894fd23fc03d7d8198"
+
+    user=User.objects.get(email=request.user)
+    if user.userHasShippoAccount():
+        shippo.config.api_key=user.shippoAccessToken
+    else:
+        shippo.config.api_key = os.getenv('SHIPPO_API_KEY')
 
     rateId=request.data['rateId']
 

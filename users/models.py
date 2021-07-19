@@ -68,7 +68,7 @@ class User(AbstractUser):
     includeUpsContainers = models.BooleanField(default=True)
     includeUspsContainers = models.BooleanField(default=True)
     shippoAccessToken=models.CharField(max_length=100,blank=True,default='')
-    def get_userHasShippoAccount(self):
+    def userHasShippoAccount(self):
         if self.shippoAccessToken:
             return True
         else:

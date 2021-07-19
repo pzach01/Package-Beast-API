@@ -51,7 +51,7 @@ def generate_shippo_transaction(request):
     try:
         ShippoTransaction.objects.get(quote=foundQuote)
         return JsonResponse('This quote already has a shippo transaction',safe=False,status=400)
-    except:
+    except ShippoTransaction.MultipleObjectsReturned:
         pass
     transaction = shippo.Transaction.create( 
         rate=rateId, 

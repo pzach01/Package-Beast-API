@@ -294,7 +294,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         import os
 
         user=User.objects.get(email=request.user)
-        if user.userHasShippoAccount():
+        if user.userHasShippoAccount() and (os.getenv('ENVIRONMENT_TYPE')=='PRODUCTION'):
             shippo.config.api_key=user.shippoAccessToken
         else:
             shippo.config.api_key = os.getenv('SHIPPO_API_KEY')

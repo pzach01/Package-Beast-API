@@ -36,7 +36,7 @@ def generate_shippo_transaction(request):
     import shippo
 
     user=User.objects.get(email=request.user)
-    if user.userHasShippoAccount():
+    if user.userHasShippoAccount() and (os.getenv('ENVIRONMENT_TYPE')=='PRODUCTION'):
         shippo.config.api_key=user.shippoAccessToken
     else:
         shippo.config.api_key = os.getenv('SHIPPO_API_KEY')

@@ -280,7 +280,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
     """
 
 
-    def get_shippo_rates(self,shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim):
+    def get_shippo_rates(self,username,shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim):
         if '.' in weight:
             weight=weight[0: (weight.index('.')+5)]
         if '.' in xDim:
@@ -294,7 +294,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         import shippo
         import os
 
-        user=User.objects.get(email=request.user)
+        user=User.objects.get(email=username)
         if user.userHasShippoAccount() and (os.getenv('ENVIRONMENT_TYPE')=='PRODUCTION'):
             shippo.config.api_key=user.shippoAccessToken
         else:
@@ -524,7 +524,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 xDim=str(xDim)
                 yDim=str(yDim)
                 zDim=str(zDim)
-                quotesAsTuplesShippo=self.get_shippo_rates(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
+                quotesAsTuplesShippo=self.get_shippo_rates(validated_data['owner'],shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
                 for quote in quotesAsTuplesShippo:
                     #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
                     Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4],shippoRateId=quote[5])

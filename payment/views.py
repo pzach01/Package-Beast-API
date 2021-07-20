@@ -166,7 +166,7 @@ class IsOwner(permissions.BasePermission):
     }
 ))
 @api_view(['post'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated, IsOwner])
 def create_stripe_subscription(request):
     sub = Subscription.objects.get(owner=request.user)
     sub.subscriptionUpdateInProgress=False
@@ -295,7 +295,7 @@ def create_stripe_subscription(request):
     }
 ))
 @api_view(['post'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated,IsOwner])
 def retry_invoice(request):
     sub = Subscription.objects.get(owner=request.user)
     
@@ -380,7 +380,7 @@ def retry_invoice(request):
         return JsonResponse("No invoice has gone through yet",safe=False)
 
 @api_view(['get'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated,IsOwner])
 def get_subscription_info(request):
     try:
         sub=Subscription.objects.get(owner=request.user)
@@ -422,7 +422,7 @@ def get_subscription_info(request):
 
 
 @api_view(['delete'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated,IsOwner])
 def cancel_subscription(request):
     try:
         sub=Subscription.objects.get(owner=request.user)
@@ -442,7 +442,7 @@ def cancel_subscription(request):
     }
 ))
 @api_view(['put'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated,IsOwner])
 #this relies upon invoice.paid distinguishing between full and partial refills of user requests
 def update_stripe_subscription(request):
     data = request.data

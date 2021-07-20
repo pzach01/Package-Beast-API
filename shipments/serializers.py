@@ -13,6 +13,7 @@ from addresses.serializers import AddressSerializer
 from addresses.models import Address
 from rest_framework import serializers
 from libs.Box_Stuff_Python3_Only import box_stuff2 as bp
+from users.models import User
 
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')

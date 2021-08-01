@@ -24,7 +24,9 @@ class IsOwner(permissions.BasePermission):
 @swagger_auto_schema(method='post', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
-        'code': openapi.Schema(type=openapi.TYPE_STRING),
+        'rateId': openapi.Schema(type=openapi.TYPE_STRING),
+        'labelFileType': openapi.Schema(type=openapi.TYPE_STRING),
+
     }
 ))
 
@@ -75,6 +77,12 @@ def generate_shippo_transaction(request):
 
     return Response(serializer.data)
 
+@swagger_auto_schema(method='post', request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'code': openapi.Schema(type=openapi.TYPE_STRING),
+    }
+))
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated,IsOwner])
 def generate_shippo_oauth_token(request):

@@ -42,7 +42,7 @@ def generate_shippo_transaction(request):
         shippo.config.api_key = os.getenv('SHIPPO_API_KEY')
 
     rateId=request.data['rateId']
-
+    labelFileType=request.data['labelFileType']
     foundQuote=None
     try:
         foundQuote=Quote.objects.filter(owner=request.user).filter(shippoRateId=rateId)[0]
@@ -57,7 +57,7 @@ def generate_shippo_transaction(request):
         return JsonResponse('This quote already has created multiple shippo transactions, contact admin',safe=False,status=400)
     transaction = shippo.Transaction.create( 
         rate=rateId, 
-        label_file_type="PDF", 
+        label_file_type=labelFileType, 
         asynchronous=False)
     shippoTransaction=ShippoTransaction.objects.create(owner=request.user,label_url=transaction['label_url'],quote=foundQuote)
 

@@ -539,12 +539,22 @@ def test_underfits_sieve():
     for ele in range(0, 100000):
         print(ele)
         test_one_underfit_sieve()
-
+def test_underfits_sieve_one():
+    containers=['18x18x24','5x5x10','10x8x2']
+    items=['1x1x1']
+    ids=[ele for ele in range(0, len(items))]
+    timeout=15
+    import time
+    start=time.time()
+    apiObjects, timedOut, arrangmentPossible=box_stuff2.sieve_containers(containers,items,timeout,False,ids)
+    end=time.time()
+    assert(end-start<1)
 '''
 from . import testing_imports
 from .testing_imports import *
 #test_underfits_api()
 #test_underfits()
 #test_underfits_multipack()
-test_underfits_sieve()
+#test_underfits_sieve()
+test_underfits_sieve_one()
 '''

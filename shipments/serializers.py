@@ -401,7 +401,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             return shipment
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
-        ratesResponses=[]
+        requestsAndArrangments=[]
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
             arrangement.timeout = timedout
@@ -497,11 +497,12 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 xDim=str(xDim)
                 yDim=str(yDim)
                 zDim=str(zDim)
-                response=self.make_rates_request(validated_data['owner'],shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
-                ratesResponses.append(response)
+                request=self.make_rates_request(validated_data['owner'],shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
+                requestsAndArrangments.append((request,arrangement))
         
 
-        for request in ratesResponses:
+        for rateAndArrangment in requestsAndArrangments:
+            request,arrangment=rateAndArrangment[0],rateAndArrangment[1]
             rates=request['rates']
 
             quotesAsTuplesShippo=[]

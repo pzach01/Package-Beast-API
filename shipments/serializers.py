@@ -280,7 +280,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
     """
 
 
-    def get_shippo_rates(self,username,shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim):
+    def make_rates_request(self,username,shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim):
         if '.' in weight:
             weight=weight[0: (weight.index('.')+5)]
         if '.' in xDim:
@@ -319,26 +319,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
             country = "US",
             validate = True
         )
-
-        """
-        address_from = {
-            "name": "Shawn Ippotle",
-            "street1": "215 Clayton St.",
-            "city": "San Francisco",
-            "state": "CA",
-            "zip": "94117",
-            "country": "US"
-        }
-
-        address_to = {
-            "name": "Mr Hippo",
-            "street1": "Broadway 1",
-            "city": "New York",
-            "state": "NY",
-            "zip": "10007",
-            "country": "US"
-        }
-        """
         parcel = {
             "length": xDim,
             "width": yDim,
@@ -348,21 +328,13 @@ class ShipmentSerializer(serializers.ModelSerializer):
             "mass_unit": "lb"
         }
 
-        shipment = shippo.Shipment.create(
+        response = shippo.Shipment.create(
             address_from = address_from,
             address_to = address_to,
             parcels = [parcel],
             asynchronous = False
         )
-        rates=shipment['rates']
-
-        tupleList=[]
-        for rate in rates:
-            rateId=rate['object_id']
-            #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
-            t=(rate['provider'],rate['amount'],rate['servicelevel']['name'],rate['estimated_days'],rate['duration_terms'],rateId)
-            tupleList.append(t)
-        return tupleList    
+        return response
     # note that these two methods are found in the arrangments serializer (quite sloppily)
     def format_as_dimensions(self,x,y,z):
         return str(x)+'x'+str(y)+'x'+str(z)
@@ -429,6 +401,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             return shipment
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
+        ratesResponses=[]
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
             arrangement.timeout = timedout
@@ -524,20 +497,22 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 xDim=str(xDim)
                 yDim=str(yDim)
                 zDim=str(zDim)
-                quotesAsTuplesShippo=self.get_shippo_rates(validated_data['owner'],shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
-                for quote in quotesAsTuplesShippo:
-                    #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
-                    Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4],shippoRateId=quote[5])
-                '''
-                quotesAsTuplesUPS=self.make_ups_request(shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
-                for quote in quotesAsTuplesUPS:
-                    #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
-                    Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4])
-                
-                quotesAsTuplesUSPS=self.make_usps_request(shipToPostalCode,shipFromPostalCode,weight,xDim,yDim,zDim)
-                for quote in quotesAsTuplesUSPS:
-                    #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
-                    Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4])
-                '''
+                response=self.make_rates_request(validated_data['owner'],shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
+                ratesResponses.append(response)
+        
+
+        for request in ratesResponses:
+            rates=request['rates']
+
+            quotesAsTuplesShippo=[]
+            for rate in rates:
+                rateId=rate['object_id']
+                #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
+                t=(rate['provider'],rate['amount'],rate['servicelevel']['name'],rate['estimated_days'],rate['duration_terms'],rateId)
+                quotesAsTuplesShippo.append(t)
+            
+            for quote in quotesAsTuplesShippo:
+                #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
+                Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4],shippoRateId=quote[5])
         return shipment
 

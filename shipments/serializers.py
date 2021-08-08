@@ -332,7 +332,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             address_from = address_from,
             address_to = address_to,
             parcels = [parcel],
-            asynchronous = False
+            asynchronous = True
         )
         return response
     # note that these two methods are found in the arrangments serializer (quite sloppily)
@@ -401,7 +401,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             return shipment
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
-        requestsAndArrangments=[]
+        requestsAndArrangements=[]
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
             arrangement.timeout = timedout
@@ -498,10 +498,38 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 yDim=str(yDim)
                 zDim=str(zDim)
                 request=self.make_rates_request(validated_data['owner'],shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
-                requestsAndArrangments.append((request,arrangement))
-        
+                requestsAndArrangements.append((request,arrangement))
+        import time
+        import shippo
+        endTime=time.time()+15
+        # give shippo 3 secs of lead time to make arrangment
+        time.sleep(3)
+        # spin lock that exits when status=SUCCESS for all requests or timeout
+        keepGoing=True
 
-        for rateAndArrangment in requestsAndArrangments:
+
+        while(time.time()<endTime and keepGoing):
+            keepGoing=False
+            for index in range(0, len(requestsAndArrangements)):
+                requestAndArrangement=requestsAndArrangements[index]
+
+                request,arrangement=requestAndArrangement[0],requestAndArrangement[1]
+                # no need to check this object again
+                if request['status']=='SUCCESS':
+                    pass
+                else:
+                    newRequest=shippo.Shipment.retrieve(request['object_id'])
+                    if newRequest['status']=='SUCCESS':
+                        requestsAndArrangements[index]=(newRequest,arrangement)
+                    else:
+                        keepGoing=True
+                        # give shippo more time
+                        time.sleep(.5)
+
+
+                    
+
+        for rateAndArrangment in requestsAndArrangements:
             request,arrangment=rateAndArrangment[0],rateAndArrangment[1]
             rates=request['rates']
 

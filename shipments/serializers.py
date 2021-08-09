@@ -288,7 +288,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
                     
 
         for rateAndArrangment in requestsAndArrangements:
-            request,arrangment=rateAndArrangment[0],rateAndArrangment[1]
+            request,arrangement=rateAndArrangment[0],rateAndArrangment[1]
             rates=request['rates']
 
             quotesAsTuplesShippo=[]

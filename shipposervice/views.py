@@ -64,7 +64,7 @@ def generate_shippo_transaction(request):
     shippoTransaction=ShippoTransaction.objects.create(owner=request.user,label_url=transaction['label_url'],quote=foundQuote)
     if "messages" in transaction:
         for message in transaction['messages']:
-            ShippoMessage.objects.create(**message, shippoTransaction=transaction)
+            ShippoMessage.objects.create(shippoTransaction=transaction, **message)
     shippoTransaction.objectState=transaction['object_state']
     shippoTransaction.status=transaction['status']
     shippoTransaction.objectCreated=transaction['object_created']

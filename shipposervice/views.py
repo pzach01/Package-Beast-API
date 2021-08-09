@@ -69,7 +69,8 @@ def generate_shippo_transaction(request):
     shippoTransaction.status=transaction['status']
     shippoTransaction.objectCreated=transaction['object_created']
     shippoTransaction.objectUpdated=transaction['object_updated']
-    shippoTransaction.objectId=transaction['object_id']
+    if 'object_id' in transaction:
+        shippoTransaction.objectId=transaction['object_id']
     shippoTransaction.objectOwner=transaction['object_owner']
     # cast from a boolean
     shippoTransaction.test=str(transaction['test'])

@@ -14,6 +14,9 @@ from addresses.models import Address
 from rest_framework import serializers
 from libs.Box_Stuff_Python3_Only import box_stuff2 as bp
 from users.models import User
+import os
+import shippo
+
 
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
@@ -31,256 +34,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
         depth=1
         fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout', 'includeUpsContainers', 'includeUspsContainers']
         read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeoutDuration','arrangements', 'timeout']
-    """
-    # used before integration with Shippo API
-    def make_ups_request(self,shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim):
-        # note that this is not production url
-        testUrl='https://wwwcie.ups.com/ups.app/xml/Rate'
-        testUrl=testUrl.replace('\n', '')
 
-        # no pickup type
-        # RequestOption can be changed to Rate to get a single rate for a single service, Shop specifies all
-        # should 'AttentionName' be included ?
-        # see package code for specific subtypes of packages like:
-        #00 = UNKNOWN
-        #01 = UPS Letter
-        #02 = Package
-        #03 = Tube
-        #04 = Pak
-        #21 = Express Box
-        #24 = 25KG Box
-        #25 = 10KG Box
-        #30 = Pallet
-        #2a = Small Express
-        #Box
-        #2b = Medium Express
-        #Box
-        #2c = Large Express
-        #Box.
-        # can add in some stuff to support cms
-
-        shipperName='Lucas Zach'
-        shipperPhoneNumber='5156573318'
-        shipperAddressLineOne='13178 Oakbrook Drive'
-        shipperCity='Des Moines'
-        shipperStateProvinceCode='IA'
-        shipperPostalCode='50323'
-        shipperCountryCode='US'
-
-        shipToCountryCode='US'
-
-        shipFromCountryCode='US'
-        #LBS = Pounds, KGS =Kilograms.
-        unitOfMeasurement='LBS'
-        xml='''
-        <?xml version="1.0"?>
-
-        <AccessRequest xml:lang="en-US">
-        <AccessLicenseNumber>5D9635047BCF95F2</AccessLicenseNumber>
-        <UserId>LucasZach35</UserId>
-        <Password>Letsgetit35!</Password>
-        </AccessRequest>
-
-        <?xml version="1.0"?>
-        <RatingServiceSelectionRequest xml:lang="en-US">
-
-        <Request>
-        <TransactionReference>
-        <CustomerContext>This string will be in the response</CustomerContext>
-        </TransactionReference>
-        <RequestAction>Shop</RequestAction>
-        <RequestOption>Shop</RequestOption>
-        </Request>
-        '''
-        xml+='<Shipment>'
-        xml+='<Shipper>'
-
-        xml+='<Name>'+shipperName+'</Name>'
-        xml+='<AttentionName></AttentionName>'
-        xml+='<PhoneNumber>'+shipperPhoneNumber+'</PhoneNumber>'
-        xml+='<FaxNumber></FaxNumber>'
-        xml+='<ShipperNumber></ShipperNumber>'
-
-        xml+='<Address>'
-        xml+='<AddressLine1>'+shipperAddressLineOne+'</AddressLine1>'
-        xml+='<City>'+shipperCity+'</City>'
-        xml+='<StateProvinceCode>'+shipperStateProvinceCode+'</StateProvinceCode>'
-        xml+='<PostalCode>'+shipperPostalCode+'</PostalCode>'
-        xml+='<CountryCode>'+shipperCountryCode+'</CountryCode>'
-        xml+='</Address>'
-
-        xml+='</Shipper>'
-
-        xml+='<ShipTo>'
-
-        xml+='<CompanyName></CompanyName>'
-        xml+='<AttentionName>'+shipToAttentionName+'</AttentionName>'
-        xml+='<PhoneNumber>'+shipToPhoneNumber+'</PhoneNumber>'
-        xml+='<FaxNumber></FaxNumber>'
-
-        xml+='<Address>'
-        xml+='<AddressLine1>'+shipToAddressLineOne+'</AddressLine1>'
-        xml+='<City>'+shipToCity+'</City>'
-        xml+='<StateProvinceCode>'+shipToStateProvinceCode+'</StateProvinceCode>'
-        xml+='<PostalCode>'+shipToPostalCode+'</PostalCode>'
-        xml+='<CountryCode>'+shipToCountryCode+'</CountryCode>'
-        xml+='</Address>'
-
-        xml+='</ShipTo>'
-
-
-        xml+='<ShipFrom>'
-        xml+='<CompanyName></CompanyName>'
-        xml+='<AttentionName>'+shipFromAttentionName+'</AttentionName>'
-        xml+='<PhoneNumber>'+shipFromPhoneNumber+'</PhoneNumber>'
-        xml+='<FaxNumber></FaxNumber>'
-        
-        xml+='<Address>'
-        xml+='<AddressLine1>'+shipFromAddressLineOne+'</AddressLine1>'
-        xml+='<City>'+shipFromCity+'</City>'
-        xml+='<StateProvinceCode>'+shipFromStateProvinceCode+'</StateProvinceCode>'
-        xml+='<PostalCode>'+shipFromPostalCode+'</PostalCode>'
-        xml+='<CountryCode>'+shipFromCountryCode+'</CountryCode>'
-        xml+='</Address>'
-
-        xml+='</ShipFrom>'
-        
-        # review what these mean
-        # ignored because of shopping
-        xml+='''
-        <Service>
-        <Code>03</Code>
-        <Description>UPS Ground</Description>
-        </Service>
-
-        <Package>
-
-        <PackagingType>
-        <Code>02</Code>
-        <Description>UPS Package</Description>
-        </PackagingType>
-        '''
-
-        xml+='<PackageWeight>'
-        xml+='<UnitOfMeasurement>'
-        xml+='<Code>'+unitOfMeasurement+'</Code>'
-        xml+='</UnitOfMeasurement>'
-        xml+='<Weight>'+weight+'</Weight>'
-        xml+='</PackageWeight>'
-
-        xml+='<Dimensions>'
-        xml+='<Length>'+xDim+'</Length>'
-        xml+='<Width>'+yDim+'</Width>'
-        xml+='<Height>'+zDim+'</Height>'
-        xml+='</Dimensions>'
-        xml+='</Package>'
-
-        xml+='</Shipment>'
-        xml+='</RatingServiceSelectionRequest>'
-        
-
-        import requests
-        # 21.90
-        #r = requests.get(get_shipping_cost_info_string('10','2','LG FLAT RATE BOX','','',''))
-
-        # 15.55
-        r = requests.post(testUrl,data=xml)
-
-        dataAsText=(r.text)
-        import xmltodict
-        import json
-        dataDict = xmltodict.parse(dataAsText)
-        nestOne=dataDict['RatingServiceSelectionResponse']
-        assert(nestOne['Response']['ResponseStatusDescription']=="Success")
-
-        ratedShipments=nestOne['RatedShipment']
-        tupleList=[]
-        for r in ratedShipments:
-            carrier='UPS'
-            if not r['TotalCharges']['CurrencyCode']=='USD':
-                raise Exception("unsupported currency")
-            cost=r['TotalCharges']['MonetaryValue']
-            guranteedDaysToDelivery=r['GuaranteedDaysToDelivery']
-            serviceCode=r['Service']['Code']
-            scheduledDeliveryTime=r['ScheduledDeliveryTime']
-            serviceDescription='Error'
-
-            # couldnt find how to force response to include serviceDescription 
-            if serviceCode=='01':
-                serviceDescription='Next Day Air'
-            if serviceCode=='02':
-                serviceDescription='2nd Day Air'
-            if serviceCode=='03':
-                serviceDescription='Ground'
-            if serviceCode=='12':
-                serviceDescription='3 Day Select'
-            if serviceCode=='13':
-                serviceDescription='Next Day Air Saver'
-            if serviceCode=='14':
-                serviceDescription='UPS Next Day Air Early'
-            if serviceCode=='59':
-                serviceDescription='2nd Day Air A.M.'
-            #Valid international values:
-            #07 = Worldwide Express
-            #08 = Worldwide Expedited
-            #11= Standard
-            #54 = Worldwide Express Plus
-            #65 = Saver
-            #96 = UPS Worldwide Express
-            #Freight
-            #71 = UPS Worldwide
-            if (serviceCode=='07') or (serviceCode=='08') or (serviceCode=='11') or (serviceCode=='54') or (serviceCode=='65') or (serviceCode=='96') or (serviceCode=='71'):
-                serviceDescription='International service, not supported'
-            tupleList.append((carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime))
-        return tupleList
-    """
-
-    """
-    # used before Shippo integration
-    def make_usps_request(self,shipToPostalCode,shipFromPostalCode,weight,xDim,yDim,zDim):
-        boxType='VARIABLE'
-        # assumes weight is in pounds as decimal
-        weightOunces=round(weight*16)
-        weightPounds=weightOunces//16
-        weightOunces=weightOunces-(16*weightPounds)
-
-        weightPounds=str(weightPounds)
-        weightOunces=str(weightOunces)
-        # not a USPS special box; reexamine this in the docs
-        endpoint='https://secure.shippingapis.com/ShippingAPI.dll?API=RateV4 &XML='
-        xml='<RateV4Request USERID="106PACKA2149"><Revision>2</Revision><Package ID="0"><Service>ALL</Service>'
-        xml+='<ZipOrigination>'+shipFromPostalCode+'</ZipOrigination>'
-        xml+='<ZipDestination>'+shipToPostalCode+'</ZipDestination>'
-        xml+='<Pounds>'+weightPounds+'</Pounds>'
-        xml+='<Ounces>'+weightOunces+'</Ounces>'
-        xml+='<Container>'+boxType+'</Container>'
-        xml+='<Width>'+xDim+'</Width>'
-        xml+='<Length>'+yDim+'</Length>'
-        xml+='<Height>'+zDim+'</Height>'
-        xml+='<Girth></Girth><Machinable>TRUE</Machinable></Package></RateV4Request>'
-        testUrl= endpoint+xml
-
-        import requests
-        r = requests.post(testUrl,data=xml)
-
-        dataAsText=(r.text)
-        import xmltodict
-        import json
-        dataDict = xmltodict.parse(dataAsText)
-        nestOne=dataDict['RateV4Response']
-        nestTwo=nestOne['Package']
-        data=nestTwo['Postage']
-        #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
-
-        tupleList=[]
-        for d in data:
-            t=('USPS',d['Rate'],d['MailService'],'','')
-            tupleList.append(t)
-        return tupleList
-    """
-
-
-    def make_rates_request(self,username,shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,weight,xDim,yDim,zDim):
+    def make_rates_request(self,addressFrom,addressTo,weight,xDim,yDim,zDim):
         if '.' in weight:
             weight=weight[0: (weight.index('.')+5)]
         if '.' in xDim:
@@ -291,34 +46,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             zDim=zDim[0: (zDim.index('.')+5)]
 
 
-        import shippo
-        import os
 
-        user=User.objects.get(email=username)
-        if user.userHasShippoAccount() and (os.getenv('ENVIRONMENT_TYPE')=='PRODUCTION'):
-            shippo.config.api_key=user.shippoAccessToken
-        else:
-            shippo.config.api_key = os.getenv('SHIPPO_API_KEY')
-
-        address_from = shippo.Address.create(
-            name = shipFromAttentionName,
-            street1 = shipFromAddressLineOne,
-            city = shipFromCity,
-            state = shipFromStateProvinceCode,
-            zip = shipFromPostalCode,
-            country = "US",
-            validate = True
-        )
-
-        address_to = shippo.Address.create(
-            name = shipToAttentionName,
-            street1 = shipToAddressLineOne,
-            city = shipToCity,
-            state = shipToStateProvinceCode,
-            zip = shipToPostalCode,
-            country = "US",
-            validate = True
-        )
         parcel = {
             "length": xDim,
             "width": yDim,
@@ -329,8 +57,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
         }
 
         response = shippo.Shipment.create(
-            address_from = address_from,
-            address_to = address_to,
+            address_from = addressFrom,
+            address_to = addressTo,
             parcels = [parcel],
             asynchronous = True
         )
@@ -348,6 +76,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
       
     def create(self, validated_data):
         # make no more then 10 api requests
+
         requestLimit=10
         requestsMade=0
 
@@ -399,6 +128,49 @@ class ShipmentSerializer(serializers.ModelSerializer):
         shipment.arrangementPossible=arrangementPossible
         if not arrangementPossible:
             return shipment
+
+
+        # create shippo addresses (shipFrom and shipTo)
+        shipToAttentionName=shipToAddress.name
+        shipToPhoneNumber=shipToAddress.phoneNumber
+        shipToAddressLineOne=shipToAddress.addressLine1
+        shipToCity=shipToAddress.city
+        shipToStateProvinceCode=shipToAddress.stateProvinceCode
+        shipToPostalCode=shipToAddress.postalCode
+
+
+        shipFromAttentionName=shipFromAddress.name
+        shipFromPhoneNumber=shipFromAddress.phoneNumber
+        shipFromAddressLineOne=shipFromAddress.addressLine1
+        shipFromCity=shipFromAddress.city
+        shipFromStateProvinceCode=shipFromAddress.stateProvinceCode
+        shipFromPostalCode=shipFromAddress.postalCode
+
+        user=User.objects.get(email=validated_data['owner'])
+        if user.userHasShippoAccount() and (os.getenv('ENVIRONMENT_TYPE')=='PRODUCTION'):
+            shippo.config.api_key=user.shippoAccessToken
+        else:
+            shippo.config.api_key = os.getenv('SHIPPO_API_KEY')
+
+        addressFrom = shippo.Address.create(
+            name = shipFromAttentionName,
+            street1 = shipFromAddressLineOne,
+            city = shipFromCity,
+            state = shipFromStateProvinceCode,
+            zip = shipFromPostalCode,
+            country = "US",
+            validate = True
+        )
+
+        addressTo = shippo.Address.create(
+            name = shipToAttentionName,
+            street1 = shipToAddressLineOne,
+            city = shipToCity,
+            state = shipToStateProvinceCode,
+            zip = shipToPostalCode,
+            country = "US",
+            validate = True
+        )
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
         requestsAndArrangements=[]
@@ -475,20 +247,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
                     totalWeight+=item['weightUnits']
 
             if requestsMade<requestLimit:
-                shipToAttentionName=shipToAddress.name
-                shipToPhoneNumber=shipToAddress.phoneNumber
-                shipToAddressLineOne=shipToAddress.addressLine1
-                shipToCity=shipToAddress.city
-                shipToStateProvinceCode=shipToAddress.stateProvinceCode
-                shipToPostalCode=shipToAddress.postalCode
 
-
-                shipFromAttentionName=shipFromAddress.name
-                shipFromPhoneNumber=shipFromAddress.phoneNumber
-                shipFromAddressLineOne=shipFromAddress.addressLine1
-                shipFromCity=shipFromAddress.city
-                shipFromStateProvinceCode=shipFromAddress.stateProvinceCode
-                shipFromPostalCode=shipFromAddress.postalCode
                 weight=totalWeight
                 assert(not xDim==0)
                 assert(not yDim==0)
@@ -497,10 +256,9 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 xDim=str(xDim)
                 yDim=str(yDim)
                 zDim=str(zDim)
-                request=self.make_rates_request(validated_data['owner'],shipToAttentionName,shipToPhoneNumber,shipToAddressLineOne,shipToCity,shipToStateProvinceCode,shipToPostalCode,shipFromAttentionName,shipFromPhoneNumber,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode,str(weight),xDim,yDim,zDim)
+                request=self.make_rates_request(addressFrom,addressTo,str(weight),xDim,yDim,zDim)
                 requestsAndArrangements.append((request,arrangement))
         import time
-        import shippo
         endTime=time.time()+15
         # give shippo 3 secs of lead time to make arrangment
         time.sleep(3)

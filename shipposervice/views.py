@@ -12,7 +12,7 @@ from users.models import User
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg import openapi
-from shipposervice.models import ShippoTransaction
+from shipposervice.models import ShippoTransaction, ShippoMessage
 from shipposervice.serializers import ShippoTransactionSerializer
 from quotes.models import Quote
 from drf_yasg.utils import swagger_auto_schema
@@ -62,7 +62,9 @@ def generate_shippo_transaction(request):
         label_file_type=labelFileType, 
         asynchronous=False)
     shippoTransaction=ShippoTransaction.objects.create(owner=request.user,label_url=transaction['label_url'],quote=foundQuote)
-
+    if "messages" in transaction:
+        for message in transaction['messages']:
+            message = ShippoMessage.objects.create(message)
     shippoTransaction.objectState=transaction['object_state']
     shippoTransaction.status=transaction['status']
     shippoTransaction.objectCreated=transaction['object_created']

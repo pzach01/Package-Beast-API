@@ -19,4 +19,12 @@ class ShippoTransaction(models.Model):
     # cast from a boolean
     test=models.CharField(max_length=256,default='',null=True,blank=True)
     shippoRateId=models.CharField(max_length=256,default='',null=True,blank=True)
+
+class ShippoMessage(models.Model):
+    code = models.CharField(max_length=32,default='',null=True,blank=True)
+    source = models.CharField(max_length=32,default='',null=True,blank=True)
+    text = models.CharField(max_length=512,default='',null=True,blank=True)
+    shippoTransaction = models.ForeignKey(ShippoTransaction, related_name='shippoMessage', on_delete=models.CASCADE, blank=True, null=True)
+
 admin.site.register(ShippoTransaction)
+admin.site.register(ShippoMessage)

@@ -30,8 +30,6 @@ class IsOwner(permissions.BasePermission):
     }
 ))
 
-
-
 @api_view(['post'])
 @permission_classes([permissions.IsAuthenticated,IsOwner])
 def generate_shippo_transaction(request):
@@ -64,13 +62,12 @@ def generate_shippo_transaction(request):
     shippoTransaction=ShippoTransaction.objects.create(owner=request.user,label_url=transaction['label_url'],quote=foundQuote)
     if "messages" in transaction:
         for message in transaction['messages']:
-            ShippoMessage.objects.create(shippoTransaction=transaction, **message)
+            ShippoMessage.objects.create(shippoTransaction=shippoTransaction, **message)
     shippoTransaction.objectState=transaction['object_state']
     shippoTransaction.status=transaction['status']
     shippoTransaction.objectCreated=transaction['object_created']
     shippoTransaction.objectUpdated=transaction['object_updated']
-    if 'object_id' in transaction:
-        shippoTransaction.objectId=transaction['object_id']
+    shippoTransaction.objectId=transaction['object_id']
     shippoTransaction.objectOwner=transaction['object_owner']
     # cast from a boolean
     shippoTransaction.test=str(transaction['test'])

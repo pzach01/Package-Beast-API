@@ -17,6 +17,39 @@ from users.models import User
 import os
 import shippo
 
+async def async_handler(tasks):
+    import asyncio
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    return results
+async def make_rates_request(addressFrom,addressTo,weight,xDim,yDim,zDim):
+    if '.' in weight:
+        weight=weight[0: (weight.index('.')+5)]
+    if '.' in xDim:
+        xDim=xDim[0: (xDim.index('.')+5)]
+    if '.' in yDim:
+        yDim=yDim[0: (yDim.index('.')+5)]
+    if '.' in zDim:
+        zDim=zDim[0: (zDim.index('.')+5)]
+
+
+
+    parcel = {
+        "length": xDim,
+        "width": yDim,
+        "height": zDim,
+        "distance_unit": "in",
+        "weight": weight,
+        "mass_unit": "lb"
+    }
+
+    response = shippo.Shipment.create(
+        address_from = addressFrom,
+        address_to = addressTo,
+        parcels = [parcel],
+        asynchronous = True
+    )
+    return response
 
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
@@ -35,34 +68,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout', 'includeUpsContainers', 'includeUspsContainers']
         read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeoutDuration','arrangements', 'timeout']
 
-    def make_rates_request(self,addressFrom,addressTo,weight,xDim,yDim,zDim):
-        if '.' in weight:
-            weight=weight[0: (weight.index('.')+5)]
-        if '.' in xDim:
-            xDim=xDim[0: (xDim.index('.')+5)]
-        if '.' in yDim:
-            yDim=yDim[0: (yDim.index('.')+5)]
-        if '.' in zDim:
-            zDim=zDim[0: (zDim.index('.')+5)]
 
-
-
-        parcel = {
-            "length": xDim,
-            "width": yDim,
-            "height": zDim,
-            "distance_unit": "in",
-            "weight": weight,
-            "mass_unit": "lb"
-        }
-
-        response = shippo.Shipment.create(
-            address_from = addressFrom,
-            address_to = addressTo,
-            parcels = [parcel],
-            asynchronous = True
-        )
-        return response
     # note that these two methods are found in the arrangments serializer (quite sloppily)
     def format_as_dimensions(self,x,y,z):
         return str(x)+'x'+str(y)+'x'+str(z)
@@ -174,6 +180,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
         requestsAndArrangements=[]
+        tasks=[]
+        arrangementsGenerated=[]
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
             arrangement.timeout = timedout
@@ -256,8 +264,20 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 xDim=str(xDim)
                 yDim=str(yDim)
                 zDim=str(zDim)
-                request=self.make_rates_request(addressFrom,addressTo,str(weight),xDim,yDim,zDim)
-                requestsAndArrangements.append((request,arrangement))
+                tasks.append(make_rates_request(addressFrom,addressTo,str(weight),xDim,yDim,zDim))
+                arrangementsGenerated.append(arrangement)
+        import asyncio
+        # Creating another thread to execute function
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        requests = loop.run_until_complete(async_handler(tasks))
+        loop.close()
+
+        #request=make_rates_request(addressFrom,addressTo,str(weight),xDim,yDim,zDim)
+        for index in range(0, len(requests)):
+            request=requests[index]
+            arrangement=arrangementsGenerated[index]
+            requestsAndArrangements.append((request,arrangement))
         import time
         endTime=time.time()+15
         # give shippo 3 secs of lead time to make arrangment

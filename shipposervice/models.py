@@ -19,6 +19,7 @@ class ShippoTransaction(models.Model):
     rate=models.CharField(max_length=256,default='',null=True,blank=True)
     trackingNumber=models.CharField(max_length=256,default='',null=True,blank=True)
     trackingStatus=models.CharField(max_length=16,default='',null=True,blank=True)
+    trackingUrlProvider=models.CharField(max_length=256,default='',null=True,blank=True)
     # cast from a boolean
     test=models.CharField(max_length=256,default='',null=True,blank=True)
     shippoRateId=models.CharField(max_length=256,default='',null=True,blank=True)

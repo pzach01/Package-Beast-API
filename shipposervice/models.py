@@ -11,11 +11,14 @@ class ShippoTransaction(models.Model):
     quote = models.OneToOneField(Quote, related_name='shippoTransaction', on_delete=models.CASCADE, blank=True, null=True)
 
     objectState=models.CharField(max_length=256,default='',null=True,blank=True)
-    status=models.CharField(max_length=256,default='',null=True,blank=True)
+    status=models.CharField(max_length=16,default='',null=True,blank=True)
     objectCreated=models.CharField(max_length=256,default='',null=True,blank=True)
     objectUpdated=models.CharField(max_length=256,default='',null=True,blank=True)
     objectId=models.CharField(max_length=256,default='',null=True,blank=True)
     objectOwner=models.CharField(max_length=256,default='',null=True,blank=True)
+    rate=models.CharField(max_length=256,default='',null=True,blank=True)
+    trackingNumber=models.CharField(max_length=256,default='',null=True,blank=True)
+    trackingStatus=models.CharField(max_length=16,default='',null=True,blank=True)
     # cast from a boolean
     test=models.CharField(max_length=256,default='',null=True,blank=True)
     shippoRateId=models.CharField(max_length=256,default='',null=True,blank=True)

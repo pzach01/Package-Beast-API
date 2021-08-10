@@ -69,6 +69,9 @@ def generate_shippo_transaction(request):
     shippoTransaction.objectUpdated=transaction['object_updated']
     shippoTransaction.objectId=transaction['object_id']
     shippoTransaction.objectOwner=transaction['object_owner']
+    shippoTransaction.rate=transaction['rate']
+    shippoTransaction.trackingNumber=transaction['tracking_number']
+    shippoTransaction.trackingStatus=transaction['tracking_status']
     # cast from a boolean
     shippoTransaction.test=str(transaction['test'])
     shippoTransaction.shippoRateId=transaction['rate']

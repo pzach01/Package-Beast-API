@@ -16,9 +16,9 @@ from libs.Box_Stuff_Python3_Only import box_stuff2 as bp
 from users.models import User
 import os
 import shippo
+import asyncio
 
 async def async_handler(tasks):
-    import asyncio
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     return results
@@ -179,7 +179,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
         )
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
-        requestsAndArrangements=[]
         tasks=[]
         arrangementsGenerated=[]
         for ele in range(0, len(apiObjects)):
@@ -266,14 +265,15 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 zDim=str(zDim)
                 tasks.append(make_rates_request(addressFrom,addressTo,str(weight),xDim,yDim,zDim))
                 arrangementsGenerated.append(arrangement)
-        import asyncio
-        # Creating another thread to execute function
+        # asynchronously call tasks
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         requests = loop.run_until_complete(async_handler(tasks))
         loop.close()
-
-        #request=make_rates_request(addressFrom,addressTo,str(weight),xDim,yDim,zDim)
+        
+        # note that for this code to work correctly loops.run_until_complete (and async_handler) must return the methods in the order they were input
+        # (it does this in testing)
+        requestsAndArrangements=[]
         for index in range(0, len(requests)):
             request=requests[index]
             arrangement=arrangementsGenerated[index]

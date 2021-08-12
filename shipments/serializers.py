@@ -17,6 +17,7 @@ from users.models import User
 import os
 import shippo
 import threading
+import multiprocessing
 def rates_spinlock(rateArrangementPair,requestsAndArrangements):
     import time
     endTime=time.time()+15
@@ -276,7 +277,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 xDim=str(xDim)
                 yDim=str(yDim)
                 zDim=str(zDim)
-                threads.append(threading.Thread(target=make_rates_request(requestsAndArrangements,arrangement,addressFrom,addressTo,str(weight),xDim,yDim,zDim)))
+                threads.append(multiprocessing.Process(target=make_rates_request,args=(requestsAndArrangements,arrangement,addressFrom,addressTo,str(weight),xDim,yDim,zDim)))
+
         for j in threads:
             j.start()
         for j in threads:
@@ -294,7 +296,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         threads=[]
         outputList=[]
         for pair in requestsAndArrangements:
-            threads.append(threading.Thread(target=rates_spinlock(pair, outputList)))
+            threads.append(multiprocessing.Process(target=rates_spinlock,args=(pair, outputList)))
 
         for j in threads:
             j.start()

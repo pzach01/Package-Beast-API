@@ -17,6 +17,23 @@ from users.models import User
 import os
 import shippo
 import threading
+def rates_spinlock(rateArrangementPair,requestsAndArrangements):
+    import time
+    endTime=time.time()+15
+
+    rate=rateArrangementPair[0]
+    arrangement=rateArrangementPair[1]
+    while(True):
+        rate=shippo.Shipment.retrieve(rate['object_id'])
+        if rate['status']=='SUCCESS':
+            requestsAndArrangements.append((rate,arrangement))
+            break
+        if time.time()>endTime:
+            break
+
+
+
+
 
 def make_rates_request(requests,arrangement,addressFrom,addressTo,weight,xDim,yDim,zDim):
     if '.' in weight:
@@ -274,30 +291,20 @@ class ShipmentSerializer(serializers.ModelSerializer):
         time.sleep(3)
         # spin lock that exits when status=SUCCESS for all requests or timeout
         keepGoing=True
+        threads=[]
+        outputList=[]
+        for pair in requestsAndArrangements:
+            threads.append(threading.Thread(target=rates_spinlock(pair, outputList)))
 
-
-        while(time.time()<endTime and keepGoing):
-            keepGoing=False
-            for index in range(0, len(requestsAndArrangements)):
-                requestAndArrangement=requestsAndArrangements[index]
-
-                request,arrangement=requestAndArrangement[0],requestAndArrangement[1]
-                # no need to check this object again
-                if request['status']=='SUCCESS':
-                    pass
-                else:
-                    newRequest=shippo.Shipment.retrieve(request['object_id'])
-                    if newRequest['status']=='SUCCESS':
-                        requestsAndArrangements[index]=(newRequest,arrangement)
-                    else:
-                        keepGoing=True
-                        # give shippo more time
-                        time.sleep(.5)
+        for j in threads:
+            j.start()
+        for j in threads:
+            j.join()
 
 
                     
 
-        for rateAndArrangment in requestsAndArrangements:
+        for rateAndArrangment in outputList:
             request,arrangement=rateAndArrangment[0],rateAndArrangment[1]
             rates=request['rates']
 

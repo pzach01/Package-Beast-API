@@ -16,13 +16,27 @@ from libs.Box_Stuff_Python3_Only import box_stuff2 as bp
 from users.models import User
 import os
 import shippo
-import asyncio
+import threading
+import multiprocessing
+def rates_spinlock(rateArrangementPair,requestsAndArrangements):
+    import time
+    endTime=time.time()+15
 
-async def async_handler(tasks):
-    results = await asyncio.gather(*tasks, return_exceptions=True)
+    rate=rateArrangementPair[0]
+    arrangement=rateArrangementPair[1]
+    while(True):
+        rate=shippo.Shipment.retrieve(rate['object_id'])
+        if rate['status']=='SUCCESS':
+            requestsAndArrangements.append((rate,arrangement))
+            break
+        if time.time()>endTime:
+            break
 
-    return results
-async def make_rates_request(addressFrom,addressTo,weight,xDim,yDim,zDim):
+
+
+
+
+def make_rates_request(requests,arrangement,addressFrom,addressTo,weight,xDim,yDim,zDim):
     if '.' in weight:
         weight=weight[0: (weight.index('.')+5)]
     if '.' in xDim:
@@ -49,8 +63,7 @@ async def make_rates_request(addressFrom,addressTo,weight,xDim,yDim,zDim):
         parcels = [parcel],
         asynchronous = True
     )
-    return response
-
+    requests.append((response,arrangement))
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     containers = ContainerSerializer(many=True, write_only=True)
@@ -179,8 +192,9 @@ class ShipmentSerializer(serializers.ModelSerializer):
         )
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
-        tasks=[]
+        threads=[]
         arrangementsGenerated=[]
+        requestsAndArrangements=[]
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
             arrangement.timeout = timedout
@@ -263,51 +277,36 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 xDim=str(xDim)
                 yDim=str(yDim)
                 zDim=str(zDim)
-                tasks.append(make_rates_request(addressFrom,addressTo,str(weight),xDim,yDim,zDim))
-                arrangementsGenerated.append(arrangement)
-        # asynchronously call tasks
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        requests = loop.run_until_complete(async_handler(tasks))
-        loop.close()
+                threads.append(multiprocessing.Process(target=make_rates_request,args=(requestsAndArrangements,arrangement,addressFrom,addressTo,str(weight),xDim,yDim,zDim)))
+
+        for j in threads:
+            j.start()
+        for j in threads:
+            j.join()
         
         # note that for this code to work correctly loops.run_until_complete (and async_handler) must return the methods in the order they were input
         # (it does this in testing)
-        requestsAndArrangements=[]
-        for index in range(0, len(requests)):
-            request=requests[index]
-            arrangement=arrangementsGenerated[index]
-            requestsAndArrangements.append((request,arrangement))
+
         import time
         endTime=time.time()+15
         # give shippo 3 secs of lead time to make arrangment
         time.sleep(3)
         # spin lock that exits when status=SUCCESS for all requests or timeout
         keepGoing=True
+        threads=[]
+        outputList=[]
+        for pair in requestsAndArrangements:
+            threads.append(multiprocessing.Process(target=rates_spinlock,args=(pair, outputList)))
 
-
-        while(time.time()<endTime and keepGoing):
-            keepGoing=False
-            for index in range(0, len(requestsAndArrangements)):
-                requestAndArrangement=requestsAndArrangements[index]
-
-                request,arrangement=requestAndArrangement[0],requestAndArrangement[1]
-                # no need to check this object again
-                if request['status']=='SUCCESS':
-                    pass
-                else:
-                    newRequest=shippo.Shipment.retrieve(request['object_id'])
-                    if newRequest['status']=='SUCCESS':
-                        requestsAndArrangements[index]=(newRequest,arrangement)
-                    else:
-                        keepGoing=True
-                        # give shippo more time
-                        time.sleep(.5)
+        for j in threads:
+            j.start()
+        for j in threads:
+            j.join()
 
 
                     
 
-        for rateAndArrangment in requestsAndArrangements:
+        for rateAndArrangment in outputList:
             request,arrangement=rateAndArrangment[0],rateAndArrangment[1]
             rates=request['rates']
 

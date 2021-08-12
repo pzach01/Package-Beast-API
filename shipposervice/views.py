@@ -12,8 +12,8 @@ from users.models import User
 from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from drf_yasg import openapi
-from shipposervice.models import ShippoTransaction, ShippoMessage
-from shipposervice.serializers import ShippoTransactionSerializer
+from shipposervice.models import ShippoRefund, ShippoTransaction, ShippoMessage
+from shipposervice.serializers import ShippoTransactionSerializer, ShippoRefundSerializer
 from quotes.models import Quote
 from drf_yasg.utils import swagger_auto_schema
 from django.core.exceptions import ObjectDoesNotExist
@@ -104,3 +104,26 @@ def generate_shippo_oauth_token(request):
     user.save()
     # can't do any additional data processing until I know what the response looks like
     return JsonResponse('Access token: '+str(shippoAccessToken),status=200,safe=False)
+
+@swagger_auto_schema(method='post', request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'transactionId': openapi.Schema(type=openapi.TYPE_STRING),
+    }
+))
+@api_view(['post'])
+@permission_classes([permissions.IsAuthenticated,IsOwner])
+def refund_shippo_transaction(request):
+    import shippo
+    user=User.objects.get(email=request.user)
+    if user.userHasShippoAccount() and (os.getenv('ENVIRONMENT_TYPE')=='PRODUCTION'):
+        shippo.config.api_key=user.shippoAccessToken
+    else:
+        shippo.config.api_key = os.getenv('SHIPPO_API_KEY')
+    transactionId=request.data['transactionId']
+    shippoTransaction = ShippoTransaction.objects.get(id=transactionId)
+    shippoTransactionId = shippoTransaction.objectId
+    refund = shippo.Refund.create(transaction=shippoTransactionId, asynchronous=False)
+    shippoRefund = ShippoRefund.objects.create(owner=request.user, status=refund['status'], objectCreated=refund['object_created'], objectUpdated=refund['object_updated'], objectId=refund['object_id'], objectOwner=refund['object_owner'], test=refund['test'], transaction=shippoTransaction)
+    serializer=ShippoRefundSerializer(shippoRefund)
+    return Response(serializer.data)

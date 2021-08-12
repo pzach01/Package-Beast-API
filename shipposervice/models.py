@@ -30,5 +30,17 @@ class ShippoMessage(models.Model):
     text = models.CharField(max_length=512,default='',null=True,blank=True)
     shippoTransaction = models.ForeignKey(ShippoTransaction, related_name='messages', on_delete=models.CASCADE, blank=True, null=True)
 
+class ShippoRefund(models.Model):
+    owner = models.ForeignKey(
+        'users.User', related_name='shippoRefund', on_delete=models.CASCADE)
+    status=models.CharField(max_length=16,default='',null=True,blank=True)
+    objectCreated=models.CharField(max_length=256,default='',null=True,blank=True)
+    objectUpdated=models.CharField(max_length=256,default='',null=True,blank=True)
+    objectId=models.CharField(max_length=256,default='',null=True,blank=True)
+    objectOwner=models.CharField(max_length=256,default='',null=True,blank=True)
+    test=models.CharField(max_length=256,default='',null=True,blank=True)
+    transaction=models.ForeignKey(ShippoTransaction, related_name='shippoRefund', on_delete=models.CASCADE, blank=True, null=True)
+
 admin.site.register(ShippoTransaction)
 admin.site.register(ShippoMessage)
+admin.site.register(ShippoRefund)

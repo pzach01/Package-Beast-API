@@ -18,25 +18,24 @@ import os
 import shippo
 import threading
 import multiprocessing
-def rates_spinlock(rateArrangementPair,requestsAndArrangements):
+def request_spinlock(requestsArrangementPair):
     import time
     endTime=time.time()+15
 
-    rate=rateArrangementPair[0]
-    arrangement=rateArrangementPair[1]
+    request=requestsArrangementPair[0]
+    arrangement=requestsArrangementPair[1]
     while(True):
-        rate=shippo.Shipment.retrieve(rate['object_id'])
-        if rate['status']=='SUCCESS':
-            requestsAndArrangements.append((rate,arrangement))
+        request=shippo.Shipment.retrieve(request['object_id'])
+        if request['status']=='SUCCESS':
             break
         if time.time()>endTime:
             break
+    return (request,arrangement)
 
 
 
 
-
-def make_rates_request(requests,arrangement,addressFrom,addressTo,weight,xDim,yDim,zDim):
+def make_rates_request_async(arrangement,addressFrom,addressTo,weight,xDim,yDim,zDim):
     if '.' in weight:
         weight=weight[0: (weight.index('.')+5)]
     if '.' in xDim:
@@ -57,13 +56,13 @@ def make_rates_request(requests,arrangement,addressFrom,addressTo,weight,xDim,yD
         "mass_unit": "lb"
     }
 
-    response = shippo.Shipment.create(
+    request = shippo.Shipment.create(
         address_from = addressFrom,
         address_to = addressTo,
         parcels = [parcel],
         asynchronous = True
     )
-    requests.append((response,arrangement))
+    return (request, arrangement)
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     containers = ContainerSerializer(many=True, write_only=True)
@@ -192,9 +191,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         )
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
-        threads=[]
-        arrangementsGenerated=[]
-        requestsAndArrangements=[]
+        requestsAndArrangementsPairs=[]
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
             arrangement.timeout = timedout
@@ -277,12 +274,9 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 xDim=str(xDim)
                 yDim=str(yDim)
                 zDim=str(zDim)
-                threads.append(multiprocessing.Process(target=make_rates_request,args=(requestsAndArrangements,arrangement,addressFrom,addressTo,str(weight),xDim,yDim,zDim)))
+                requestArrangementPair=make_rates_request_async(arrangement,addressFrom,addressTo,str(weight),xDim,yDim,zDim)
+                requestsAndArrangementsPairs.append(requestArrangementPair)
 
-        for j in threads:
-            j.start()
-        for j in threads:
-            j.join()
         
         # note that for this code to work correctly loops.run_until_complete (and async_handler) must return the methods in the order they were input
         # (it does this in testing)
@@ -295,13 +289,9 @@ class ShipmentSerializer(serializers.ModelSerializer):
         keepGoing=True
         threads=[]
         outputList=[]
-        for pair in requestsAndArrangements:
-            threads.append(multiprocessing.Process(target=rates_spinlock,args=(pair, outputList)))
-
-        for j in threads:
-            j.start()
-        for j in threads:
-            j.join()
+        for pair in requestsAndArrangementsPairs:
+            output=request_spinlock(pair)
+            outputList.append(output)
 
 
                     

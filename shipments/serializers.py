@@ -18,19 +18,31 @@ import os
 import shippo
 import threading
 import multiprocessing
+from multiprocessing import Pool
 def request_spinlock(requestsArrangementPair):
     import time
     endTime=time.time()+15
 
-    request=requestsArrangementPair[0]
+    request=None
+    requestId=requestsArrangementPair[0]
     arrangement=requestsArrangementPair[1]
     while(True):
-        request=shippo.Shipment.retrieve(request['object_id'])
+        request=shippo.Shipment.retrieve(requestId)
         if request['status']=='SUCCESS':
             break
         if time.time()>endTime:
             break
-    return (request,arrangement)
+
+
+    rates=request['rates']
+
+    quotesAsTuplesShippo=[]
+    for rate in rates:
+        rateId=rate['object_id']
+        #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
+        t=(rate['provider'],rate['amount'],rate['servicelevel']['name'],rate['estimated_days'],rate['duration_terms'],rateId)
+        quotesAsTuplesShippo.append(t)
+    return (quotesAsTuplesShippo,arrangement)
 
 
 
@@ -285,28 +297,25 @@ class ShipmentSerializer(serializers.ModelSerializer):
         endTime=time.time()+15
         # give shippo 3 secs of lead time to make arrangment
         time.sleep(3)
+
+        # arbritrary limit
+        poolsToMake=min(10,len(requestsAndArrangementsPairs))
         # spin lock that exits when status=SUCCESS for all requests or timeout
-        keepGoing=True
-        threads=[]
-        outputList=[]
+        inputList=[]
         for pair in requestsAndArrangementsPairs:
-            output=request_spinlock(pair)
-            outputList.append(output)
+            rateId=pair[0]['object_id']
+            arrangement=pair[1]
+            inputList.append((rateId,arrangement))
+
+        outputList=[]
+        with Pool(poolsToMake) as p:
+            outputList=p.map(request_spinlock, inputList)
 
 
                     
 
         for rateAndArrangment in outputList:
-            request,arrangement=rateAndArrangment[0],rateAndArrangment[1]
-            rates=request['rates']
-
-            quotesAsTuplesShippo=[]
-            for rate in rates:
-                rateId=rate['object_id']
-                #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
-                t=(rate['provider'],rate['amount'],rate['servicelevel']['name'],rate['estimated_days'],rate['duration_terms'],rateId)
-                quotesAsTuplesShippo.append(t)
-            
+            quotesAsTuplesShippo,arrangement=rateAndArrangment[0],rateAndArrangment[1]            
             for quote in quotesAsTuplesShippo:
                 #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
                 Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4],shippoRateId=quote[5])

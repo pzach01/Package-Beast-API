@@ -39,7 +39,7 @@ class ShippoRefund(models.Model):
     objectId=models.CharField(max_length=256,default='',null=True,blank=True)
     objectOwner=models.CharField(max_length=256,default='',null=True,blank=True)
     test=models.CharField(max_length=256,default='',null=True,blank=True)
-    transaction=models.ForeignKey(ShippoTransaction, related_name='shippoRefund', on_delete=models.CASCADE, blank=True, null=True)
+    transaction=models.OneToOneField(ShippoTransaction, related_name='shippoRefund', on_delete=models.CASCADE, blank=True, null=True)
 
 admin.site.register(ShippoTransaction)
 admin.site.register(ShippoMessage)

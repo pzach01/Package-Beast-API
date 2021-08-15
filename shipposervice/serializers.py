@@ -19,6 +19,6 @@ class ShippoTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShippoTransaction
         depth = 1 #this setting expands the depth of the serialized fields
-        fields = ['id', 'owner', 'label_url', 'messages', 'quote','objectState','status','objectCreated','objectUpdated','objectId','objectOwner', 'rate', 'trackingNumber', 'trackingStatus', 'trackingUrlProvider', 'test','shippoRateId', 'shippoRefund']
+        fields = ['id', 'owner', 'label_url', 'messages','objectState','status','objectCreated','objectUpdated','objectId','objectOwner', 'rate', 'trackingNumber', 'trackingStatus', 'trackingUrlProvider', 'test','shippoRateId', 'shippoRefund']
         read_only_fields = ['owner']
 

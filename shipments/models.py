@@ -17,4 +17,5 @@ class Shipment(models.Model):
     timeout = models.BooleanField(default=False)
     shipFromAddress = models.OneToOneField(Address, related_name='shipmentIsFromAddress', on_delete=models.CASCADE, blank=True, null=True)
     shipToAddress = models.OneToOneField(Address, related_name='shipmentIsToAddress', on_delete=models.CASCADE, blank=True, null=True)
+    timingInformation=models.CharField(max_length=255,default='No timeout info')
 admin.site.register(Shipment)

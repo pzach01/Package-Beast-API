@@ -19,8 +19,10 @@ import shippo
 import threading
 import multiprocessing
 from multiprocessing import Pool
+
 def request_spinlock(requestsArrangementPair):
     import time
+
     endTime=time.time()+15
 
     request=None
@@ -89,7 +91,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout', 'includeUpsContainers', 'includeUspsContainers']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout', 'includeUpsContainers', 'includeUspsContainers','timingInformation']
         read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeoutDuration','arrangements', 'timeout']
 
 
@@ -105,11 +107,13 @@ class ShipmentSerializer(serializers.ModelSerializer):
             return x/2.54, y/2.54, z/2.54, "in"
       
     def create(self, validated_data):
-        # make no more then 10 api requests
+        import time
 
+        # make no more then 10 api requests
+        startTotal=time.time()
         requestLimit=10
         requestsMade=0
-
+        addressCreationAndOptimizationStart=time.time()
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')
         timeoutDuration=validated_data.pop('timeoutDuration')
@@ -307,17 +311,29 @@ class ShipmentSerializer(serializers.ModelSerializer):
             arrangement=pair[1]
             inputList.append((rateId,arrangement))
 
+        addressCreationAndOptimizationEnd=time.time()
+
+        spinlockStart=time.time()
         outputList=[]
         with Pool(poolsToMake) as p:
             outputList=p.map(request_spinlock, inputList)
-
+        spinlockEnd=time.time()
 
                     
-
+        quoteCreationStart=time.time()
         for rateAndArrangment in outputList:
             quotesAsTuplesShippo,arrangement=rateAndArrangment[0],rateAndArrangment[1]            
             for quote in quotesAsTuplesShippo:
                 #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
                 Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4],shippoRateId=quote[5])
+        quoteCreationEnd=time.time()
+        
+        endTotal=time.time()
+        addressCreationAndOptimizationTotal=addressCreationAndOptimizationEnd-addressCreationAndOptimizationStart
+        quoteCreationTotal=quoteCreationEnd-quoteCreationStart
+        spinlockTotal=spinlockEnd-spinlockStart
+        totalTime=endTotal-startTotal
+        shipment.timingInformation=str(totalTime)+";"+str(spinlockTotal)+";"+str(quoteCreationTotal)+";"+str(addressCreationAndOptimizationTotal)
+        shipment.save()
         return shipment
 

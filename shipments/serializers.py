@@ -337,7 +337,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         sieveTotal=sieveEnd-sieveStart
         addressCreationTotal=addressEndTime-addressStartTime
         forLoopTime=forLoopEnd-forLoopEnd
-        shipment.timingInformation=str(totalTime)+";"+str(spinlockTotal)+";"+str(quoteCreationTotal)+";"+str(addressCreationTotal)+";"+str(sieveTotal)
+        shipment.timingInformation=str(totalTime)+";"+str(spinlockTotal)+";"+str(quoteCreationTotal)+";"+str(addressCreationTotal)+";"+str(sieveTotal)+";"+str(forLoopTime)
         shipment.save()
         return shipment
 

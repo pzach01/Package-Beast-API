@@ -113,7 +113,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
         startTotal=time.time()
         requestLimit=10
         requestsMade=0
-        addressCreationAndOptimizationStart=time.time()
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')
         timeoutDuration=validated_data.pop('timeoutDuration')
@@ -157,14 +156,17 @@ class ShipmentSerializer(serializers.ModelSerializer):
             itemIds.append(item['id'])
         #increment the amount of shipments the user has used
         userSubscription.increment_shipment_requests()
+        sieveStart=time.time()
         apiObjects,timedout,arrangementPossible = bp.sieve_containers(
             containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
+        sieveEnd=time.time()
         shipment.arrangementPossible=arrangementPossible
         if not arrangementPossible:
             return shipment
 
 
         # create shippo addresses (shipFrom and shipTo)
+        addressStartTime=time.time()
         shipToAttentionName=shipToAddress.name
         shipToPhoneNumber=shipToAddress.phoneNumber
         shipToAddressLineOne=shipToAddress.addressLine1
@@ -205,8 +207,10 @@ class ShipmentSerializer(serializers.ModelSerializer):
             country = "US",
             validate = True
         )
+        addressEndTime=time.time()
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
+        forLoopStart=time.time()
         requestsAndArrangementsPairs=[]
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
@@ -293,12 +297,11 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 requestArrangementPair=make_rates_request_async(arrangement,addressFrom,addressTo,str(weight),xDim,yDim,zDim)
                 requestsAndArrangementsPairs.append(requestArrangementPair)
 
-        
+        forLoopEnd=time.time()
         # note that for this code to work correctly loops.run_until_complete (and async_handler) must return the methods in the order they were input
         # (it does this in testing)
 
         import time
-        endTime=time.time()+15
         # give shippo 3 secs of lead time to make arrangment
         time.sleep(3)
 
@@ -311,7 +314,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
             arrangement=pair[1]
             inputList.append((rateId,arrangement))
 
-        addressCreationAndOptimizationEnd=time.time()
 
         spinlockStart=time.time()
         outputList=[]
@@ -329,11 +331,13 @@ class ShipmentSerializer(serializers.ModelSerializer):
         quoteCreationEnd=time.time()
         
         endTotal=time.time()
-        addressCreationAndOptimizationTotal=addressCreationAndOptimizationEnd-addressCreationAndOptimizationStart
         quoteCreationTotal=quoteCreationEnd-quoteCreationStart
         spinlockTotal=spinlockEnd-spinlockStart
         totalTime=endTotal-startTotal
-        shipment.timingInformation=str(totalTime)+";"+str(spinlockTotal)+";"+str(quoteCreationTotal)+";"+str(addressCreationAndOptimizationTotal)
+        sieveTotal=sieveEnd-sieveStart
+        addressCreationTotal=addressEndTime-addressStartTime
+        forLoopTime=forLoopEnd-forLoopEnd
+        shipment.timingInformation=str(totalTime)+";"+str(spinlockTotal)+";"+str(quoteCreationTotal)+";"+str(addressCreationTotal)+";"+str(sieveTotal)
         shipment.save()
         return shipment
 

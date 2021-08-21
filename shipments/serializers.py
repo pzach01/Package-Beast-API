@@ -49,7 +49,31 @@ def request_spinlock(requestsArrangementPair):
 
 
 
-def make_rates_request_async(arrangement,addressFrom,addressTo,weight,xDim,yDim,zDim):
+def make_rates_request_async(inputTuple):
+    arrangement,weight,xDim,yDim,zDim,addressFromTuple,addressToTuple=inputTuple[0],inputTuple[1],inputTuple[2],inputTuple[3],inputTuple[4],inputTuple[5],inputTuple[6]
+    import shippo
+    addressFrom = shippo.Address.create(
+        name = addressFromTuple[0],
+        street1 = addressFromTuple[1],
+        city = addressFromTuple[2],
+        state = addressFromTuple[3],
+        zip = addressFromTuple[4],
+        country = "US",
+        validate = True
+    )
+
+    addressTo = shippo.Address.create(
+        name = addressToTuple[0],
+        street1 = addressToTuple[1],
+        city = addressToTuple[2],
+        state = addressToTuple[3],
+        zip = addressToTuple[4],
+        country = "US",
+        validate = True
+    )
+
+
+
     if '.' in weight:
         weight=weight[0: (weight.index('.')+5)]
     if '.' in xDim:
@@ -76,7 +100,7 @@ def make_rates_request_async(arrangement,addressFrom,addressTo,weight,xDim,yDim,
         parcels = [parcel],
         asynchronous = True
     )
-    return (request, arrangement)
+    return (request['object_id'], arrangement)
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     containers = ContainerSerializer(many=True, write_only=True)
@@ -212,7 +236,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         # one container per arrangment
         forLoopStart=time.time()
         asyncioTotal=0
-        requestsAndArrangementsPairs=[]
+        inputTuples=[]
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
             arrangement.timeout = timedout
@@ -295,13 +319,21 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 xDim=str(xDim)
                 yDim=str(yDim)
                 zDim=str(zDim)
-                asyncioStart=time.time()
-                requestArrangementPair=make_rates_request_async(arrangement,addressFrom,addressTo,str(weight),xDim,yDim,zDim)
-                asyncioEnd=time.time()
-                asyncioTotal+=(asyncioEnd-asyncioStart)
-                requestsAndArrangementsPairs.append(requestArrangementPair)
+
+                addressFromTuple=(shipFromAttentionName,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode)
+                addressToTuple=(shipToAttentionName, shipFromAddressLineOne, shipToCity, shipToStateProvinceCode, shipToPostalCode)
+                inputTuple=(arrangement,str(weight),xDim,yDim,zDim,addressFromTuple, addressToTuple)
+                inputTuples.append(inputTuple)
 
         forLoopEnd=time.time()
+
+
+        poolsToMake=min(10,len(inputTuples))
+
+        requestsAndArrangementsPairs=[]
+        with Pool(poolsToMake) as p:
+            requestsAndArrangementsPairs=p.map(make_rates_request_async, inputTuples)
+
         # note that for this code to work correctly loops.run_until_complete (and async_handler) must return the methods in the order they were input
         # (it does this in testing)
 
@@ -310,11 +342,10 @@ class ShipmentSerializer(serializers.ModelSerializer):
         time.sleep(3)
 
         # arbritrary limit
-        poolsToMake=min(10,len(requestsAndArrangementsPairs))
         # spin lock that exits when status=SUCCESS for all requests or timeout
         inputList=[]
         for pair in requestsAndArrangementsPairs:
-            rateId=pair[0]['object_id']
+            rateId=pair[0]
             arrangement=pair[1]
             inputList.append((rateId,arrangement))
 

@@ -339,7 +339,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         import time
         # give shippo 3 secs of lead time to make arrangment
-        time.sleep(3)
 
         # arbritrary limit
         # spin lock that exits when status=SUCCESS for all requests or timeout

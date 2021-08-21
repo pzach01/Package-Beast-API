@@ -211,6 +211,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
         forLoopStart=time.time()
+        asyncioTotal=0
         requestsAndArrangementsPairs=[]
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
@@ -294,7 +295,10 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 xDim=str(xDim)
                 yDim=str(yDim)
                 zDim=str(zDim)
+                asyncioStart=time.time()
                 requestArrangementPair=make_rates_request_async(arrangement,addressFrom,addressTo,str(weight),xDim,yDim,zDim)
+                asyncioEnd=time.time()
+                asyncioTotal+=(asyncioEnd-asyncioStart)
                 requestsAndArrangementsPairs.append(requestArrangementPair)
 
         forLoopEnd=time.time()
@@ -337,7 +341,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         sieveTotal=sieveEnd-sieveStart
         addressCreationTotal=addressEndTime-addressStartTime
         forLoopTime=forLoopEnd-forLoopStart
-        shipment.timingInformation=str(totalTime)+";"+str(spinlockTotal)+";"+str(quoteCreationTotal)+";"+str(addressCreationTotal)+";"+str(sieveTotal)+";"+str(forLoopTime)
+        shipment.timingInformation=str(totalTime)+";"+str(spinlockTotal)+";"+str(quoteCreationTotal)+";"+str(addressCreationTotal)+";"+str(sieveTotal)+";"+str(forLoopTime)+";"+str(asyncioTotal)
         shipment.save()
         return shipment
 

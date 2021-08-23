@@ -3,7 +3,22 @@ from django.shortcuts import render
 # Create your views here.
 from quotes.models import Quote
 from quotes.serializers import QuoteSerializer
+from rest_framework import generics, permissions
+
+from shipments.models import Shipment
+from containers.models import Container
+from items.models import Item
+from django.http.response import JsonResponse
+from django.shortcuts import render
+import os
+
 from rest_framework import generics, viewsets, permissions
+from rest_framework.decorators import api_view, permission_classes
+from users.models import User
+from drf_yasg import openapi
+
+from quotes.models import Quote
+from drf_yasg.utils import swagger_auto_schema
 
 
 class IsOwner(permissions.BasePermission):
@@ -28,3 +43,92 @@ class QuoteDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
     queryset = Quote.objects.all()
     serializer_class = QuoteSerializer
+
+@swagger_auto_schema(method='put', request_body=openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'quoteId': openapi.Schema(type=openapi.TYPE_STRING),
+    }
+))
+@api_view(['put'])
+@permission_classes([permissions.IsAuthenticated,IsOwner])
+def refresh_shippo_quote(request):
+    import shippo
+    user=User.objects.get(email=request.user)
+    if user.userHasShippoAccount() and (os.getenv('ENVIRONMENT_TYPE')=='PRODUCTION'):
+        shippo.config.api_key=user.shippoAccessToken
+    else:
+        shippo.config.api_key = os.getenv('SHIPPO_API_KEY')
+    quoteId=request.data['quoteId']
+    shippoQuote = Quote.objects.get(id=quoteId)
+    # shippoQuoteObjectId = shippoQuote.get('objectId', None)
+    print(shippoQuote.arrangement)
+
+    arrangement = shippoQuote.arrangement
+    container = Container.objects.filter(arrangement=arrangement)[0]
+    items = Item.objects.filter(arrangement=arrangement)
+    shipment = Shipment.objects.get(id = shippoQuote.shipment.id)
+    oldRates = Quote.objects.filter(shipment=shipment)
+    print('shipment', shipment.shipFromAddress)
+
+    # arrangement = Arrangement.objects.get(id=arrangementId)
+    print(arrangement.containers)
+    xDim = container.xDim
+    yDim = container.yDim
+    zDim = container.zDim
+    print('dims', xDim, yDim, zDim)
+    weight = 0
+    for item in items:
+        weight =+ item.weight
+
+    parcel = {
+        "length": xDim,
+        "width": yDim,
+        "height": zDim,
+        "distance_unit": "in",
+        "weight": weight,
+        "mass_unit": "lb"
+    }
+    print(parcel)
+
+    # it is probably better to just serialize the address data and pass it to shippo.shipment.create
+    # country was not present so it was hard to test. fix this later
+    # shipFrom = AddressSerializer(shipment.shipFromAddress)
+    # shipTo = AddressSerializer(shipment.shipToAddress)
+    # print(shipTo.data)
+
+    addressFrom = shippo.Address.create(
+        name = shipment.shipFromAddress.name,
+        street1 = shipment.shipFromAddress.addressLine1,
+        city = shipment.shipFromAddress.city,
+        state = shipment.shipFromAddress.stateProvinceCode,
+        zip = shipment.shipFromAddress.postalCode,
+        country = "US",
+        validate = True
+    )
+
+    addressTo = shippo.Address.create(
+        name = shipment.shipToAddress.name,
+        street1 = shipment.shipToAddress.addressLine1,
+        city = shipment.shipToAddress.city,
+        state = shipment.shipToAddress.stateProvinceCode,
+        zip = shipment.shipToAddress.postalCode,
+        country = "US",
+        validate = True
+    )
+
+    newShippoShipment = shippo.Shipment.create(address_from=addressFrom, address_to=addressTo, parcels=[parcel], asynchronous=False)
+    newRates = newShippoShipment['rates']
+
+    for newRate in newRates:
+        print(newRate['servicelevel']['token'])
+        for oldRate in oldRates:
+            print(oldRate)
+
+    return JsonResponse('Test Response', status=200, safe=False)     
+        # if service level matches, replace quote
+        # newShippoQuote = Quote.objects.create(owner=request.user, carrier=rate['carrier'], cost=rate['cost'], serviceDescription=rate['servciceDescription'], daysToShip=rate['daysToShip'], scheduledDeliveryTime=rate['scheduledDeliveryTime'], shipment=rate['shipment'], arrangement=rate['arrangement'], shippoRateId=rate['shippoRateId'])
+    # serializer=QuoteSerializer(newShippoQuote)
+    # return Response(serializer.data)
+   
+    

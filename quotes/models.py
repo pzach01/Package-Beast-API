@@ -19,4 +19,12 @@ class Quote(models.Model):
     shipment = models.ForeignKey(Shipment, related_name='quotes', on_delete=models.CASCADE, blank=True, null=True)
     arrangement = models.ForeignKey(Arrangement, related_name='quotes', on_delete=models.CASCADE, blank=True, null=True)
     shippoRateId=models.CharField(max_length=255,default='')
+
+class ServiceLevel(models.Model):
+    name=models.CharField(max_length=32,blank=True,null=True,default='')
+    token=models.CharField(max_length=32,blank=True,null=True,default='')
+    terms=models.CharField(max_length=255,blank=True,null=True,default='')
+    quote = models.OneToOneField(Quote, related_name='serviceLevel', on_delete=models.CASCADE, blank=True, null=True)
+
+admin.site.register(ServiceLevel)
 admin.site.register(Quote)

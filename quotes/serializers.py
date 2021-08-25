@@ -6,7 +6,7 @@ from arrangements.serializers import ArrangementSerializer
 class ServiceLevelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceLevel
-        fields = all
+        fields = ['name','token','terms']
 
 class QuoteSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
@@ -16,5 +16,5 @@ class QuoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quote
         depth = 1 #this setting expands the depth of the serialized fields
-        fields = ['id', 'owner', 'created', 'carrier', 'cost', 'daysToShip','serviceDescription', 'scheduledDeliveryTime','arrangement', 'shipment','shippoRateId', 'shippoTransaction']
+        fields = ['id', 'owner', 'created', 'carrier', 'cost', 'daysToShip','serviceDescription', 'scheduledDeliveryTime','arrangement', 'shipment','shippoRateId', 'shippoTransaction','serviceLevel']
         read_only_fields = ['owner', 'created']

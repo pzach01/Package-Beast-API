@@ -2,7 +2,7 @@ from rest_framework import serializers
 from shipments.models import Shipment
 from django.http import Http404
 from subscription.models import Subscription
-from quotes.models import Quote
+from quotes.models import Quote, ServiceLevel
 from containers.serializers import ContainerSerializer
 from arrangements.serializers import ArrangementSerializer
 from items.serializers import ItemSerializerWithId
@@ -42,7 +42,10 @@ def request_spinlock(requestsArrangementPair):
     for rate in rates:
         rateId=rate['object_id']
         #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
-        t=(rate['provider'],rate['amount'],rate['servicelevel']['name'],rate['estimated_days'],rate['duration_terms'],rateId)
+        serviceLevel=rate['servicelevel']
+        serviceToken=serviceLevel['token']
+        serviceTerms=serviceLevel['terms']
+        t=(rate['provider'],rate['amount'],rate['servicelevel']['name'],rate['estimated_days'],rate['duration_terms'],rateId,serviceToken,serviceTerms)
         quotesAsTuplesShippo.append(t)
     return (quotesAsTuplesShippo,arrangement)
 
@@ -361,7 +364,11 @@ class ShipmentSerializer(serializers.ModelSerializer):
             quotesAsTuplesShippo,arrangement=rateAndArrangment[0],rateAndArrangment[1]            
             for quote in quotesAsTuplesShippo:
                 #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
-                Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4],shippoRateId=quote[5])
+                q=Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4],shippoRateId=quote[5])
+                serviceName=quote[2]
+                serviceToken=quote[6]
+                serviceTerms=quote[7]
+                ServiceLevel.objects.create(name=serviceName,token=serviceToken,terms=serviceTerms,quote=q)
         quoteCreationEnd=time.time()
         
         endTotal=time.time()

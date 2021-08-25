@@ -4,11 +4,10 @@ from django.shortcuts import render
 from quotes.models import Quote
 from quotes.serializers import QuoteSerializer
 from rest_framework import generics, permissions
-
+from rest_framework.response import Response
 from shipments.models import Shipment
 from containers.models import Container
 from items.models import Item
-from django.http.response import JsonResponse
 from django.shortcuts import render
 import os
 
@@ -121,14 +120,19 @@ def refresh_shippo_quote(request):
     newRates = newShippoShipment['rates']
 
     for newRate in newRates:
-        print(newRate['servicelevel']['token'])
         for oldRate in oldRates:
-            print(oldRate)
+            if newRate['servicelevel']['token'] == oldRate.serviceLevel.token:
+                oldRate.cost=newRate['amount']
+                oldRate.serviceDescription=newRate['servicelevel']['name']
+                oldRate.daysToShip=newRate['estimated_days']
+                oldRate.scheduledDeliveryTime=['duration_terms']
+                oldRate.shippoRateId=['object_id']
+                oldRate.save()
 
-    return JsonResponse('Test Response', status=200, safe=False)     
-        # if service level matches, replace quote
-        # newShippoQuote = Quote.objects.create(owner=request.user, carrier=rate['carrier'], cost=rate['cost'], serviceDescription=rate['servciceDescription'], daysToShip=rate['daysToShip'], scheduledDeliveryTime=rate['scheduledDeliveryTime'], shipment=rate['shipment'], arrangement=rate['arrangement'], shippoRateId=rate['shippoRateId'])
-    # serializer=QuoteSerializer(newShippoQuote)
-    # return Response(serializer.data)
+                if oldRate.id == quoteId:
+                    returned_quote_in_view = oldRate
+
+    serializer=QuoteSerializer(returned_quote_in_view)
+    return Response(serializer.data)
    
     

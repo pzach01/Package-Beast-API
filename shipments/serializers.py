@@ -73,7 +73,7 @@ def make_rates_request_async(inputTuple):
         state = addressToTuple[3],
         zip = addressToTuple[4],
         country = "US",
-        phone = addressFromTuple[6],
+        phone = addressFromTuple[5],
         validate = True
     )
 

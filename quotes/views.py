@@ -132,8 +132,8 @@ def refresh_shippo_quote(request):
                 oldRate.cost=newRate['amount']
                 oldRate.serviceDescription=newRate['servicelevel']['name']
                 oldRate.daysToShip=newRate['estimated_days']
-                oldRate.scheduledDeliveryTime=['duration_terms']
-                oldRate.shippoRateId=['object_id']
+                oldRate.scheduledDeliveryTime=newRate['duration_terms']
+                oldRate.shippoRateId=newRate['object_id']
                 oldRate.save()
 
                 if oldRate.id == quoteId:

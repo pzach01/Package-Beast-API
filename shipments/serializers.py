@@ -328,7 +328,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 zDim=str(zDim)
 
                 addressFromTuple=(shipFromAttentionName,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode, shipFromPhoneNumber)
-                addressToTuple=(shipToAttentionName, shipFromAddressLineOne, shipToCity, shipToStateProvinceCode, shipToPostalCode, shipToPhoneNumber)
+                addressToTuple=(shipToAttentionName, shipToAddressLineOne, shipToCity, shipToStateProvinceCode, shipToPostalCode, shipToPhoneNumber)
                 inputTuple=(arrangement,str(weight),xDim,yDim,zDim,addressFromTuple, addressToTuple)
                 inputTuples.append(inputTuple)
 

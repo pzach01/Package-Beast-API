@@ -62,6 +62,7 @@ def make_rates_request_async(inputTuple):
         state = addressFromTuple[3],
         zip = addressFromTuple[4],
         country = "US",
+        phone = addressFromTuple[5],
         validate = True
     )
 
@@ -72,6 +73,7 @@ def make_rates_request_async(inputTuple):
         state = addressToTuple[3],
         zip = addressToTuple[4],
         country = "US",
+        phone = addressFromTuple[6],
         validate = True
     )
 
@@ -215,25 +217,27 @@ class ShipmentSerializer(serializers.ModelSerializer):
         else:
             shippo.config.api_key = os.getenv('SHIPPO_API_KEY')
 
-        addressFrom = shippo.Address.create(
-            name = shipFromAttentionName,
-            street1 = shipFromAddressLineOne,
-            city = shipFromCity,
-            state = shipFromStateProvinceCode,
-            zip = shipFromPostalCode,
-            country = "US",
-            validate = True
-        )
+        # addressFrom = shippo.Address.create(
+        #     name = shipFromAttentionName,
+        #     street1 = shipFromAddressLineOne,
+        #     city = shipFromCity,
+        #     state = shipFromStateProvinceCode,
+        #     zip = shipFromPostalCode,
+        #     country = "US",
+        #     phone = shipFromPhoneNumber,
+        #     validate = True
+        # )
 
-        addressTo = shippo.Address.create(
-            name = shipToAttentionName,
-            street1 = shipToAddressLineOne,
-            city = shipToCity,
-            state = shipToStateProvinceCode,
-            zip = shipToPostalCode,
-            country = "US",
-            validate = True
-        )
+        # addressTo = shippo.Address.create(
+        #     name = shipToAttentionName,
+        #     street1 = shipToAddressLineOne,
+        #     city = shipToCity,
+        #     state = shipToStateProvinceCode,
+        #     zip = shipToPostalCode,
+        #     country = "US",
+        #     phone = shipToPhoneNumber,
+        #     validate = True
+        # )
         addressEndTime=time.time()
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
@@ -323,8 +327,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 yDim=str(yDim)
                 zDim=str(zDim)
 
-                addressFromTuple=(shipFromAttentionName,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode)
-                addressToTuple=(shipToAttentionName, shipFromAddressLineOne, shipToCity, shipToStateProvinceCode, shipToPostalCode)
+                addressFromTuple=(shipFromAttentionName,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode, shipFromPhoneNumber)
+                addressToTuple=(shipToAttentionName, shipFromAddressLineOne, shipToCity, shipToStateProvinceCode, shipToPostalCode, shipToPhoneNumber)
                 inputTuple=(arrangement,str(weight),xDim,yDim,zDim,addressFromTuple, addressToTuple)
                 inputTuples.append(inputTuple)
 

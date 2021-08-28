@@ -102,6 +102,7 @@ def refresh_shippo_quote(request):
         city = shipment.shipFromAddress.city,
         state = shipment.shipFromAddress.stateProvinceCode,
         zip = shipment.shipFromAddress.postalCode,
+        phone = shipment.shipToAddress.phoneNumber,
         country = "US",
         validate = True
     )
@@ -113,6 +114,7 @@ def refresh_shippo_quote(request):
         state = shipment.shipToAddress.stateProvinceCode,
         zip = shipment.shipToAddress.postalCode,
         country = "US",
+        phone = shipment.shipToAddress.phoneNumber,
         validate = True
     )
 
@@ -122,6 +124,9 @@ def refresh_shippo_quote(request):
     for newRate in newRates:
         for oldRate in oldRates:
             if newRate['servicelevel']['token'] == oldRate.serviceLevel.token:
+                #If this quote is the same as the old quote remove the refund so we can re-quote
+                if quoteId == oldRate.id and not oldRate.shippoTransaction.shippoRefund:
+                    oldRate.shippoTransaction.shippoRefund = ''
                 oldRate.cost=newRate['amount']
                 oldRate.serviceDescription=newRate['servicelevel']['name']
                 oldRate.daysToShip=newRate['estimated_days']

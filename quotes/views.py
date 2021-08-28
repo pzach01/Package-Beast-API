@@ -127,8 +127,8 @@ def refresh_shippo_quote(request):
             if newRate['servicelevel']['token'] == oldRate.serviceLevel.token:
                 #If this quote is the same as the old quote remove the refund so we can re-quote
                 if quoteId == oldRate.id and oldRate.shippoTransaction.shippoRefund:
-                    oldRate.shippoTransaction = None
                     ShippoTransaction.objects.get(id=oldRate.shippoTransaction.id).delete()
+                    oldRate.shippoTransaction = None
                 oldRate.cost=newRate['amount']
                 oldRate.serviceDescription=newRate['servicelevel']['name']
                 oldRate.daysToShip=newRate['estimated_days']

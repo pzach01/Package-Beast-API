@@ -126,15 +126,25 @@ def refresh_shippo_quote(request):
         for oldRate in oldRates:
             if newRate['servicelevel']['token'] == oldRate.serviceLevel.token:
                 #If this quote is the same as the old quote remove the refund so we can re-quote
-                if quoteId == oldRate.id and oldRate.shippoTransaction.shippoRefund:
-                    ShippoTransaction.objects.get(id=oldRate.shippoTransaction.id).delete()
-                    oldRate.shippoTransaction = None
-                oldRate.cost=newRate['amount']
-                oldRate.serviceDescription=newRate['servicelevel']['name']
-                oldRate.daysToShip=newRate['estimated_days']
-                oldRate.scheduledDeliveryTime=newRate['duration_terms']
-                oldRate.shippoRateId=newRate['object_id']
-                oldRate.save()
+                if quoteId == oldRate.id:
+                    try:
+                        #check to see if the quote has a shippo refund before getting the associated transaction.
+                        oldRate.shippoTransaction.shippoRefund
+                        ShippoTransaction.objects.get(id=oldRate.shippoTransaction.id).delete()
+                        oldRate.shippoTransaction = None
+                    except:
+                        pass
+                #Check to see if there is already a transaction with the rate/quote
+                try:
+                    oldRate.shippoTransaction
+                #If there is no transaction, let's save the new quote information
+                except:
+                    oldRate.cost=newRate['amount']
+                    oldRate.serviceDescription=newRate['servicelevel']['name']
+                    oldRate.daysToShip=newRate['estimated_days']
+                    oldRate.scheduledDeliveryTime=newRate['duration_terms']
+                    oldRate.shippoRateId=newRate['object_id']
+                    oldRate.save()
 
                 if oldRate.id == quoteId:
                     returned_quote_in_view = oldRate

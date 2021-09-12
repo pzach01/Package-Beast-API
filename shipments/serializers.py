@@ -1,3 +1,4 @@
+from quotes.serializers import QuoteSerializer
 from rest_framework import serializers
 from shipments.models import Shipment
 from django.http import Http404
@@ -116,6 +117,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
     shipFromAddress = AddressSerializer()
     includeUpsContainers = serializers.BooleanField(write_only=True)
     includeUspsContainers = serializers.BooleanField(write_only=True)
+    quotes = QuoteSerializer(many=True, required=False, read_only=True)
 
     class Meta:
         model = Shipment

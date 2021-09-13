@@ -3,16 +3,7 @@ import os
 # Create your views here.
 from shipments.models import Shipment
 from shipments.serializers import ShipmentSerializer
-from rest_framework import generics, viewsets, permissions
-import requests
-from django.http import JsonResponse
-from rest_framework.decorators import api_view, permission_classes
-from users.models import User
-from rest_framework import status
-from django.views.decorators.csrf import csrf_exempt
-from drf_yasg import openapi
-
-from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, permissions
 
 
 class IsOwner(permissions.BasePermission):
@@ -24,8 +15,7 @@ class ShipmentList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Shipment.objects.filter(owner=user)
-
+        return Shipment.objects.prefetch_related('owner').prefetch_related('quotes', 'quotes__owner', 'quotes__arrangement', 'quotes__owner', 'quotes__arrangement', 'quotes__arrangement__containers', 'quotes__arrangement__items', 'quotes__arrangement__items__container').select_related('shipFromAddress').select_related('shipToAddress').filter(owner = user)
     serializer_class = ShipmentSerializer
 
     def perform_create(self, serializer):

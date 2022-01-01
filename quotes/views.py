@@ -44,6 +44,7 @@ class QuoteDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Quote.objects.all()
     serializer_class = QuoteSerializer
 
+'''
 @swagger_auto_schema(method='put', request_body=openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
@@ -51,7 +52,6 @@ class QuoteDetail(generics.RetrieveUpdateDestroyAPIView):
     }
 ))
 
-'''
 @api_view(['put'])
 @permission_classes([permissions.IsAuthenticated,IsOwner])
 def refresh_shippo_quote(request):

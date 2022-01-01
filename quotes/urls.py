@@ -5,5 +5,6 @@ from rest_framework.urlpatterns import format_suffix_patterns
 urlpatterns = [
     path('quotes/', views.QuoteList.as_view()),
     path('quotes/<int:pk>/', views.QuoteDetail.as_view()),
-    path('quotes/refresh/', views.refresh_shippo_quote)
 ]
+
+#path('quotes/refresh/', views.refresh_shippo_quote

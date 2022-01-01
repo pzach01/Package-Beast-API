@@ -50,6 +50,8 @@ class QuoteDetail(generics.RetrieveUpdateDestroyAPIView):
         'quoteId': openapi.Schema(type=openapi.TYPE_STRING),
     }
 ))
+
+'''
 @api_view(['put'])
 @permission_classes([permissions.IsAuthenticated,IsOwner])
 def refresh_shippo_quote(request):
@@ -152,4 +154,4 @@ def refresh_shippo_quote(request):
     serializer=QuoteSerializer(returned_quote_in_view)
     return Response(serializer.data)
    
-    
+'''

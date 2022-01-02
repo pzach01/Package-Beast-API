@@ -142,13 +142,26 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         startTotal=time.time()
         containers = validated_data.pop('containers')
+
+        includeUpsContainers = validated_data.pop('includeUpsContainers')
+        includeUspsContainers = validated_data.pop('includeUspsContainers')
+        # adding container logic
+
+        if includeUpsContainers:
+            import collections
+            from collections import OrderedDict
+            # unit box
+            d = OrderedDict([('sku', 'ups1'), ('description', 'ups1Description'),('xDim',1.0),('yDim',1.0),('zDim',1.0),('units','in')])            
+            containers.append(d)
+
+
+
         items = validated_data.pop('items')
         timeoutDuration=validated_data.pop('timeoutDuration')
         lastSelectedQuoteId=validated_data.pop('lastSelectedQuoteId')
         # this is actually unused (remove at future date from)
         multiBinPack=validated_data['multiBinPack']
-        includeUpsContainers = validated_data.pop('includeUpsContainers')
-        includeUspsContainers = validated_data.pop('includeUspsContainers')
+
 
 
         shipFromAddress_data = validated_data.pop('shipFromAddress')

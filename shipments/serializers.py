@@ -140,10 +140,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         import time
 
-        # make no more then 10 api requests
         startTotal=time.time()
-        requestLimit=10
-        requestsMade=0
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')
         timeoutDuration=validated_data.pop('timeoutDuration')
@@ -153,9 +150,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         includeUpsContainers = validated_data.pop('includeUpsContainers')
         includeUspsContainers = validated_data.pop('includeUspsContainers')
 
-        # shipFromAddress=Address.objects.create(validated_data.pop('shipFromAddress'))
-        # shipToAddress=Address.objects.create(validated_data.pop('shipToAddress'))
-        # print(shipToAddress)
+
         shipFromAddress_data = validated_data.pop('shipFromAddress')
         shipFromAddress=Address.objects.create(owner=validated_data['owner'], **shipFromAddress_data)
 
@@ -219,27 +214,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         else:
             shippo.config.api_key = os.getenv('SHIPPO_API_KEY')
 
-        # addressFrom = shippo.Address.create(
-        #     name = shipFromAttentionName,
-        #     street1 = shipFromAddressLineOne,
-        #     city = shipFromCity,
-        #     state = shipFromStateProvinceCode,
-        #     zip = shipFromPostalCode,
-        #     country = "US",
-        #     phone = shipFromPhoneNumber,
-        #     validate = True
-        # )
 
-        # addressTo = shippo.Address.create(
-        #     name = shipToAttentionName,
-        #     street1 = shipToAddressLineOne,
-        #     city = shipToCity,
-        #     state = shipToStateProvinceCode,
-        #     zip = shipToPostalCode,
-        #     country = "US",
-        #     phone = shipToPhoneNumber,
-        #     validate = True
-        # )
         addressEndTime=time.time()
         # similiar to running original arrangments serializer multiple times, but only creates
         # one container per arrangment
@@ -318,21 +293,20 @@ class ShipmentSerializer(serializers.ModelSerializer):
                     # this line maybe shouldnt be here
                     totalWeight+=item['weightUnits']
 
-            if requestsMade<requestLimit:
 
-                weight=totalWeight
-                assert(not xDim==0)
-                assert(not yDim==0)
-                assert(not zDim==0)
+            weight=totalWeight
+            assert(not xDim==0)
+            assert(not yDim==0)
+            assert(not zDim==0)
 
-                xDim=str(xDim)
-                yDim=str(yDim)
-                zDim=str(zDim)
+            xDim=str(xDim)
+            yDim=str(yDim)
+            zDim=str(zDim)
 
-                addressFromTuple=(shipFromAttentionName,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode, shipFromPhoneNumber)
-                addressToTuple=(shipToAttentionName, shipToAddressLineOne, shipToCity, shipToStateProvinceCode, shipToPostalCode, shipToPhoneNumber)
-                inputTuple=(arrangement,str(weight),xDim,yDim,zDim,addressFromTuple, addressToTuple)
-                inputTuples.append(inputTuple)
+            addressFromTuple=(shipFromAttentionName,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode, shipFromPhoneNumber)
+            addressToTuple=(shipToAttentionName, shipToAddressLineOne, shipToCity, shipToStateProvinceCode, shipToPostalCode, shipToPhoneNumber)
+            inputTuple=(arrangement,str(weight),xDim,yDim,zDim,addressFromTuple, addressToTuple)
+            inputTuples.append(inputTuple)
 
         forLoopEnd=time.time()
 
@@ -346,7 +320,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
         # note that for this code to work correctly loops.run_until_complete (and async_handler) must return the methods in the order they were input
         # (it does this in testing)
 
-        import time
         # give shippo 3 secs of lead time to make arrangment
 
         # arbritrary limit

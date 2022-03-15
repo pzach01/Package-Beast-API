@@ -77,6 +77,10 @@ def make_rates_request_async(inputTuple):
         phone = addressFromTuple[5],
         validate = True
     )
+    if not addressFrom['validation_results']['is_valid']:
+        return "invalid address"
+    if not addressTo['validation_results']['is_valid']:
+        return "invalid address"
 
 
 
@@ -99,13 +103,15 @@ def make_rates_request_async(inputTuple):
         "weight": weight,
         "mass_unit": "lb"
     }
-
-    request = shippo.Shipment.create(
-        address_from = addressFrom,
-        address_to = addressTo,
-        parcels = [parcel],
-        asynchronous = True
-    )
+    try:
+        request = shippo.Shipment.create(
+            address_from = addressFrom,
+            address_to = addressTo,
+            parcels = [parcel],
+            asynchronous = True
+        )
+    except:
+        return "error creating shippo Shipment"
     return (request['object_id'], arrangement)
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
@@ -166,7 +172,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         shipFromAddress_data = validated_data.pop('shipFromAddress')
         shipFromAddress=Address.objects.create(owner=validated_data['owner'], **shipFromAddress_data)
-
         shipToAddress_data = validated_data.pop('shipToAddress')
         shipToAddress=Address.objects.create(owner=validated_data['owner'], **shipToAddress_data)
 
@@ -329,7 +334,10 @@ class ShipmentSerializer(serializers.ModelSerializer):
         requestsAndArrangementsPairs=[]
         with Pool(poolsToMake) as p:
             requestsAndArrangementsPairs=p.map(make_rates_request_async, inputTuples)
-
+        for asyncResult in requestsAndArrangementsPairs:
+            if asyncResult=='error creating shippo Shipment' or asyncResult=="invalid address":
+                return shipment 
+        
         # note that for this code to work correctly loops.run_until_complete (and async_handler) must return the methods in the order they were input
         # (it does this in testing)
 

@@ -335,41 +335,35 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
         start=time.time()
 
         for ele in range(0, len(bins1)):
-            try:
-                indicesRemaining=get_possibly_optimal_indices_remaining(ele,bins1,costList, minCost,bestScore,optimalScore,volumeList)
+            indicesRemaining=get_possibly_optimal_indices_remaining(ele,bins1,costList, minCost,bestScore,optimalScore,volumeList)
 
 
-                numRemaining=len(indicesRemaining)
-                # override case where there is exactly one item remaining
+            numRemaining=len(indicesRemaining)
+            # override case where there is exactly one item remaining
 
-                # we use this non-verbose form to avoid repeating ourselves (chiefly the condition(s) above)
-                if (ele in indicesRemaining) and (ele not in indicesUsed.keys()):
-                    # sanity check
-                    assert(indicesRemaining[0]==ele)
-                    # cant subscript none so must use lambda
-                    miniCostList=None if costList==None else [costList[ele]]
-                    miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
+            # we use this non-verbose form to avoid repeating ourselves (chiefly the condition(s) above)
+            if (ele in indicesRemaining) and (ele not in indicesUsed.keys()):
+                # sanity check
+                assert(indicesRemaining[0]==ele)
+                # cant subscript none so must use lambda
+                miniCostList=None if costList==None else [costList[ele]]
+                miniBinWeightCapacitys=None if binWeightCapacitys==None else [binWeightCapacitys[ele]]
 
-                    innerStart=time.time()
-                    apiFormat,timedOut,arrangmentPossible,renderingList=master_calculate_optimal_solution([bins1[ele]], boxs1,(timeForThisRotation/numRemaining),True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights,True)
-                    innerEnd=time.time()
-                    timeForThisRotation-=(innerEnd-innerStart)
-                    anyTimeout=True if (timedOut or anyTimeout) else False
+                innerStart=time.time()
+                apiFormat,timedOut,arrangmentPossible,renderingList=master_calculate_optimal_solution([bins1[ele]], boxs1,(timeForThisRotation/numRemaining),True,itemIds, miniCostList, miniBinWeightCapacitys, boxWeights,True)
+                innerEnd=time.time()
+                timeForThisRotation-=(innerEnd-innerStart)
+                anyTimeout=True if (timedOut or anyTimeout) else False
 
-                    if arrangmentPossible:
-                        # 3rd decimal point
-                        score=truncate_to_nth_decimal_point(sum([box.volume for box in apiFormat[0].boxes]),3)
-                        if score==optimalScore:
-                            # no error, update to better solution
-                            indicesUsed[ele]=apiFormat
+                if arrangmentPossible:
+                    # 3rd decimal point
+                    score=truncate_to_nth_decimal_point(sum([box.volume for box in apiFormat[0].boxes]),3)
+                    if score==optimalScore:
+                        # no error, update to better solution
+                        indicesUsed[ele]=apiFormat
 
                         
-            # ran out of time
-            except TimeoutError:
-                pass
-            # no solution, look for next bin
-            except NotImplementedError:
-                pass
+
         end=time.time()
         timeout-=(end-start)
         if noMoreRotations:

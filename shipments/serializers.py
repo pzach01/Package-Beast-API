@@ -119,7 +119,7 @@ class SimpleShipmentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipment
         fields = ['id', 'owner', 'created', 'title']
-
+    
 
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
@@ -138,7 +138,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         depth=1
         fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout', 'includeUpsContainers', 'includeUspsContainers','timingInformation']
         read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeoutDuration','arrangements', 'timeout']
-
+        
 
     # note that these two methods are found in the arrangments serializer (quite sloppily)
     def format_as_dimensions(self,x,y,z):

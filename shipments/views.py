@@ -10,7 +10,7 @@ class IsOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.owner == request.user
 
-class SimpleShipmentList(generics.ListCreateAPIView):
+class SimpleShipmentList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
     def get_queryset(self):
         user = self.request.user

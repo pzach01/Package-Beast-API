@@ -113,6 +113,14 @@ def make_rates_request_async(inputTuple):
     except:
         return "error creating shippo Shipment"
     return (request['object_id'], arrangement)
+
+class SimpleShipmentsSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.email')
+    class Meta:
+        model = Shipment
+        fields = ['id', 'owner', 'created', 'title']
+
+
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     containers = ContainerSerializer(many=True, write_only=True)

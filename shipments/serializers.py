@@ -150,7 +150,11 @@ class ShipmentSerializer(serializers.ModelSerializer):
             return x/25.4, y/25.4, z/25.4, "in"
         if units == "cm":
             return x/2.54, y/2.54, z/2.54, "in"
-      
+    def convert_to_pounds(self, weight, weightUnits):
+        if weightUnits=='lb':
+            return weight,'lb'
+        else:
+            return weight*2.205,'lb'
     def create(self, validated_data):
         import time
 
@@ -200,6 +204,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             containerStrings.append(as_string)
         for item in items:
             item['height'], item['length'], item['width'], item['units'] = self.convert_to_inches(item['height'], item['length'], item['width'], item['units'])
+            item['weight'], item['weightUnits']=self.convert_to_pounds(item['weight'],item['weightUnits'])
             item['xDim'],item['yDim'],item['zDim'] = item['height'],item['length'],item['width']
             x,y,z= item['xDim'], item['yDim'], item['zDim']
             as_string=self.format_as_dimensions(x,y,z)

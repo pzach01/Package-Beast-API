@@ -99,6 +99,7 @@ INSTALLED_APPS = [
     'subscription',
     'payment',
     'shipposervice',
+    'safedelete'
 ]
 
 # User registration errors out if you remove this. I think its used with django.contrib.sites

@@ -5,10 +5,14 @@ from arrangements.models import Arrangement
 from shipments.models import Shipment
 from django.contrib import admin
 from django.core.validators import MinValueValidator
+from safedelete.models import SafeDeleteModel
+from safedelete.models import SOFT_DELETE_CASCADE
 # Create your models here.
 
 
-class Item(models.Model):
+class Item(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(
         'users.User', related_name='items', on_delete=models.CASCADE)

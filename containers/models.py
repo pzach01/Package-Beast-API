@@ -2,11 +2,12 @@ from django.db import models
 from django.utils.timezone import now
 from arrangements.models import Arrangement
 from django.contrib import admin
-from shipments.models import Shipment
-
+from safedelete.models import SafeDeleteModel
+from safedelete.models import SOFT_DELETE_CASCADE
 
 # Create your models here.
-class Container(models.Model):
+class Container(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(
         'users.User', related_name='containers', on_delete=models.CASCADE)

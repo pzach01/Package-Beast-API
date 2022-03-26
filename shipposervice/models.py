@@ -1,10 +1,13 @@
 from django.db import models
 from django.contrib import admin
 from quotes.models import Quote
+from safedelete.models import SafeDeleteModel
+from safedelete.models import SOFT_DELETE_CASCADE
 
 # Create your models here.
 
-class ShippoTransaction(models.Model):
+class ShippoTransaction(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
     owner = models.ForeignKey(
         'users.User', related_name='shippoTransaction', on_delete=models.CASCADE)
     label_url = models.CharField(max_length=1012, default='', null=True, blank=True)
@@ -24,13 +27,15 @@ class ShippoTransaction(models.Model):
     test=models.CharField(max_length=256,default='',null=True,blank=True)
     shippoRateId=models.CharField(max_length=256,default='',null=True,blank=True)
 
-class ShippoMessage(models.Model):
+class ShippoMessage(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
     code = models.CharField(max_length=32,default='',null=True,blank=True)
     source = models.CharField(max_length=32,default='',null=True,blank=True)
     text = models.CharField(max_length=512,default='',null=True,blank=True)
     shippoTransaction = models.ForeignKey(ShippoTransaction, related_name='messages', on_delete=models.CASCADE, blank=True, null=True)
 
-class ShippoRefund(models.Model):
+class ShippoRefund(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
     owner = models.ForeignKey(
         'users.User', related_name='shippoRefund', on_delete=models.CASCADE)
     status=models.CharField(max_length=16,default='',null=True,blank=True)

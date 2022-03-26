@@ -3,11 +3,12 @@ from django.utils.timezone import now
 from arrangements.models import Arrangement
 from django.contrib import admin
 from shipments.models import Shipment
+from safedelete.models import SafeDeleteModel
+from safedelete.models import SOFT_DELETE_CASCADE
 
-# Create your models here.
 
-
-class Quote(models.Model):
+class Quote(SafeDeleteModel):
+    safedelete_policy = SOFT_DELETE_CASCADE
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(
         'users.User', related_name='quotes', on_delete=models.CASCADE)
@@ -21,6 +22,7 @@ class Quote(models.Model):
     shippoRateId=models.CharField(max_length=255,default='')
 
 class ServiceLevel(models.Model):
+    safedelete_policy = SOFT_DELETE_CASCADE
     name=models.CharField(max_length=32,blank=True,null=True,default='')
     token=models.CharField(max_length=32,blank=True,null=True,default='')
     terms=models.CharField(max_length=255,blank=True,null=True,default='')

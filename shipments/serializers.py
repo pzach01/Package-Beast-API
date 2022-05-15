@@ -129,14 +129,12 @@ class ShipmentSerializer(serializers.ModelSerializer):
     timeoutDuration = serializers.IntegerField(write_only=True, min_value=1, max_value=55)
     shipToAddress = AddressSerializer()
     shipFromAddress = AddressSerializer()
-    includeUpsContainers = serializers.BooleanField(write_only=True)
-    includeUspsContainers = serializers.BooleanField(write_only=True)
     quotes = QuoteSerializer(many=True, required=False, read_only=True)
 
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout', 'includeUpsContainers', 'includeUspsContainers','timingInformation','validAddress']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validAddress']
         read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeoutDuration','arrangements', 'timeout','validAddress']
         
 
@@ -161,16 +159,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         startTotal=time.time()
         containers = validated_data.pop('containers')
 
-        includeUpsContainers = validated_data.pop('includeUpsContainers')
-        includeUspsContainers = validated_data.pop('includeUspsContainers')
-        # adding container logic
 
-        if includeUpsContainers:
-            import collections
-            from collections import OrderedDict
-            # unit box
-            d = OrderedDict([('sku', 'ups1'), ('description', 'ups1Description'),('xDim',1.0),('yDim',1.0),('zDim',1.0),('units','in')])            
-            containers.append(d)
 
 
 

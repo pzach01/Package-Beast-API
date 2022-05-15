@@ -90,9 +90,7 @@ class ShipmentsTests(APITestCase):
                 "city": "Des Moines",
                 "stateProvince": "IA",
                 "postalCode": "50323"
-            },
-            "includeUpsContainers":False,
-            "includeUspsContainers":False,
+            }
             }
 
             data=self.generic_logic(inputData)
@@ -151,9 +149,7 @@ class ShipmentsTests(APITestCase):
                 "city": "Des Moines",
                 "stateProvince": "IA",
                 "postalCode": "50323"
-            },
-            "includeUpsContainers":False,
-            "includeUspsContainers":False,
+            }
             }
 
 
@@ -214,9 +210,7 @@ class ShipmentsTests(APITestCase):
             "city": "Des Moines",
             "stateProvince": "IA",
             "postalCode": "50323"
-        },
-        "includeUpsContainers":False,
-        "includeUspsContainers":False
+        }
         }
 
 
@@ -304,9 +298,7 @@ class ShipmentsTests(APITestCase):
                 "city": "Des Moines",
                 "stateProvince": "IA",
                 "postalCode": "50323"
-            },
-            "includeUpsContainers":False,
-            "includeUspsContainers":False,
+            }
             }
 
 
@@ -553,9 +545,7 @@ class ShipmentsTests(APITestCase):
                 "city": "Des Moines",
                 "stateProvince": "IA",
                 "postalCode": "50323"
-            },
-            "includeUpsContainers":False,
-            "includeUspsContainers":False,
+            }
             }
 
 
@@ -575,75 +565,7 @@ class ShipmentsTests(APITestCase):
             print("-----------Shipments test 5 Failed")
 
 
-    # does turning UPS containers on work?
-    def test_6(self):
-        try:
-            inputData={
-            "title": "string",
-            "lastSelectedQuoteId": 0,
-            "items": [
-                {
-                "id": 0,
-                "sku": "string",
-                "description": "string",
-                "length": 1,
-                "width": 1,
-                "height": 1,
-                "units": "in",
-                "weight": 5,
-                "weightUnits": "lb"
-                }
-            ],
-            "containers": [
-                {
-                "sku": "string",
-                "description": "string",
-                "xDim": 2,
-                "yDim": 2,
-                "zDim": 2,
-                "units": "in"
-                }
-            ],
-            "multiBinPack": False,
-            "timeoutDuration": 15,
-            "shipFromAddress": {
-                "name":"Lucas Z",
-                "phoneNumber":"5156573318",
-                "addressLine1": "314 North Clinton Street",
-                "addressLine2": "string",
-                "city": "Iowa City",
-                "stateProvince": "IA",
-                "postalCode": "52245"
-            },
-            "shipToAddress":{
-                "name":"John Doe",
-                "phoneNumber":"5156573318",
-                "addressLine1": "13178 Oakbrook Drive",
-                "addressLine2": "string",
-                "city": "Des Moines",
-                "stateProvince": "IA",
-                "postalCode": "50323"
-            },
-            "includeUpsContainers":True,
-            "includeUspsContainers":False,
-            }
 
-            data=self.generic_logic(inputData)
-            assert(data['arrangementPossible']==True)
-            
-            assert(data['arrangements'][0]['items'][0]['xCenter']==.5)
-            assert(data['arrangements'][0]['items'][0]['yCenter']==.5)
-            assert(data['arrangements'][0]['items'][0]['zCenter']==.5)
-            assert(len(data['arrangements'][0]['containers'])==1)
-            # both containers are used
-            assert(data['arrangements'][0]['containers'][0]['xDim']==2.0)
-            assert(data['arrangements'][1]['containers'][0]['xDim']==1.0)
-
-            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
-
-            print("Shipments test 6 Passed")
-        except:
-            print('--------------Failed shipments test 6')
 
 
     # do unit conversions work for weight
@@ -705,9 +627,7 @@ class ShipmentsTests(APITestCase):
                 "city": "Des Moines",
                 "stateProvince": "IA",
                 "postalCode": "50323"
-            },
-            "includeUpsContainers":False,
-            "includeUspsContainers":False,
+            }
             }
 
             data=self.generic_logic(inputData)
@@ -772,9 +692,7 @@ class ShipmentsTests(APITestCase):
                 "city": "Des Moines",
                 "stateProvince": "IA",
                 "postalCode": "50323"
-            },
-            "includeUpsContainers":False,
-            "includeUspsContainers":False,
+            }
             }
 
             data=self.generic_logic(inputData)

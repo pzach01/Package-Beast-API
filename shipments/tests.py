@@ -722,3 +722,64 @@ class ShipmentsTests(APITestCase):
             print("Shipments test 7 Passed")
         except:
             print('--------------Failed shipments test 7')
+
+
+    # QUESTION ASKED:: does the error thrown by invalidAddress/error creating shippo Shipment
+    def test_8(self):
+        try:
+            inputData={
+            "title": "string",
+            "lastSelectedQuoteId": 0,
+            "items": [
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 1,
+                "width": 1,
+                "height": 1,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                }
+            ],
+            "containers": [
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 1,
+                "yDim": 1,
+                "zDim": 1,
+                "units": "in"
+                }
+            ],
+            "multiBinPack": False,
+            "timeoutDuration": 15,
+            "shipFromAddress": {
+                "name":"John Doe",
+                "phoneNumber":"5156573318",
+                "addressLine1": "13178 Oakbrook Drive",
+                "addressLine2": "string",
+                "city": "Des Moines",
+                "stateProvince": "IA",
+                "postalCode": "50323"
+            },
+            "shipToAddress":{
+                "name":"John Doe",
+                "phoneNumber":"5156573318",
+                "addressLine1": "13178 Oakbrook Drive",
+                "addressLine2": "string",
+                "city": "Des Moines",
+                "stateProvince": "IA",
+                "postalCode": "50323"
+            },
+            "includeUpsContainers":False,
+            "includeUspsContainers":False,
+            }
+
+            data=self.generic_logic(inputData)
+            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+            assert(data['validAddress']==False)
+            print("Shipments test 8 Passed")
+        except:
+            print('--------------Failed shipments test 8')

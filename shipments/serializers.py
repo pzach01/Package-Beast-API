@@ -136,8 +136,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout', 'includeUpsContainers', 'includeUspsContainers','timingInformation']
-        read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeoutDuration','arrangements', 'timeout']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout', 'includeUpsContainers', 'includeUspsContainers','timingInformation','validAddress']
+        read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeoutDuration','arrangements', 'timeout','validAddress']
         
 
     # note that these two methods are found in the arrangments serializer (quite sloppily)
@@ -349,6 +349,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
             requestsAndArrangementsPairs=p.map(make_rates_request_async, inputTuples)
         for asyncResult in requestsAndArrangementsPairs:
             if asyncResult=='error creating shippo Shipment' or asyncResult=="invalid address":
+                shipment.validAddress=False
+                shipment.save()
                 return shipment 
         
         # note that for this code to work correctly loops.run_until_complete (and async_handler) must return the methods in the order they were input

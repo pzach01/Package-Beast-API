@@ -37,7 +37,7 @@ class ThirdPartyContainer(SafeDeleteModel):
     volume = models.FloatField(default=0.0)
     units = models.CharField(max_length=2, blank=False, default='in')
     cost = models.FloatField(default=0.0)
-    #ups, fedex, usps, etc
+    #UPS, FEDEX, USPS, etc
     supplier = models.CharField(max_length=5, blank=True, default='ups')
 
 

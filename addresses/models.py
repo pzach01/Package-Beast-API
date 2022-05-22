@@ -6,7 +6,7 @@ from safedelete.models import SOFT_DELETE_CASCADE
 # Create your models here.
 
 class Address(SafeDeleteModel):
-    safedelete_policy = SOFT_DELETE_CASCADE
+    _safedelete_policy = SOFT_DELETE_CASCADE
 
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(

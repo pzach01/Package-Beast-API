@@ -118,7 +118,7 @@ class SimpleShipmentsSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     class Meta:
         model = Shipment
-        fields = ['id', 'owner', 'created', 'title']
+        fields = ['id', 'owner', 'created', 'title', 'validAddress']
     
 
 class ShipmentSerializer(serializers.ModelSerializer):

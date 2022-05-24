@@ -14,7 +14,7 @@ class SimpleShipmentList(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]
     def get_queryset(self):
         user = self.request.user
-        return Shipment.objects.filter(owner=user)
+        return Shipment.objects.filter(owner=user, validAddress=True)
     serializer_class = SimpleShipmentsSerializer
 
 class ShipmentList(generics.ListCreateAPIView):

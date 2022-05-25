@@ -78,9 +78,9 @@ def make_rates_request_async(inputTuple):
         validate = True
     )
     if not addressFrom['validation_results']['is_valid']:
-        return "invalid address"
+        return "invalid from address"
     if not addressTo['validation_results']['is_valid']:
-        return "invalid address"
+        return "invalid to address"
 
 
 
@@ -134,8 +134,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validAddress']
-        read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeoutDuration','arrangements', 'timeout','validAddress']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress']
+        read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress']
         
 
     # note that these two methods are found in the arrangments serializer (quite sloppily)
@@ -337,11 +337,19 @@ class ShipmentSerializer(serializers.ModelSerializer):
         with Pool(poolsToMake) as p:
             requestsAndArrangementsPairs=p.map(make_rates_request_async, inputTuples)
         for asyncResult in requestsAndArrangementsPairs:
-            if asyncResult=='error creating shippo Shipment' or asyncResult=="invalid address":
-                shipment.validAddress=False
+            if asyncResult=='error creating shippo Shipment':
+                shipment.validFromAddress=False
+                shipment.validToAddress=False
                 shipment.save()
-                return shipment 
-        
+                return shipment
+            if asyncResult=='invalid from address':
+                shipment.validFromAddress=False
+                shipment.save()
+                return shipment
+            if asyncResult=='invalid to address':
+                shipment.validToAddress=False
+                shipment.save()
+                return shipment
         # note that for this code to work correctly loops.run_until_complete (and async_handler) must return the methods in the order they were input
         # (it does this in testing)
 

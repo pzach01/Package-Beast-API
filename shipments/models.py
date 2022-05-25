@@ -22,5 +22,6 @@ class Shipment(SafeDeleteModel):
     shipToAddress = models.OneToOneField(Address, related_name='shipmentIsToAddress', on_delete=models.CASCADE, blank=True, null=True)
     timingInformation=models.CharField(max_length=255,default='No timeout info')
     # false doesn't necessarily mean address was invalid, only that error thrown during shipment creation code (see serializer)
-    validAddress=models.BooleanField(default=True)
+    validFromAddress=models.BooleanField(default=True)
+    validToAddress=models.BooleanField(default=True)
 admin.site.register(Shipment)

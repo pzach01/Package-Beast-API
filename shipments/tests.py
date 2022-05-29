@@ -156,7 +156,9 @@ class ShipmentsTests(APITestCase):
 
 
             data=self.generic_logic(inputData)
-            assert(data['arrangementPossible']==False)
+
+            assert(data['fitAllArrangementPossibleAPriori']==False)
+            assert(data['arrangementFittingAllItemsFound']==False)
             # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
 
             print("Shipments test 2 Passed")
@@ -217,8 +219,8 @@ class ShipmentsTests(APITestCase):
 
 
         data=self.generic_logic(inputData)
-        assert(data['arrangementPossible']==True)
-        
+        assert(data['fitAllArrangementPossibleAPriori']==True)
+        assert(data['arrangementFittingAllItemsFound']==True)        
         # check the return data for truth
         assert(data['arrangements'][0]['items'][0]['xCenter']==.5)
         assert(data['arrangements'][0]['items'][0]['yCenter']==.5)
@@ -232,8 +234,9 @@ class ShipmentsTests(APITestCase):
         # check the database for truth
         arrangementData=(self.get_arrangment(arrangmentId))
         # this test will fail without saving the arrangment, very odd because item data is still returned
-        assert(arrangementData['arrangementPossible']==True)
-
+        assert(data['fitAllArrangementPossibleAPriori']==True)
+        assert(data['arrangementFittingAllItemsFound']==True)
+        
         selectedItem=arrangementData['items'][0]
         assert(selectedItem['xCenter']==.5)
         assert(selectedItem['yCenter']==.5)
@@ -307,8 +310,8 @@ class ShipmentsTests(APITestCase):
 
             data=self.generic_logic(inputData)
             # check the return data for truth
-
-            assert(data['arrangementPossible']==True)
+            assert(data['fitAllArrangementPossibleAPriori']==True)
+            assert(data['arrangementFittingAllItemsFound']==True)
             
             assert(data['arrangements'][0]['items'][0]['xCenter']==.5)
             assert(data['arrangements'][0]['items'][0]['yCenter']==.5)
@@ -555,8 +558,9 @@ class ShipmentsTests(APITestCase):
             data=self.generic_logic(inputData)
             # check the return data for truth
 
-            assert(data['arrangementPossible']==True)
-            
+            assert(data['fitAllArrangementPossibleAPriori']==True)
+            assert(data['arrangementFittingAllItemsFound']==True)
+
             assert(len(data['arrangements'])==8)
             # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
 
@@ -631,6 +635,11 @@ class ShipmentsTests(APITestCase):
             }
 
             data=self.generic_logic(inputData)
+
+
+            assert(data['fitAllArrangementPossibleAPriori']==True)
+            assert(data['arrangementFittingAllItemsFound']==True)
+
             items=data['quotes'][0]['arrangement']['items']
             weight=sum([item['weight'] for item in items])
             assert(weight==3.205)
@@ -700,6 +709,9 @@ class ShipmentsTests(APITestCase):
             assert(data['validFromAddress']==False)
             assert(data['validToAddress']==False)
 
+            assert(data['fitAllArrangementPossibleAPriori']==True)
+            assert(data['arrangementFittingAllItemsFound']==True)
+
             print("Shipments test 8 Passed")
         except:
             print('--------------Failed shipments test 8')
@@ -756,9 +768,86 @@ class ShipmentsTests(APITestCase):
 
             data=self.generic_logic(inputData)
             # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+
+            assert(data['fitAllArrangementPossibleAPriori']==True)
+            assert(data['arrangementFittingAllItemsFound']==True)
+
             assert(data['validFromAddress']==True)
             assert(data['validToAddress']==False)
 
             print("Shipments test 9 Passed")
         except:
             print('--------------Failed shipments test 9')
+
+
+    # QUESTION ASKED: can we seperate the behavior of fitAllArrangementPossibleAPriori and arrangementFittingAllItemsFound
+    def test_10(self):
+        try:
+            inputData={
+            "title": "string",
+            "lastSelectedQuoteId": 0,
+            "items": [
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 9,
+                "width": 9,
+                "height": 10,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                },
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 2,
+                "width": 2,
+                "height": 2,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                }             
+            ],
+            "containers": [
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 10,
+                "yDim": 10,
+                "zDim": 10,
+                "units": "in"
+                }
+            ],
+            "multiBinPack": False,
+            "timeoutDuration": 15,
+            "shipFromAddress": {
+                "name":"Lucas Z",
+                "phoneNumber":"5156573318",
+                "addressLine1": "314 North Clinton Street",
+                "addressLine2": "string",
+                "city": "Iowa City",
+                "stateProvince": "IA",
+                "postalCode": "52245"
+            },
+            "shipToAddress":{
+                "name":"John Doe",
+                "phoneNumber":"5156573318",
+                "addressLine1": "13178 Oakbrook Drive",
+                "addressLine2": "string",
+                "city": "Des Moines",
+                "stateProvince": "IA",
+                "postalCode": "50323"
+            }
+            }
+
+            data=self.generic_logic(inputData)
+            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+            assert(data['fitAllArrangementPossibleAPriori']==True)
+            assert(data['arrangementFittingAllItemsFound']==False)
+
+
+            print("Shipments test 10 Passed")
+        except:
+            print('--------------Failed shipments test 10')

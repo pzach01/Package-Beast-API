@@ -134,8 +134,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'arrangementPossible', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress']
-        read_only_fields = ['owner', 'created', 'arrangementPossible', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress']
+        read_only_fields = ['owner', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress']
         
 
     # note that these two methods are found in the arrangments serializer (quite sloppily)
@@ -213,7 +213,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
         apiObjects,timedout,fitAllArrangementPossibleAPriori,arrangementFittingAllItemsFound = bp.sieve_containers(
             containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
         sieveEnd=time.time()
-        shipment.arrangementPossible=fitAllArrangementPossibleAPriori
+        shipment.fitAllArrangementPossibleAPriori=fitAllArrangementPossibleAPriori
+        shipment.arrangementFittingAllItemsFound=arrangementFittingAllItemsFound
         if not fitAllArrangementPossibleAPriori:
             return shipment
         if not arrangementFittingAllItemsFound:

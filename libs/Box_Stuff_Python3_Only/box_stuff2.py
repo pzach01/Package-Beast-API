@@ -260,19 +260,47 @@ def get_indices_remaining(startingIndex,bins,costList, minCost,bestScore,optimal
         indicesRemaining=[index for index in indicesRemaining if volumeList[index]>=optimalScore]
     return indicesRemaining
 
-def get_possibly_optimal_indices_remaining(startingIndex,bins,costList, minCost,bestScore,optimalScore,volumeList):
+def get_possibly_optimal_indices_remaining(startingIndex,bins,costList, minCost,optimalScore,volumeList):
     # sometimes starting index is non-zero to reflect ignoring already searched bins
     indicesRemaining=[index for index in range(startingIndex, len(bins))]
 
     indicesRemaining=[index for index in indicesRemaining if volumeList[index]>=optimalScore]
     return indicesRemaining
 
+
+def get_possible_to_fit_all_items(bins1, boxs1):
+    anyFit=False
+    epsilon=.01
+    for container in bins1:
+        xContainer,yContainer,zContainer=float(container.split('x')[0]),float(container.split('x')[1]),float(container.split('x')[2])
+        containerList=sorted([xContainer,yContainer,zContainer])
+
+        containerVolume=(xContainer*yContainer*zContainer)
+
+        couldFit=True
+        
+        boxesVolume=0
+        for box in boxs1:
+            xBox,yBox,zBox=float(box.split('x')[0]),float(box.split('x')[1]),float(box.split('x')[2])
+            boxesVolume+=(xBox*yBox*zBox)
+            boxList=sorted([xBox,yBox,zBox])
+
+            for index in range(0, 3):
+                if containerList[index]<boxList[index]:
+                    couldFit=False
+                    break
+        if (containerVolume+epsilon<boxesVolume):
+            couldFit=False
+        if couldFit:
+            anyFit=True
+            break
+    return anyFit
 # ripoff of fit_all but returns multiple containers
 
 def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCapacitys=None, boxWeights=None):
-    possibleToFitOneBox=get_possible_to_fit_one_box(bins1,boxs1)
-    if not possibleToFitOneBox:
-        return None, False, False
+    possibleToFitAllItemsAPriori=get_possible_to_fit_all_items(bins1,boxs1)
+    if not possibleToFitAllItemsAPriori:
+        return None, False, False,False
                    
     import math
     minCost=math.inf
@@ -296,7 +324,6 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
     indexUsed=None
     indicesUsed={}
     anyTimeout=False
-    bestScore=0
 
     optimalScore=0
     for ele in boxs1:
@@ -324,7 +351,7 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
 
     for rotation in range(0, numRotations):
 
-        numRemainingInitial=len(get_possibly_optimal_indices_remaining(0,bins1,costList, minCost,bestScore,optimalScore,volumeList))
+        numRemainingInitial=len(get_possibly_optimal_indices_remaining(0,bins1,costList, minCost,optimalScore,volumeList))
         # override using multiple rotations and try to pack everything in one container in first pass
         if numRemainingInitial==1:
             fractionToUseForThisRotation=1
@@ -335,7 +362,7 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
         start=time.time()
 
         for ele in range(0, len(bins1)):
-            indicesRemaining=get_possibly_optimal_indices_remaining(ele,bins1,costList, minCost,bestScore,optimalScore,volumeList)
+            indicesRemaining=get_possibly_optimal_indices_remaining(ele,bins1,costList, minCost,optimalScore,volumeList)
 
 
             numRemaining=len(indicesRemaining)
@@ -373,7 +400,7 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
     if len(indicesUsed.keys())==0:
         # no arrangment, timedout, unable to decide if arrangment is possible
 
-        return None, anyTimeout, False
+        return None, anyTimeout, True, False
     else:
         for ele in range(0, len(bins1)):
             if ele in indicesUsed.keys():
@@ -383,7 +410,7 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
                 container=minArrangment[0]
                 container.id=ele
                 containersUsed.append(container)
-    return containersUsed,anyTimeout,True
+    return containersUsed,anyTimeout,True,True
 
 
 

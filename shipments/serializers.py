@@ -203,11 +203,20 @@ class ShipmentSerializer(serializers.ModelSerializer):
         #increment the amount of shipments the user has used
         userSubscription.increment_shipment_requests()
         sieveStart=time.time()
-        apiObjects,timedout,arrangementPossible = bp.sieve_containers(
+        # arrangementPossible= arrangementPossibleAPriori= some item that has lxwxh < some containers LXWxH exists
+        # arrangementFittingAllItemsFound= there is a container that can fit all items and the corresponding arrangement has been found
+
+
+        #TODO: rewire the logic for arrangmentPossible vs arrangementFittingAllItemsFound
+        # arrangmenet returns partial fits; sieve doesn't but the flags returned don't indicate this
+        # ie. what about when no optimal arrangmeent possible, but 
+        apiObjects,timedout,fitAllArrangementPossibleAPriori,arrangementFittingAllItemsFound = bp.sieve_containers(
             containerStrings, itemStrings, timeoutDuration, multiBinPack,itemIds)
         sieveEnd=time.time()
-        shipment.arrangementPossible=arrangementPossible
-        if not arrangementPossible:
+        shipment.arrangementPossible=fitAllArrangementPossibleAPriori
+        if not fitAllArrangementPossibleAPriori:
+            return shipment
+        if not arrangementFittingAllItemsFound:
             return shipment
 
 
@@ -244,7 +253,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
             arrangement.timeout = timedout
-            arrangement.arrangementPossible = arrangementPossible
+            # later we should tie this to an actual value (per arrangement)
+            arrangement.arrangementPossible = True
             arrangement.shipment=shipment
             arrangement.save()
 

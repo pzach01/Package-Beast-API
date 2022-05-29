@@ -492,11 +492,11 @@ def test_one_underfit_sieve(printStuff=True):
 
     while(keepGoing):
         start=time.time()
-        apiObjects, timedOut, arrangmentPossible=box_stuff2.sieve_containers(containers,items,timeout,False,ids)
+        apiObjects, timedOut, fitAllArrangementPossibleAPriori,arrangementFittingAllItemsFound=box_stuff2.sieve_containers(containers,items,timeout,False,ids)
         if apiObjects==None:
             # too wierd to happen during regular behavior
             raise Exception('wierd stuff')
-        assert(arrangmentPossible)
+        assert(fitAllArrangementPossibleAPriori)
         # check that containers are returned in same order as they were input (needed in shippments.serializer; but not strictly necessary everywhere else)
         sortedInputList=[]
         for index in range(0,len(containers)):
@@ -532,6 +532,7 @@ def test_one_underfit_sieve(printStuff=True):
     # we always double at the end (so this is the timeout that gave us the answer)
     for item in tempContainers:
         assert(item in optimalContainers)
+    assert(arrangementFittingAllItemsFound)
     print('Successful timeout :'+str(end-start))
 
 
@@ -546,8 +547,10 @@ def test_underfits_sieve_one():
     timeout=15
     import time
     start=time.time()
-    apiObjects, timedOut, arrangmentPossible=box_stuff2.sieve_containers(containers,items,timeout,False,ids)
+    apiObjects, timedOut, fitAllArrangementPossibleAPriori,arrangementFittingAllItemsFound=box_stuff2.sieve_containers(containers,items,timeout,False,ids)
     end=time.time()
+    assert(arrangementFittingAllItemsFound)
+    assert(fitAllArrangementPossibleAPriori)
     assert(end-start<1)
 '''
 from . import testing_imports
@@ -556,5 +559,5 @@ from .testing_imports import *
 #test_underfits()
 #test_underfits_multipack()
 #test_underfits_sieve()
-test_underfits_sieve_one()
+#test_underfits_sieve_one()
 '''

@@ -259,13 +259,30 @@ def get_indices_remaining(startingIndex,bins,costList, minCost,bestScore,optimal
     if (disqualifyTooLight):
         indicesRemaining=[index for index in indicesRemaining if volumeList[index]>=optimalScore]
     return indicesRemaining
-
-def get_possibly_optimal_indices_remaining(startingIndex,bins,costList, minCost,optimalScore,volumeList):
+# return indices which could possibly fit everything
+def get_possibly_optimal_indices_remaining(startingIndex,bins,items,optimalScore,volumeList):
     # sometimes starting index is non-zero to reflect ignoring already searched bins
     indicesRemaining=[index for index in range(startingIndex, len(bins))]
 
     indicesRemaining=[index for index in indicesRemaining if volumeList[index]>=optimalScore]
-    return indicesRemaining
+    
+    indicesMinusBinsThatCantFitLargeItems=[]
+    for index in indicesRemaining:
+        container=bins[index]
+        xContainer,yContainer,zContainer=float(container.split('x')[0]),float(container.split('x')[1]),float(container.split('x')[2])
+        containerList=sorted([xContainer,yContainer,zContainer])
+
+        couldFit=True
+        for item in items:
+            xItem,yItem,zItem=float(item.split('x')[0]),float(item.split('x')[1]),float(item.split('x')[2])
+            itemList=sorted([xItem,yItem,zItem])
+            for thing in range(0, 3):
+                if containerList[thing]<itemList[thing]:
+                    couldFit=False
+                    break
+        if couldFit:
+            indicesMinusBinsThatCantFitLargeItems.append(index)
+    return indicesMinusBinsThatCantFitLargeItems
 
 
 def get_possible_to_fit_all_items(bins1, boxs1):
@@ -303,12 +320,8 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
         return None, False, False,False
                    
     import math
-    minCost=math.inf
-    minArrangment=None
-    minPacker=None
 
-    timeSpentAtEndPacking=5
-    timeout-=timeSpentAtEndPacking
+
 
     assert((binWeightCapacitys==None and boxWeights==None) or (binWeightCapacitys!=None and binWeightCapacitys!=None))
     volumeList=[]
@@ -321,7 +334,6 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
         # use volume
 
     # end replication of bruteforce code
-    indexUsed=None
     indicesUsed={}
     anyTimeout=False
 
@@ -351,7 +363,7 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
 
     for rotation in range(0, numRotations):
 
-        numRemainingInitial=len(get_possibly_optimal_indices_remaining(0,bins1,costList, minCost,optimalScore,volumeList))
+        numRemainingInitial=len(get_possibly_optimal_indices_remaining(0,bins1,boxs1,optimalScore,volumeList))
         # override using multiple rotations and try to pack everything in one container in first pass
         if numRemainingInitial==1:
             fractionToUseForThisRotation=1
@@ -362,7 +374,7 @@ def fit_all_sieve(bins1, boxs1, timeout, itemIds=[], costList=None, binWeightCap
         start=time.time()
 
         for ele in range(0, len(bins1)):
-            indicesRemaining=get_possibly_optimal_indices_remaining(ele,bins1,costList, minCost,optimalScore,volumeList)
+            indicesRemaining=get_possibly_optimal_indices_remaining(ele,bins1,boxs1,optimalScore,volumeList)
 
 
             numRemaining=len(indicesRemaining)

@@ -56,27 +56,34 @@ def request_spinlock(requestsArrangementPair):
 def make_rates_request_async(inputTuple):
     arrangement,weight,xDim,yDim,zDim,addressFromTuple,addressToTuple=inputTuple[0],inputTuple[1],inputTuple[2],inputTuple[3],inputTuple[4],inputTuple[5],inputTuple[6]
     import shippo
-    addressFrom = shippo.Address.create(
-        name = addressFromTuple[0],
-        street1 = addressFromTuple[1],
-        city = addressFromTuple[2],
-        state = addressFromTuple[3],
-        zip = addressFromTuple[4],
-        country = "US",
-        phone = addressFromTuple[5],
-        validate = True
-    )
+    from shippo.error import APIError
+    try:
+        addressFrom = shippo.Address.create(
+            name = addressFromTuple[0],
+            street1 = addressFromTuple[1],
+            city = addressFromTuple[2],
+            state = addressFromTuple[3],
+            zip = addressFromTuple[4],
+            country = "US",
+            phone = addressFromTuple[5],
+            validate = True
+        )
+    except APIError as e:
+        return 'error making request'
 
-    addressTo = shippo.Address.create(
-        name = addressToTuple[0],
-        street1 = addressToTuple[1],
-        city = addressToTuple[2],
-        state = addressToTuple[3],
-        zip = addressToTuple[4],
-        country = "US",
-        phone = addressFromTuple[5],
-        validate = True
-    )
+    try:
+        addressTo = shippo.Address.create(
+            name = addressToTuple[0],
+            street1 = addressToTuple[1],
+            city = addressToTuple[2],
+            state = addressToTuple[3],
+            zip = addressToTuple[4],
+            country = "US",
+            phone = addressFromTuple[5],
+            validate = True
+        )
+    except APIError as e:
+        return 'error making request'       
     if not addressFrom['validation_results']['is_valid']:
         return "invalid from address"
     if not addressTo['validation_results']['is_valid']:
@@ -110,6 +117,8 @@ def make_rates_request_async(inputTuple):
             parcels = [parcel],
             asynchronous = True
         )
+    except APIError as e:
+        return 'error making request'      
     except:
         return "error creating shippo Shipment"
     return (request['object_id'], arrangement)
@@ -134,8 +143,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress']
-        read_only_fields = ['owner', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress','usedAllContainers','noValidRequests']
+        read_only_fields = ['owner', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress','usedAllContainers','noValidRequests']
         
 
     # note that these two methods are found in the arrangments serializer (quite sloppily)
@@ -191,6 +200,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             as_string=self.format_as_dimensions(x,y,z)
 
             containerStrings.append(as_string)
+
         for item in items:
             item['height'], item['length'], item['width'], item['units'] = self.convert_to_inches(item['height'], item['length'], item['width'], item['units'])
             item['weight'], item['weightUnits']=self.convert_to_pounds(item['weight'],item['weightUnits'])
@@ -251,6 +261,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
         forLoopStart=time.time()
         asyncioTotal=0
         inputTuples=[]
+
+
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
             arrangement.timeout = timedout
@@ -348,6 +360,9 @@ class ShipmentSerializer(serializers.ModelSerializer):
         with Pool(poolsToMake) as p:
             requestsAndArrangementsPairs=p.map(make_rates_request_async, inputTuples)
         for asyncResult in requestsAndArrangementsPairs:
+            if asyncResult=='error making request':
+                shipment.usedAllContainers=False
+                shipment.save()
             if asyncResult=='error creating shippo Shipment':
                 shipment.validFromAddress=False
                 shipment.validToAddress=False
@@ -369,10 +384,19 @@ class ShipmentSerializer(serializers.ModelSerializer):
         # arbritrary limit
         # spin lock that exits when status=SUCCESS for all requests or timeout
         inputList=[]
+        anyValid=False
         for pair in requestsAndArrangementsPairs:
-            rateId=pair[0]
-            arrangement=pair[1]
-            inputList.append((rateId,arrangement))
+            if pair=='error making request':
+                pass
+            else:
+                anyValid=True
+                rateId=pair[0]
+                arrangement=pair[1]
+                inputList.append((rateId,arrangement))
+        if not anyValid:
+            shipment.noValidRequests=True
+            shipment.save()
+            return shipment
 
 
         spinlockStart=time.time()

@@ -25,4 +25,6 @@ class Shipment(SafeDeleteModel):
     # false doesn't necessarily mean address was invalid, only that error thrown during shipment creation code (see serializer)
     validFromAddress=models.BooleanField(default=True)
     validToAddress=models.BooleanField(default=True)
+    usedAllContainers=models.BooleanField(default=True)
+    noValidRequests=models.BooleanField(default=False)
 admin.site.register(Shipment)

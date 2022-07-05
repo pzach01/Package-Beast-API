@@ -143,8 +143,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress','usedAllContainers','noValidRequests']
-        read_only_fields = ['owner', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress','usedAllContainers','noValidRequests']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests']
+        read_only_fields = ['owner', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests']
         
 
     # note that these two methods are found in the arrangments serializer (quite sloppily)
@@ -361,7 +361,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             requestsAndArrangementsPairs=p.map(make_rates_request_async, inputTuples)
         for asyncResult in requestsAndArrangementsPairs:
             if asyncResult=='error making request':
-                shipment.usedAllContainers=False
+                shipment.usedAllValidContainers=False
                 shipment.save()
             if asyncResult=='error creating shippo Shipment':
                 shipment.validFromAddress=False

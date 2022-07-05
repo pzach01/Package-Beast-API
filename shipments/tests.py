@@ -1221,7 +1221,7 @@ class ShipmentsTests(APITestCase):
             # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
             assert(data['fitAllArrangementPossibleAPriori']==True)
             assert(data['arrangementFittingAllItemsFound']==True)
-            assert(data['usedAllContainers']==False)
+            assert(data['usedAllValidContainers']==False)
             assert(len(data['quotes'])>0)
 
             print("Shipments test 11 Passed")

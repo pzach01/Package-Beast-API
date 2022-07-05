@@ -26,5 +26,6 @@ class Shipment(SafeDeleteModel):
     validFromAddress=models.BooleanField(default=True)
     validToAddress=models.BooleanField(default=True)
     usedAllValidContainers=models.BooleanField(default=True)
+    noErrorsMakingRequests=models.BooleanField(default=True)
     noValidRequests=models.BooleanField(default=False)
 admin.site.register(Shipment)

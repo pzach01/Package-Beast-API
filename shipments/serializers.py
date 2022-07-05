@@ -143,8 +143,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests']
-        read_only_fields = ['owner', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests']
+        read_only_fields = ['owner', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests']
         
 
     # note that these two methods are found in the arrangments serializer (quite sloppily)
@@ -263,6 +263,18 @@ class ShipmentSerializer(serializers.ModelSerializer):
         inputTuples=[]
 
 
+        maxContainersToUse=20
+        nonEmptyAPIObjects=[obj for obj in apiObjects if len(obj.boxes)>0]
+        largestContainerUsed=max(nonEmptyAPIObjects, key=lambda l: abs(l.xDim*l.yDim*l.zDim))
+        largestVolumeAccepted=abs(largestContainerUsed.xDim*largestContainerUsed.yDim*largestContainerUsed.zDim)
+        if len(nonEmptyAPIObjects)>maxContainersToUse:
+            nonEmptyAPIObjects=sorted(nonEmptyAPIObjects, key=lambda l: abs(l.xDim*l.yDim*l.zDim))
+            largestContainerUsed=nonEmptyAPIObjects[maxContainersToUse-1]
+            largestVolumeAccepted=abs(largestContainerUsed.xDim*largestContainerUsed.yDim*largestContainerUsed.zDim)
+            shipment.usedAllValidContainers=False
+            # filter the api objects so that only the smallest 'n' containers are sent to shippo 
+        apiObjects=[obj for obj in apiObjects if abs(obj.xDim*obj.yDim*obj.zDim)<=largestVolumeAccepted]
+
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
             arrangement.timeout = timedout
@@ -361,7 +373,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             requestsAndArrangementsPairs=p.map(make_rates_request_async, inputTuples)
         for asyncResult in requestsAndArrangementsPairs:
             if asyncResult=='error making request':
-                shipment.usedAllValidContainers=False
+                shipment.noErrorsMakingRequests=False
                 shipment.save()
             if asyncResult=='error creating shippo Shipment':
                 shipment.validFromAddress=False

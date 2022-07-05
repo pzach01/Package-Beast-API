@@ -1218,12 +1218,15 @@ class ShipmentsTests(APITestCase):
             data=self.generic_logic(inputData)
             import time
             time.sleep(30)
-            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+            # checks on the data, will print -----------Failed Arrangments Test 11 if these fail
+            # all of these may fail at times depending on how overloaded Shippo is
             assert(data['fitAllArrangementPossibleAPriori']==True)
             assert(data['arrangementFittingAllItemsFound']==True)
             assert(data['usedAllValidContainers']==False)
+            assert(data['noErrorsMakingRequests']==True)
+            assert(data['noValidRequests']==False)
             assert(len(data['quotes'])>0)
 
             print("Shipments test 11 Passed")
         except:
-            print('--------------Failed shipments test 11')
+            print('-------------Shipments test 11 Failed')

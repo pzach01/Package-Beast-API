@@ -29,4 +29,5 @@ class Shipment(SafeDeleteModel):
     noErrorsMakingRequests=models.BooleanField(default=True)
     noValidRequests=models.BooleanField(default=False)
     calculationInProgress = models.BooleanField(default=False)
+    dummyField = models.BooleanField(default=False)
 admin.site.register(Shipment)

@@ -263,7 +263,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         inputTuples=[]
 
 
-        maxContainersToUse=20
+        maxContainersToUse=2
         nonEmptyAPIObjects=[obj for obj in apiObjects if len(obj.boxes)>0]
         largestContainerUsed=max(nonEmptyAPIObjects, key=lambda l: abs(l.xDim*l.yDim*l.zDim))
         largestVolumeAccepted=abs(largestContainerUsed.xDim*largestContainerUsed.yDim*largestContainerUsed.zDim)

@@ -143,8 +143,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests']
-        read_only_fields = ['owner', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests']
+        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests','activeThreads']
+        read_only_fields = ['owner', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests','activeThreads']
         
 
     # note that these two methods are found in the arrangments serializer (quite sloppily)
@@ -438,6 +438,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         addressCreationTotal=addressEndTime-addressStartTime
         forLoopTime=forLoopEnd-forLoopStart
         shipment.timingInformation=str(totalTime)+";"+str(spinlockTotal)+";"+str(quoteCreationTotal)+";"+str(addressCreationTotal)+";"+str(sieveTotal)+";"+str(forLoopTime)+";"+str(asyncioTotal)
+        shipment.activeThreads=threading.active_count()
         shipment.save()
         return shipment
 

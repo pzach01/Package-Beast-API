@@ -366,7 +366,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         forLoopEnd=time.time()
 
 
-        poolsToMake=min(10,len(inputTuples))
+        poolsToMake=min(4,len(inputTuples))
 
         requestsAndArrangementsPairs=[]
         with Pool(poolsToMake) as p:

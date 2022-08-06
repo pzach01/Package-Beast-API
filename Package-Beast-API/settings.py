@@ -33,6 +33,8 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
         }
     }
     ALLOWED_HOSTS = ['api.packagebeast.com', 'packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com']
+    ALLOWED_HOSTS = ['*']
+   
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = False
     os.environ['STRIPE_TAX_RATE_ID']='txr_1ICsUoJWFTMXIZUo9c5KbCFS'
@@ -50,7 +52,8 @@ else:
             'PORT': '5432'
         }
     }
-    ALLOWED_HOSTS = ['127.0.0.1', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'developmentapi.packagebeast.com']
+    # ALLOWED_HOSTS = ['127.0.0.1', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'developmentapi.packagebeast.com']
+    ALLOWED_HOSTS = ['*']
     DEBUG = True
 
     # test keys

@@ -439,7 +439,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
         forLoopTime=forLoopEnd-forLoopStart
         shipment.timingInformation=str(totalTime)+";"+str(spinlockTotal)+";"+str(quoteCreationTotal)+";"+str(addressCreationTotal)+";"+str(sieveTotal)+";"+str(forLoopTime)+";"+str(asyncioTotal)
         shipment.activeThreads=threading.active_count()
-        return shipment
-
         shipment.save()
+        return shipment
 

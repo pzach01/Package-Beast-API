@@ -229,7 +229,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             return shipment
         if not arrangementFittingAllItemsFound:
             return shipment
-            
+        shipment.save()
         return shipment
 
         # create shippo addresses (shipFrom and shipTo)

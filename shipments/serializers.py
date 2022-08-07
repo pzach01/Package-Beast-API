@@ -229,7 +229,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
             return shipment
         if not arrangementFittingAllItemsFound:
             return shipment
-
+            
+        return shipment
 
         # create shippo addresses (shipFrom and shipTo)
         addressStartTime=time.time()

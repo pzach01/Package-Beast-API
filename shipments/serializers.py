@@ -229,8 +229,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             return shipment
         if not arrangementFittingAllItemsFound:
             return shipment
-        shipment.save()
-        return shipment
+
 
         # create shippo addresses (shipFrom and shipTo)
         addressStartTime=time.time()
@@ -440,6 +439,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         forLoopTime=forLoopEnd-forLoopStart
         shipment.timingInformation=str(totalTime)+";"+str(spinlockTotal)+";"+str(quoteCreationTotal)+";"+str(addressCreationTotal)+";"+str(sieveTotal)+";"+str(forLoopTime)+";"+str(asyncioTotal)
         shipment.activeThreads=threading.active_count()
-        shipment.save()
         return shipment
+
+        shipment.save()
 

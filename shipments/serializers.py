@@ -23,7 +23,7 @@ from multiprocessing import Pool
 
 def request_spinlock(requestsArrangementPair):
     import time
-
+    import random
     endTime=time.time()+15
 
     request=None
@@ -34,7 +34,9 @@ def request_spinlock(requestsArrangementPair):
         if request['status']=='SUCCESS':
             break
         if time.time()>endTime:
-            break
+            return ('', arrangement)
+        time.sleep(2+random.random())
+        # try to prevent all the threads from hitting at same time (since they are spawned like this)
 
 
     rates=request['rates']
@@ -263,7 +265,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         inputTuples=[]
 
 
-        maxContainersToUse=2
+        maxContainersToUse=20
         nonEmptyAPIObjects=[obj for obj in apiObjects if len(obj.boxes)>0]
         largestContainerUsed=max(nonEmptyAPIObjects, key=lambda l: abs(l.xDim*l.yDim*l.zDim))
         largestVolumeAccepted=abs(largestContainerUsed.xDim*largestContainerUsed.yDim*largestContainerUsed.zDim)
@@ -421,6 +423,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
         quoteCreationStart=time.time()
         for rateAndArrangment in outputList:
             quotesAsTuplesShippo,arrangement=rateAndArrangment[0],rateAndArrangment[1]            
+            if quotesAsTuplesShippo=='':
+                continue
             for quote in quotesAsTuplesShippo:
                 #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
                 q=Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4],shippoRateId=quote[5])

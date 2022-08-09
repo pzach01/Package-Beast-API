@@ -367,17 +367,20 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         forLoopEnd=time.time()
 
-        import requests
-        response = requests.get("http://api.open-notify.org/astros.json")
-        shipment.timingInformation=str(response)
-        shipment.save()
-        return shipment
+        #import requests
+        #response = requests.get("http://api.open-notify.org/astros.json")
+        #shipment.timingInformation=str(response)
+        #shipment.save()
 
         poolsToMake=min(4,len(inputTuples))
 
         requestsAndArrangementsPairs=[]
+        for i in inputTuples:
+            requestsAndArrangementsPairs.append(make_rates_request_async(i))
+        '''
         with Pool(poolsToMake) as p:
             requestsAndArrangementsPairs=p.map(make_rates_request_async, inputTuples)
+        '''
         for asyncResult in requestsAndArrangementsPairs:
             if asyncResult=='error making request':
                 shipment.noErrorsMakingRequests=False
@@ -395,6 +398,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 shipment.validToAddress=False
                 shipment.save()
                 return shipment
+
         # note that for this code to work correctly loops.run_until_complete (and async_handler) must return the methods in the order they were input
         # (it does this in testing)
 
@@ -420,8 +424,12 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         spinlockStart=time.time()
         outputList=[]
+        for i in inputList:
+            outputList.append(request_spinlock(i))
+        '''
         with Pool(poolsToMake) as p:
             outputList=p.map(request_spinlock, inputList)
+        '''
         spinlockEnd=time.time()
 
                     

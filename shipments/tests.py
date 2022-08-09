@@ -1230,3 +1230,379 @@ class ShipmentsTests(APITestCase):
             print("Shipments test 11 Passed")
         except:
             print('-------------Shipments test 11 Failed')
+    def test_12(self):
+        try:
+            inputData={
+            "title": "string",
+            "lastSelectedQuoteId": 0,
+            "items": [
+                {
+                "id": 0,
+                "sku": "string",
+                "description": "string",
+                "length": 1,
+                "width": 1,
+                "height": 1,
+                "units": "in",
+                "weight": 5,
+                "weightUnits": "lb"
+                },           
+            ],
+            "containers": [
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 1,
+                "yDim": 1,
+                "zDim": 1,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 2,
+                "yDim": 2,
+                "zDim": 2,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 3,
+                "yDim": 3,
+                "zDim": 3,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 4,
+                "yDim": 4,
+                "zDim": 4,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 5,
+                "yDim": 5,
+                "zDim": 5,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 6,
+                "yDim": 6,
+                "zDim": 6,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 7,
+                "yDim": 7,
+                "zDim": 7,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 8,
+                "yDim": 8,
+                "zDim": 8,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 9,
+                "yDim": 9,
+                "zDim": 9,
+                "units": "in"
+                },                 
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 10,
+                "yDim": 10,
+                "zDim": 10,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 11,
+                "yDim": 11,
+                "zDim": 11,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 12,
+                "yDim": 12,
+                "zDim": 12,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 13,
+                "yDim": 13,
+                "zDim": 13,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 14,
+                "yDim": 14,
+                "zDim": 14,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 15,
+                "yDim": 15,
+                "zDim": 15,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 16,
+                "yDim": 16,
+                "zDim": 16,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 17,
+                "yDim": 17,
+                "zDim": 17,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 18,
+                "yDim": 18,
+                "zDim": 18,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 19,
+                "yDim": 19,
+                "zDim": 19,
+                "units": "in"
+                },                 
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 20,
+                "yDim": 20,
+                "zDim": 20,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 21,
+                "yDim": 21,
+                "zDim": 21,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 22,
+                "yDim": 22,
+                "zDim": 22,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 23,
+                "yDim": 23,
+                "zDim": 23,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 24,
+                "yDim": 24,
+                "zDim": 24,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 25,
+                "yDim": 25,
+                "zDim": 25,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 26,
+                "yDim": 26,
+                "zDim": 26,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 27,
+                "yDim": 27,
+                "zDim": 27,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 28,
+                "yDim": 28,
+                "zDim": 28,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 29,
+                "yDim": 29,
+                "zDim": 29,
+                "units": "in"
+                },                 
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 30,
+                "yDim": 30,
+                "zDim": 30,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 31,
+                "yDim": 31,
+                "zDim": 31,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 32,
+                "yDim": 32,
+                "zDim": 32,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 33,
+                "yDim": 33,
+                "zDim": 33,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 34,
+                "yDim": 34,
+                "zDim": 34,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 35,
+                "yDim": 35,
+                "zDim": 35,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 36,
+                "yDim": 36,
+                "zDim": 36,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 37,
+                "yDim": 37,
+                "zDim": 37,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 38,
+                "yDim": 38,
+                "zDim": 38,
+                "units": "in"
+                },
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 39,
+                "yDim": 39,
+                "zDim": 39,
+                "units": "in"
+                },                 
+                {
+                "sku": "string",
+                "description": "string",
+                "xDim": 40,
+                "yDim": 40,
+                "zDim": 40,
+                "units": "in"
+                }                                                      
+
+            ],
+            "multiBinPack": False,
+            "timeoutDuration": 15,
+            "shipFromAddress": {
+                "name":"Lucas Z",
+                "phoneNumber":"5156573318",
+                "addressLine1": "314 North Clinton Street",
+                "addressLine2": "string",
+                "city": "Iowa City",
+                "stateProvince": "IA",
+                "postalCode": "52245"
+            },
+            "shipToAddress":{
+                "name":"John Doe",
+                "phoneNumber":"5156573318",
+                "addressLine1": "13178 Oakbrook Drive",
+                "addressLine2": "string",
+                "city": "Des Moines",
+                "stateProvince": "IA",
+                "postalCode": "50323"
+            }
+            }
+
+            data=self.generic_logic(inputData)
+            import time
+            time.sleep(30)
+            # checks on the data, will print -----------Failed Arrangments Test 11 if these fail
+            # all of these may fail at times depending on how overloaded Shippo is
+            assert('200' in data['timingInformation'])
+            print('Timing information')
+            print(data['timingInformation'])
+
+
+            print("Shipments test 12 Passed")
+        except:
+            print('-------------Shipments test 12 Failed')            

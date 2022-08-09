@@ -367,6 +367,11 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         forLoopEnd=time.time()
 
+        import requests
+        response = requests.get("http://api.open-notify.org/astros.json")
+        shipment.timingInformation=str(response)
+        shipment.save()
+        return shipment
 
         poolsToMake=min(4,len(inputTuples))
 
@@ -415,7 +420,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         spinlockStart=time.time()
         outputList=[]
-        return shipment
         with Pool(poolsToMake) as p:
             outputList=p.map(request_spinlock, inputList)
         spinlockEnd=time.time()

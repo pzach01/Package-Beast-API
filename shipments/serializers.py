@@ -415,6 +415,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         spinlockStart=time.time()
         outputList=[]
+        return shipment
         with Pool(poolsToMake) as p:
             outputList=p.map(request_spinlock, inputList)
         spinlockEnd=time.time()

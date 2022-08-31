@@ -20,37 +20,6 @@ import shippo
 import threading
 from django.conf import settings
 
-def request_spinlock(requestsArrangementPair):
-    import time
-    import random
-    endTime=time.time()+15
-
-    request=None
-    requestId=requestsArrangementPair[0]
-    arrangement=requestsArrangementPair[1]
-    while(True):
-        request=shippo.Shipment.retrieve(requestId)
-        if request['status']=='SUCCESS':
-            break
-        if time.time()>endTime:
-            return ('', arrangement)
-        time.sleep(2+random.random())
-        # try to prevent all the threads from hitting at same time (since they are spawned like this)
-
-
-    rates=request['rates']
-
-    quotesAsTuplesShippo=[]
-    for rate in rates:
-        rateId=rate['object_id']
-        #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
-        serviceLevel=rate['servicelevel']
-        serviceToken=serviceLevel['token']
-        serviceTerms=serviceLevel['terms']
-        t=(rate['provider'],rate['amount'],rate['servicelevel']['name'],rate['estimated_days'],rate['duration_terms'],rateId,serviceToken,serviceTerms)
-        quotesAsTuplesShippo.append(t)
-    return (quotesAsTuplesShippo,arrangement)
-
 def get_shippo_shipments(SHIPPO_API_KEY, shipmentIds):
     import requests
     post_data = {"SHIPPO_API_KEY": SHIPPO_API_KEY, "shipmentIds": shipmentIds}

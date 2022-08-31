@@ -303,7 +303,14 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 shipment.validToAddress=False
                 shipment.save()
                 return shipment
-        
+            if len(shipmentsReturnedFromShippo['messages'])>1:
+                if shipmentsReturnedFromShippo['messages'][0]=='invalid from address' and shipmentsReturnedFromShippo['messages'][1]=='invalid to address':
+                    shipment.validFromAddress=False
+                    shipment.validToAddress=False
+                    shipment.save()
+                    return shipment
+            
+
         shippoShipmentIds = []
 
         for shipmentReturnedFromShippo in shipmentsReturnedFromShippo:

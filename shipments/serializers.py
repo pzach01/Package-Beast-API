@@ -18,8 +18,7 @@ from users.models import User
 import os
 import shippo
 import threading
-import multiprocessing
-from multiprocessing import Pool
+from django.conf import settings
 
 def request_spinlock(requestsArrangementPair):
     import time
@@ -52,78 +51,59 @@ def request_spinlock(requestsArrangementPair):
         quotesAsTuplesShippo.append(t)
     return (quotesAsTuplesShippo,arrangement)
 
+def get_shippo_shipments(SHIPPO_API_KEY, shipmentIds):
+    import requests
+    post_data = {"SHIPPO_API_KEY": SHIPPO_API_KEY, "shipmentIds": shipmentIds}
+    url = settings.SHIPPO_API_INTERFACE_FETCH_MANY_SHIPMENTS_URI
+    headers = { 'content-type': "application/json" }
+    response = requests.post(url, json = post_data, headers=headers)    
+    import json
+    shippo_shipments = json.loads(response.text)
+    return shippo_shipments
 
-
-
-def make_rates_request_async(inputTuple):
-    arrangement,weight,xDim,yDim,zDim,addressFromTuple,addressToTuple=inputTuple[0],inputTuple[1],inputTuple[2],inputTuple[3],inputTuple[4],inputTuple[5],inputTuple[6]
-    import shippo
-    from shippo.error import APIError
-    try:
-        addressFrom = shippo.Address.create(
-            name = addressFromTuple[0],
-            street1 = addressFromTuple[1],
-            city = addressFromTuple[2],
-            state = addressFromTuple[3],
-            zip = addressFromTuple[4],
-            country = "US",
-            phone = addressFromTuple[5],
-            validate = True
-        )
-    except APIError as e:
-        return 'error making request'
-
-    try:
-        addressTo = shippo.Address.create(
-            name = addressToTuple[0],
-            street1 = addressToTuple[1],
-            city = addressToTuple[2],
-            state = addressToTuple[3],
-            zip = addressToTuple[4],
-            country = "US",
-            phone = addressFromTuple[5],
-            validate = True
-        )
-    except APIError as e:
-        return 'error making request'       
-    if not addressFrom['validation_results']['is_valid']:
-        return "invalid from address"
-    if not addressTo['validation_results']['is_valid']:
-        return "invalid to address"
-
-
-
-    if '.' in weight:
-        weight=weight[0: (weight.index('.')+5)]
-    if '.' in xDim:
-        xDim=xDim[0: (xDim.index('.')+5)]
-    if '.' in yDim:
-        yDim=yDim[0: (yDim.index('.')+5)]
-    if '.' in zDim:
-        zDim=zDim[0: (zDim.index('.')+5)]
-
-
-
-    parcel = {
-        "length": xDim,
-        "width": yDim,
-        "height": zDim,
-        "distance_unit": "in",
-        "weight": weight,
-        "mass_unit": "lb"
+def make_shippo_shipment_request(SHIPPO_API_KEY, shipFromAddress, shipToAddress, solutionContainers):
+    import requests
+    address_from = {
+        "name": shipFromAddress.name,
+        "street1": shipFromAddress.addressLine1,
+        "street2": "",
+        "city": shipFromAddress.city,
+        "state": shipFromAddress.stateProvinceCode,
+        "zip": shipFromAddress.postalCode,
+        "country":"US",
+        "phone": shipFromAddress.phoneNumber
     }
-    try:
-        request = shippo.Shipment.create(
-            address_from = addressFrom,
-            address_to = addressTo,
-            parcels = [parcel],
-            asynchronous = True
-        )
-    except APIError as e:
-        return 'error making request'      
-    except:
-        return "error creating shippo Shipment"
-    return (request['object_id'], arrangement)
+    address_to = {
+        "name": shipToAddress.name,
+        "street1": shipToAddress.addressLine1,
+        "street2": "",
+        "city": shipToAddress.city,
+        "state": shipToAddress.stateProvinceCode,
+        "zip": shipToAddress.postalCode,
+        "country":"US",
+        "phone": shipToAddress.phoneNumber
+    }
+
+    parcels = []
+    for solutionContainer in solutionContainers:
+        parcel = {
+        "length": solutionContainer.xDim,
+        "width": solutionContainer.yDim,
+        "height": solutionContainer.zDim,
+        "distance_unit": "in",
+        "weight": solutionContainer.weight,
+        "mass_unit": "lb"
+        }
+        parcels.append(parcel)
+    
+    post_data = {"SHIPPO_API_KEY": SHIPPO_API_KEY, "address_from": address_from, "address_to": address_to, "parcels": parcels, "async":True}
+    url = settings.SHIPPO_API_INTERFACE_CREATE_SHIPMENTS_URI
+    headers = { 'content-type': "application/json" }
+    response = requests.post(url, json = post_data, headers=headers)    
+    import json
+    shippo_shipments = json.loads(response.text)
+    return shippo_shipments
+
 
 class SimpleShipmentsSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
@@ -170,17 +150,11 @@ class ShipmentSerializer(serializers.ModelSerializer):
         startTotal=time.time()
         containers = validated_data.pop('containers')
 
-
-
-
-
         items = validated_data.pop('items')
         timeoutDuration=validated_data.pop('timeoutDuration')
         lastSelectedQuoteId=validated_data.pop('lastSelectedQuoteId')
         # this is actually unused (remove at future date from)
         multiBinPack=validated_data['multiBinPack']
-
-
 
         shipFromAddress_data = validated_data.pop('shipFromAddress')
         shipFromAddress=Address.objects.create(owner=validated_data['owner'], **shipFromAddress_data)
@@ -235,26 +209,14 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         # create shippo addresses (shipFrom and shipTo)
         addressStartTime=time.time()
-        shipToAttentionName=shipToAddress.name
-        shipToPhoneNumber=shipToAddress.phoneNumber
-        shipToAddressLineOne=shipToAddress.addressLine1
-        shipToCity=shipToAddress.city
-        shipToStateProvinceCode=shipToAddress.stateProvinceCode
-        shipToPostalCode=shipToAddress.postalCode
-
-
-        shipFromAttentionName=shipFromAddress.name
-        shipFromPhoneNumber=shipFromAddress.phoneNumber
-        shipFromAddressLineOne=shipFromAddress.addressLine1
-        shipFromCity=shipFromAddress.city
-        shipFromStateProvinceCode=shipFromAddress.stateProvinceCode
-        shipFromPostalCode=shipFromAddress.postalCode
 
         user=User.objects.get(email=validated_data['owner'])
         if user.userHasShippoAccount() and (os.getenv('ENVIRONMENT_TYPE')=='PRODUCTION'):
             shippo.config.api_key=user.shippoAccessToken
+            SHIPPO_API_KEY =user.shippoAccessToken
         else:
             shippo.config.api_key = os.getenv('SHIPPO_API_KEY')
+            SHIPPO_API_KEY = os.getenv('SHIPPO_API_KEY')
 
 
         addressEndTime=time.time()
@@ -262,8 +224,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
         # one container per arrangment
         forLoopStart=time.time()
         asyncioTotal=0
-        inputTuples=[]
-
 
         maxContainersToUse=20
         nonEmptyAPIObjects=[obj for obj in apiObjects if len(obj.boxes)>0]
@@ -277,6 +237,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
             # filter the api objects so that only the smallest 'n' containers are sent to shippo 
         apiObjects=[obj for obj in apiObjects if abs(obj.xDim*obj.yDim*obj.zDim)<=largestVolumeAccepted]
 
+        solutionContainers = []
+        solutionArrangements = []
         for ele in range(0, len(apiObjects)):
             arrangement = Arrangement.objects.create(**validated_data,shipment=shipment)
             arrangement.timeout = timedout
@@ -284,8 +246,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
             arrangement.arrangementPossible = True
             arrangement.shipment=shipment
             arrangement.save()
-
-            containerList = []
 
             xDim=0
             yDim=0
@@ -305,8 +265,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
             description = containers[ele]['description']
             units = containers[ele]['units']
             volume = xDim*yDim*zDim
-            containerList.append(Container.objects.create(arrangement=arrangement, xDim=xDim, yDim=yDim, zDim=zDim, volume=volume,
-                                                        owner=validated_data['owner'], sku=sku, description=description, units=units))
+            container = Container.objects.create(arrangement=arrangement, xDim=xDim, yDim=yDim, zDim=zDim, volume=volume,
+                                                        owner=validated_data['owner'], sku=sku, description=description, units=units)
             totalWeight=0
             if (len(apiObjects[ele].boxes)>0):
                 for item in apiObjects[ele].boxes:
@@ -337,114 +297,62 @@ class ShipmentSerializer(serializers.ModelSerializer):
                     units = foundItem['units']
                     weight=foundItem['weight']
                     weightUnits=foundItem['weightUnits']
-                    Item.objects.create(xDim=xDim, yDim=yDim, zDim=zDim, volume=volume, container=containerList[0], arrangement=arrangement,
+                    Item.objects.create(xDim=xDim, yDim=yDim, zDim=zDim, volume=volume, container=container, arrangement=arrangement,
                                         owner=validated_data['owner'], xCenter=xCenter, yCenter=yCenter, zCenter=zCenter, weight=weight,weightUnits=weightUnits, sku=sku, description=description, units=units, masterItemId=masterItemId, width=width, length=length, height=height)
 
                     totalWeight+=weight
             else:
                 raise Exception('not sure why you are in this code, doesnt necessarily bug besides this line')
-                for item in items:
-                    volume = item['width']*item['length']*item['height']
-                    Item.objects.create(xDim=item['width'], yDim=item['length'], zDim=item['height'],weight=item['weight'],weightUnits=item['weightUnits'], volume=volume,container=None, arrangement=arrangement, owner=validated_data['owner'], xCenter=0, yCenter=0, zCenter=0, sku=item['sku'], description=item['description'], masterItemId=item['id'], units=item['units'], width=item['width'], length=item['length'], height=item['height'])
-
-                    # this line maybe shouldnt be here
-                    totalWeight+=item['weightUnits']
-
 
             weight=totalWeight
+
+            '''Note: this value is never saved back to the container object.
+            We might want to update container model to include weight - Aug 27 2022'''
+            container.weight = weight
+            solutionContainers.append(container)
+            solutionArrangements.append(arrangement)
             assert(not xDim==0)
             assert(not yDim==0)
             assert(not zDim==0)
 
-            xDim=str(xDim)
-            yDim=str(yDim)
-            zDim=str(zDim)
-
-            addressFromTuple=(shipFromAttentionName,shipFromAddressLineOne,shipFromCity,shipFromStateProvinceCode,shipFromPostalCode, shipFromPhoneNumber)
-            addressToTuple=(shipToAttentionName, shipToAddressLineOne, shipToCity, shipToStateProvinceCode, shipToPostalCode, shipToPhoneNumber)
-            inputTuple=(arrangement,str(weight),xDim,yDim,zDim,addressFromTuple, addressToTuple)
-            inputTuples.append(inputTuple)
-
         forLoopEnd=time.time()
-
-        #import requests
-        #response = requests.get("http://api.open-notify.org/astros.json")
-        #shipment.timingInformation=str(response)
-        #shipment.save()
-
-        poolsToMake=min(4,len(inputTuples))
-
-        requestsAndArrangementsPairs=[]
-        for i in inputTuples:
-            requestsAndArrangementsPairs.append(make_rates_request_async(i))
-        '''
-        with Pool(poolsToMake) as p:
-            requestsAndArrangementsPairs=p.map(make_rates_request_async, inputTuples)
-        '''
-        for asyncResult in requestsAndArrangementsPairs:
-            if asyncResult=='error making request':
+        shipmentsReturnedFromShippo = make_shippo_shipment_request(SHIPPO_API_KEY, shipFromAddress, shipToAddress, solutionContainers)
+        if "messages" in shipmentsReturnedFromShippo:
+            if shipmentsReturnedFromShippo['messages'][0]=='error making request':
                 shipment.noErrorsMakingRequests=False
                 shipment.save()
-            if asyncResult=='error creating shippo Shipment':
+            if shipmentsReturnedFromShippo['messages'][0]=='error creating shippo Shipment':
                 shipment.validFromAddress=False
                 shipment.validToAddress=False
                 shipment.save()
                 return shipment
-            if asyncResult=='invalid from address':
+            if shipmentsReturnedFromShippo['messages'][0]=='invalid from address':
                 shipment.validFromAddress=False
                 shipment.save()
                 return shipment
-            if asyncResult=='invalid to address':
+            if shipmentsReturnedFromShippo['messages'][0]=='invalid to address':
                 shipment.validToAddress=False
                 shipment.save()
                 return shipment
+        
+        shippoShipmentIds = []
 
-        # note that for this code to work correctly loops.run_until_complete (and async_handler) must return the methods in the order they were input
-        # (it does this in testing)
-
-        # give shippo 3 secs of lead time to make arrangment
-
-        # arbritrary limit
-        # spin lock that exits when status=SUCCESS for all requests or timeout
-        inputList=[]
-        anyValid=False
-        for pair in requestsAndArrangementsPairs:
-            if pair=='error making request':
-                pass
-            else:
-                anyValid=True
-                rateId=pair[0]
-                arrangement=pair[1]
-                inputList.append((rateId,arrangement))
-        if not anyValid:
-            shipment.noValidRequests=True
-            shipment.save()
-            return shipment
-
+        for shipmentReturnedFromShippo in shipmentsReturnedFromShippo:
+            shippoShipmentIds.append(shipmentReturnedFromShippo['object_id'])
 
         spinlockStart=time.time()
-        outputList=[]
-        for i in inputList:
-            outputList.append(request_spinlock(i))
-        '''
-        with Pool(poolsToMake) as p:
-            outputList=p.map(request_spinlock, inputList)
-        '''
+        shipmentsReturnedFromShippo = get_shippo_shipments(SHIPPO_API_KEY, shippoShipmentIds)
+
         spinlockEnd=time.time()
 
-                    
+            
         quoteCreationStart=time.time()
-        for rateAndArrangment in outputList:
-            quotesAsTuplesShippo,arrangement=rateAndArrangment[0],rateAndArrangment[1]            
-            if quotesAsTuplesShippo=='':
-                continue
-            for quote in quotesAsTuplesShippo:
-                #(carrier,cost,serviceDescription, guranteedDaysToDelivery,scheduledDeliveryTime)
-                q=Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=arrangement,carrier=quote[0],cost=float(quote[1]),serviceDescription=quote[2],daysToShip=quote[3],scheduledDeliveryTime=quote[4],shippoRateId=quote[5])
-                serviceName=quote[2]
-                serviceToken=quote[6]
-                serviceTerms=quote[7]
-                ServiceLevel.objects.create(name=serviceName,token=serviceToken,terms=serviceTerms,quote=q)
+
+        for i, shipmentReturnedFromShippo in enumerate(shipmentsReturnedFromShippo):
+            rates = shipmentReturnedFromShippo['rates']
+            for rate in rates:
+                q=Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=solutionArrangements[i],carrier=rate['provider'],cost=float(rate['amount']),serviceDescription=rate['servicelevel']['name'],daysToShip=rate['estimated_days'],scheduledDeliveryTime=rate['duration_terms'],shippoRateId=rate['object_id'])
+                ServiceLevel.objects.create(name=rate['servicelevel']['name'],token=rate['servicelevel']['token'],terms=rate['servicelevel']['terms'],quote=q)
         quoteCreationEnd=time.time()
         
         endTotal=time.time()
@@ -458,4 +366,3 @@ class ShipmentSerializer(serializers.ModelSerializer):
         shipment.activeThreads=threading.active_count()
         shipment.save()
         return shipment
-

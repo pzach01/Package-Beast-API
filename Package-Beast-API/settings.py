@@ -64,6 +64,10 @@ else:
     os.environ['SHIPPO_CLIENT_SECRET']='LC9N-5-HnySDwsSGbG1PCSvuaTve1WMf0HyEXXu-t_g'
     os.environ['SHIPPO_API_KEY']='shippo_test_41c916402deba95527751c894fd23fc03d7d8198'
 
+# Lambda function / api gateway uri's
+SHIPPO_API_INTERFACE_FETCH_MANY_SHIPMENTS_URI = 'https://z3k2o2uns4.execute-api.us-east-1.amazonaws.com/shippo-shipments/fetch-many'
+SHIPPO_API_INTERFACE_CREATE_SHIPMENTS_URI = 'https://z3k2o2uns4.execute-api.us-east-1.amazonaws.com/shippo-shipments/create-many'
+
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Setup support for proxy headers

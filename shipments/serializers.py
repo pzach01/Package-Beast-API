@@ -286,6 +286,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         forLoopEnd=time.time()
         shipmentsReturnedFromShippo = make_shippo_shipment_request(SHIPPO_API_KEY, shipFromAddress, shipToAddress, solutionContainers)
+        
         if "messages" in shipmentsReturnedFromShippo:
             if shipmentsReturnedFromShippo['messages'][0]=='error making request':
                 shipment.noErrorsMakingRequests=False
@@ -303,12 +304,11 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 shipment.validToAddress=False
                 shipment.save()
                 return shipment
-            if len(shipmentsReturnedFromShippo['messages'])>1:
-                if shipmentsReturnedFromShippo['messages'][0]=='invalid from address' and shipmentsReturnedFromShippo['messages'][1]=='invalid to address':
-                    shipment.validFromAddress=False
-                    shipment.validToAddress=False
-                    shipment.save()
-                    return shipment
+            if shipmentsReturnedFromShippo['messages'][0]=='same from and to addresses':
+                shipment.validFromAddress=False
+                shipment.validToAddress=False
+                shipment.save()
+                return shipment
             
 
         shippoShipmentIds = []

@@ -14,7 +14,14 @@ from libs.Box_Stuff_Python3_Only import box_stuff2 as bp
 from subscription.models import Subscription
 from django.http import Http404
 
+class SimpleArrangementSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.email')
+    containers = ContainerSerializer(many=True)
 
+    class Meta:
+        model = Arrangement
+        fields = ['id', 'created', 'owner', 'arrangementPossible', 'timeout', 'multiBinPack', 'containers','title','shipment']
+        read_only_fields = ['arrangementPossible', 'timeout','shipment'] 
 
 class ArrangementSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')

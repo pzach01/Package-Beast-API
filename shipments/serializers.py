@@ -1,4 +1,4 @@
-from quotes.serializers import QuoteSerializer
+from quotes.serializers import QuoteSerializer, SimpleQuoteSerializer
 from rest_framework import serializers
 from shipments.models import Shipment
 from django.http import Http404
@@ -84,12 +84,13 @@ class SimpleShipmentsSerializer(serializers.ModelSerializer):
 
 class SimpleShipmentQuotesSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
+    quotes = SimpleQuoteSerializer(many=True, required=False, read_only=True)
     class Meta:
         model = Shipment
         depth=1
         fields = ['id', 'owner', 'created', 'title', 'validFromAddress', 'validToAddress', 'quotes']
     
-
+    
 class ShipmentSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
     containers = ContainerSerializer(many=True, write_only=True)

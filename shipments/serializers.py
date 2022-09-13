@@ -19,6 +19,8 @@ import os
 import shippo
 import threading
 from django.conf import settings
+from rest_framework import status
+
 
 def get_shippo_shipments(SHIPPO_API_KEY, shipmentIds):
     import requests
@@ -79,6 +81,13 @@ class SimpleShipmentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipment
         fields = ['id', 'owner', 'created', 'title', 'validFromAddress', 'validToAddress']
+
+class SimpleShipmentQuotesSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.email')
+    class Meta:
+        model = Shipment
+        depth=1
+        fields = ['id', 'owner', 'created', 'title', 'validFromAddress', 'validToAddress', 'quotes']
     
 
 class ShipmentSerializer(serializers.ModelSerializer):
@@ -146,6 +155,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
             containerStrings.append(as_string)
 
+        totalWeight = 0
         for item in items:
             item['height'], item['length'], item['width'], item['units'] = self.convert_to_inches(item['height'], item['length'], item['width'], item['units'])
             item['weight'], item['weightUnits']=self.convert_to_pounds(item['weight'],item['weightUnits'])
@@ -155,7 +165,12 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
             itemStrings.append(as_string)
             itemIds.append(item['id'])
-        #increment the amount of shipments the user has used
+            totalWeight += item['weight']
+        
+        if totalWeight > 70:
+            raise serializers.ValidationError({"message":'shipment total weight exceeds limit of 70 lbs'})
+
+        #increment the amount of shipments the user has used      
         userSubscription.increment_shipment_requests()
         sieveStart=time.time()
         # arrangementPossible= arrangementPossibleAPriori= some item that has lxwxh < some containers LXWxH exists
@@ -295,20 +310,18 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 shipment.validFromAddress=False
                 shipment.validToAddress=False
                 shipment.save()
-                return shipment
             if shipmentsReturnedFromShippo['messages'][0]=='invalid from address':
                 shipment.validFromAddress=False
                 shipment.save()
-                return shipment
             if shipmentsReturnedFromShippo['messages'][0]=='invalid to address':
                 shipment.validToAddress=False
                 shipment.save()
-                return shipment
             if shipmentsReturnedFromShippo['messages'][0]=='same from and to addresses':
                 shipment.validFromAddress=False
                 shipment.validToAddress=False
                 shipment.save()
-                return shipment
+            raise serializers.ValidationError({"message":shipmentsReturnedFromShippo['messages'][0]})
+
             
 
         shippoShipmentIds = []
@@ -318,7 +331,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         spinlockStart=time.time()
         shipmentsReturnedFromShippo = get_shippo_shipments(SHIPPO_API_KEY, shippoShipmentIds)
-
         spinlockEnd=time.time()
 
             

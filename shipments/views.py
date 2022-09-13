@@ -2,7 +2,7 @@ from django.shortcuts import render
 import os
 # Create your views here.
 from shipments.models import Shipment
-from shipments.serializers import ShipmentSerializer, SimpleShipmentsSerializer
+from shipments.serializers import ShipmentSerializer, SimpleShipmentsSerializer, SimpleShipmentQuotesSerializer
 from rest_framework import generics, permissions
 
 
@@ -28,6 +28,10 @@ class ShipmentList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+class SimpleShipmentQuotesDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
+    queryset = Shipment.objects.all()
+    serializer_class = SimpleShipmentQuotesSerializer
 
 class ShipmentDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOwner]

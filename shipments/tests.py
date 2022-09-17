@@ -94,7 +94,7 @@ class ShipmentsTests(APITestCase):
             }
 
             data=self.generic_logic(inputData)
-            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+            # checks on the data, will print -----------Failed Shipments Test 1 if these fail
 
             print("Shipments test 1 Passed")
         except:
@@ -159,7 +159,7 @@ class ShipmentsTests(APITestCase):
 
             assert(data['fitAllArrangementPossibleAPriori']==False)
             assert(data['arrangementFittingAllItemsFound']==False)
-            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+            # checks on the data, will print -----------Failed Shipments Test 2 if these fail
 
             print("Shipments test 2 Passed")
         except:
@@ -241,7 +241,7 @@ class ShipmentsTests(APITestCase):
         assert(selectedItem['xCenter']==.5)
         assert(selectedItem['yCenter']==.5)
         assert(selectedItem['zCenter']==.5)
-        # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+        # checks on the data, will print -----------Failed Shipments Test 3 if these fail
 
         print("Shipments test 3 Passed")
 
@@ -322,7 +322,7 @@ class ShipmentsTests(APITestCase):
             assert(data['arrangements'][1]['items'][0]['yCenter']==.5)
             assert(data['arrangements'][1]['items'][0]['zCenter']==.5)
             assert(len(data['arrangements'])==2)
-            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+            # checks on the data, will print -----------Failed Shipments Test 4 if these fail
 
             print("Shipments test 4 Passed")
         except:
@@ -562,7 +562,7 @@ class ShipmentsTests(APITestCase):
             assert(data['arrangementFittingAllItemsFound']==True)
 
             assert(len(data['arrangements'])==8)
-            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+            # checks on the data, will print -----------Failed Shipments Test 5 if these fail
 
             print("Shipments test 5 Passed")
         except:
@@ -573,7 +573,7 @@ class ShipmentsTests(APITestCase):
 
 
     # do unit conversions work for weight
-    def test_7(self):
+    def test_6(self):
         try:
             inputData={
             "title": "string",
@@ -646,15 +646,15 @@ class ShipmentsTests(APITestCase):
             #weights=[item['weight'] for item in data['quotes'][0]['items']]
             #print(weights)
             #assert(sum(weights)==3.205)
-            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+            # checks on the data, will print -----------Failed Shipments Test 6 if these fail
 
-            print("Shipments test 7 Passed")
+            print("Shipments test 6 Passed")
         except:
-            print('--------------Failed shipments test 7')
+            print('--------------Failed shipments test 6')
 
 
     # QUESTION ASKED:: does the error throw correctly when shipping to same address
-    def test_8(self):
+    def test_7(self):
         try:
             inputData={
             "title": "string",
@@ -705,18 +705,14 @@ class ShipmentsTests(APITestCase):
             }
 
             data=self.generic_logic(inputData)
-            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
-            assert(data['validFromAddress']==False)
-            assert(data['validToAddress']==False)
+            # checks on the data, will print -----------Failed Shipments Test 7 if these fail
 
-            assert(data['fitAllArrangementPossibleAPriori']==True)
-            assert(data['arrangementFittingAllItemsFound']==True)
-
-            print("Shipments test 8 Passed")
+            assert(data['message']=='same from and to addresses')
+            print("Shipments test 7 Passed")
         except:
-            print('--------------Failed shipments test 8')
-    # QUESTION ASKED:: does validFromAddress work
-    def test_9(self):
+            print('--------------Failed shipments test 7')
+    # QUESTION ASKED:: does validToAddress work
+    def test_8(self):
         try:
             inputData={
             "title": "string",
@@ -767,21 +763,16 @@ class ShipmentsTests(APITestCase):
             }
 
             data=self.generic_logic(inputData)
-            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+            # checks on the data, will print -----------Failed Shipments Test 8 if these fail
+            assert(data['message']=='invalid to address')
 
-            assert(data['fitAllArrangementPossibleAPriori']==True)
-            assert(data['arrangementFittingAllItemsFound']==True)
-
-            assert(data['validFromAddress']==True)
-            assert(data['validToAddress']==False)
-
-            print("Shipments test 9 Passed")
+            print("Shipments test 8 Passed")
         except:
-            print('--------------Failed shipments test 9')
+            print('--------------Failed shipments test 8')
 
 
     # QUESTION ASKED: can we seperate the behavior of fitAllArrangementPossibleAPriori and arrangementFittingAllItemsFound
-    def test_10(self):
+    def test_9(self):
         try:
             inputData={
             "title": "string",
@@ -843,16 +834,16 @@ class ShipmentsTests(APITestCase):
             }
 
             data=self.generic_logic(inputData)
-            # checks on the data, will print -----------Failed Arrangments Test 1 if these fail
+            # checks on the data, will print -----------Failed Shipments Test 9 if these fail
             assert(data['fitAllArrangementPossibleAPriori']==True)
             assert(data['arrangementFittingAllItemsFound']==False)
 
 
-            print("Shipments test 10 Passed")
+            print("Shipments test 9 Passed")
         except:
-            print('--------------Failed shipments test 10')
+            print('--------------Failed shipments test 9')
     # do we bug when using lots of containers?
-    def test_11(self):
+    def test_10(self):
         try:
             inputData={
             "title": "string",
@@ -1218,7 +1209,7 @@ class ShipmentsTests(APITestCase):
             data=self.generic_logic(inputData)
             import time
             time.sleep(30)
-            # checks on the data, will print -----------Failed Arrangments Test 11 if these fail
+            # checks on the data, will print -----------Failed Shipments Test 10 if these fail
             # all of these may fail at times depending on how overloaded Shippo is
             assert(data['fitAllArrangementPossibleAPriori']==True)
             assert(data['arrangementFittingAllItemsFound']==True)
@@ -1227,7 +1218,7 @@ class ShipmentsTests(APITestCase):
             assert(data['noValidRequests']==False)
             assert(len(data['quotes'])>0)
 
-            print("Shipments test 11 Passed")
+            print("Shipments test 10 Passed")
         except:
-            print('-------------Shipments test 11 Failed')
+            print('-------------Shipments test 10 Failed')
          

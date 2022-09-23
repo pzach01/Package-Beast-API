@@ -71,8 +71,6 @@ class RegisterSerializer(serializers.Serializer):
         self.cleaned_data = self.get_cleaned_data()
         adapter.save_user(request, user, self)
         setup_user_email(request, user, [])
-
-
         user.save()
         Subscription.objects.create_subscription(user)
 
@@ -84,5 +82,5 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name', 'arrangements', 'units', 'dateTimeFormat', 'multiBinPack', 'disableFillContainerAnimation', 'disablePreviousNextItemAnimation', 'animationSpeed', 'usersTermsOfServiceRevision', 'termsOfServiceRevision']
-        read_only_fields = ['arrangements', 'email', 'termsOfServiceRevision']
+        fields = ['id', 'email', 'first_name', 'last_name', 'arrangements', 'units', 'weightUnits', 'dateTimeFormat', 'multiBinPack', 'disableFillContainerAnimation', 'disablePreviousNextItemAnimation', 'animationSpeed', 'usersTermsOfServiceRevision', 'termsOfServiceRevision', 'addressLine1', 'addressLine2', 'city', 'stateProvince', 'country', 'postalCode', 'phoneNumber', 'includeUpsContainers', 'includeUspsContainers','shippoAccessToken', 'userHasShippoAccount']
+        read_only_fields = ['arrangements', 'email', 'termsOfServiceRevision', 'userHasShippoAccount']

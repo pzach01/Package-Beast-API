@@ -2,12 +2,17 @@ from django.db import models
 from django.utils.timezone import now
 from containers.models import Container
 from arrangements.models import Arrangement
+from shipments.models import Shipment
 from django.contrib import admin
-
+from django.core.validators import MinValueValidator
+from safedelete.models import SafeDeleteModel
+from safedelete.models import SOFT_DELETE_CASCADE
 # Create your models here.
 
 
-class Item(models.Model):
+class Item(SafeDeleteModel):
+    _safedelete_policy = SOFT_DELETE_CASCADE
+
     created = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(
         'users.User', related_name='items', on_delete=models.CASCADE)
@@ -22,6 +27,8 @@ class Item(models.Model):
     volume = models.FloatField(default=0.0)
     units = models.CharField(max_length=2, blank=False, default='in')
     cost = models.FloatField(default=0.0)
+    weight = models.FloatField(default=0.0000001,validators=[MinValueValidator(.0000001)])
+    weightUnits = models.CharField(max_length=2, blank=False, default='lb')
     # We could do it like this but we just need a reference to the item id
     # This reduces db calls in arrangements serializer
     # masterItem = models.ForeignKey('items.Item', related_name="items", on_delete=models.CASCADE, blank=True, null=True)

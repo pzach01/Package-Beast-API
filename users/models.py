@@ -51,12 +51,28 @@ class User(AbstractUser):
     
     email = models.EmailField(_('email address'), unique=True)
     units = models.CharField(max_length=2, blank=False, default='in')
+    weightUnits = models.CharField(max_length=2, blank=False, default='lb')
     dateTimeFormat = models.CharField(max_length=40, blank=False, default='MMM d, yyyy, h:mm aa')
     multiBinPack = models.BooleanField(default=False)
     disableFillContainerAnimation = models.BooleanField(default=False)
     disablePreviousNextItemAnimation = models.BooleanField(default=False)
     animationSpeed = models.IntegerField(default=100)
     usersTermsOfServiceRevision = models.IntegerField(default=0)
+    phoneNumber=models.CharField(max_length=100, blank=True, default='')
+    addressLine1 = models.CharField(max_length=100, blank=True, default='')
+    addressLine2 = models.CharField(max_length=100, blank=True, default='')
+    city = models.CharField(max_length=100, blank=True, default='')
+    stateProvince = models.CharField(max_length=50, blank=True, default='')
+    country = models.CharField(max_length=50, blank=True, default='')
+    postalCode = models.CharField(max_length=20, blank=True, default='')
+    includeUpsContainers = models.BooleanField(default=True)
+    includeUspsContainers = models.BooleanField(default=True)
+    shippoAccessToken=models.CharField(max_length=100,blank=True,default='')
+    def userHasShippoAccount(self):
+        if self.shippoAccessToken:
+            return True
+        else:
+            return False
     @property
     def termsOfServiceRevision(self):
         termsOfServiceRevision = 2

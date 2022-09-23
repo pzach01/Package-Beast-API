@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from arrangements.models import Arrangement
 from django.utils.timezone import now
-from arrangements.Box_Stuff_Python3_Only import box_stuff2 as optimize
+#from arrangements.Box_Stuff_Python3_Only import box_stuff2 as optimize
 
 from users.models import User
 from users.serializers import UserSerializer
@@ -9,11 +9,19 @@ from containers.serializers import ContainerSerializer
 from items.serializers import ItemSerializer, ItemSerializerWithId
 from items.models import Item
 from containers.models import Container
-from .Box_Stuff_Python3_Only import box_stuff2 as bp
+#from .Box_Stuff_Python3_Only import box_stuff2 as bp
+from libs.Box_Stuff_Python3_Only import box_stuff2 as bp
 from subscription.models import Subscription
 from django.http import Http404
 
+class SimpleArrangementSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.email')
+    containers = ContainerSerializer(many=True)
 
+    class Meta:
+        model = Arrangement
+        fields = ['id', 'created', 'owner', 'arrangementPossible', 'timeout', 'multiBinPack', 'containers','title','shipment']
+        read_only_fields = ['arrangementPossible', 'timeout','shipment'] 
 
 class ArrangementSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
@@ -23,8 +31,8 @@ class ArrangementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Arrangement
-        fields = ['id', 'created', 'owner', 'arrangementPossible', 'timeout', 'multiBinPack', 'timeoutDuration', 'containers', 'items','title']
-        read_only_fields = ['arrangementPossible', 'timeout']       
+        fields = ['id', 'created', 'owner', 'arrangementPossible', 'timeout', 'multiBinPack', 'timeoutDuration', 'containers', 'items','title','shipment']
+        read_only_fields = ['arrangementPossible', 'timeout','shipment']       
     def format_as_dimensions(self,x,y,z):
         return str(x)+'x'+str(y)+'x'+str(z)
     def convert_to_inches(self,x,y,z,units):
@@ -38,7 +46,7 @@ class ArrangementSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         userSubscription=Subscription.objects.filter(owner=validated_data['owner'])[0]
         if not(userSubscription.getUserCanCreateArrangment()):
-            raise Http404('user doesnt have right to create arrangment')
+            raise Http404('user doesnt have right to create arrangement')
 
         containers = validated_data.pop('containers')
         items = validated_data.pop('items')
@@ -150,3 +158,5 @@ class ArrangementSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+

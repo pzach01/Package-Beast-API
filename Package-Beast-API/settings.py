@@ -33,10 +33,12 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
         }
     }
     ALLOWED_HOSTS = ['api.packagebeast.com', 'packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com']
+    ALLOWED_HOSTS = ['*']
+   
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = False
     os.environ['STRIPE_TAX_RATE_ID']='txr_1ICsUoJWFTMXIZUo9c5KbCFS'
-
+    os.environ['SHIPPO_API_KEY']='shippo_test_41c916402deba95527751c894fd23fc03d7d8198'
 
 else:
     SECRET_KEY = '05^q)gef3f(*a^u3-e2b4of@5uh^^#i@roi*54^c2kft*r+*sq'
@@ -50,16 +52,27 @@ else:
             'PORT': '5432'
         }
     }
-    ALLOWED_HOSTS = ['127.0.0.1', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'developmentapi.packagebeast.com']
+    # ALLOWED_HOSTS = ['127.0.0.1', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'developmentapi.packagebeast.com']
+    ALLOWED_HOSTS = ['*']
     DEBUG = True
 
     # test keys
     os.environ['STRIPE_API_SECRET']='sk_test_51I76dqE5mpXPYa9nHYN046OuGpuQdNihI2JNfZHPYb05YbGtcr4EXDwytftg6MEgOk6SOvstWxMvFcFtyH67nrEN00xQKQQ6Jv'
     os.environ['STRIPE_WEBHOOK_SECRET']='whsec_sp9erCWYVqUqRZpj3Z99jFrWKtlJNKQO'
     os.environ['STRIPE_TAX_RATE_ID']='txr_1ICrg3E5mpXPYa9nYpguvzzc'
+    os.environ['SHIPPO_CLIENT_ID']='bf2c8e4685b44c3dbf35b8aa3cb2df5e'
+    os.environ['SHIPPO_CLIENT_SECRET']='LC9N-5-HnySDwsSGbG1PCSvuaTve1WMf0HyEXXu-t_g'
+    os.environ['SHIPPO_API_KEY']='shippo_test_41c916402deba95527751c894fd23fc03d7d8198'
 
+# Lambda function / api gateway uri's
+SHIPPO_API_INTERFACE_FETCH_MANY_SHIPMENTS_URI = 'https://z3k2o2uns4.execute-api.us-east-1.amazonaws.com/shippo-shipments/fetch-many'
+SHIPPO_API_INTERFACE_CREATE_SHIPMENTS_URI = 'https://z3k2o2uns4.execute-api.us-east-1.amazonaws.com/shippo-shipments/create-many'
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+# Setup support for proxy headers
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 DEFAULT_FROM_EMAIL = 'no-reply@packagebeast.com'
 
@@ -79,16 +92,21 @@ INSTALLED_APPS = [
     'allauth',  # New-PZ
     'allauth.account',  # New-PZ
     'allauth.socialaccount',  # New-PZ 2-9-20
+    'allauth.socialaccount.providers.google', # New PZ 3-6-21
     'rest_auth.registration',  # New-PZ
     'django.contrib.sites',  # New-PZ
     'drf_yasg',  # 2-7-20 New PZ
     'items',
     'containers',
+    'shipments',
+    'addresses',
+    'quotes',
     'arrangements',
     'users',
     'subscription',
     'payment',
-
+    'shipposervice',
+    'safedelete'
 ]
 
 # User registration errors out if you remove this. I think its used with django.contrib.sites
@@ -124,25 +142,23 @@ REST_FRAMEWORK = {
         # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication'
-
     ],
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
 # REST_FRAMEWORK = { 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' }
 
 SWAGGER_SETTINGS = {
-    # 'USE_SESSION_AUTH': False,
     'SECURITY_DEFINITIONS': {
         #   'Basic': {
         #         'type': 'basic'
         #   },
+
         'Token': {
             'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header'
         }
     },
-
 }
 
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -236,3 +252,4 @@ STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
 
 AUTH_USER_MODEL = 'users.User'
+SOCIALACCOUNT_ADAPTER = 'Package-Beast-API.urls.CustomSocialAccountAdapter'

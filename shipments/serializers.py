@@ -302,6 +302,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         forLoopEnd=time.time()
         shipmentsReturnedFromShippo = make_shippo_shipment_request(SHIPPO_API_KEY, shipFromAddress, shipToAddress, solutionContainers)
+        print("shipmentsReturnedFromShippo 1: ", shipmentsReturnedFromShippo)
         
         if "messages" in shipmentsReturnedFromShippo:
             if shipmentsReturnedFromShippo['messages'][0]=='error making request':
@@ -332,6 +333,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         spinlockStart=time.time()
         shipmentsReturnedFromShippo = get_shippo_shipments(SHIPPO_API_KEY, shippoShipmentIds)
+        print("shipmentsReturnedFromShippo 2: ", shipmentsReturnedFromShippo)
         spinlockEnd=time.time()
 
             

@@ -36,8 +36,9 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
     ALLOWED_HOSTS = ['*']
    
     # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = False
+    DEBUG = True
     os.environ['STRIPE_TAX_RATE_ID']='txr_1ICsUoJWFTMXIZUo9c5KbCFS'
+    #Delete this line...
     os.environ['SHIPPO_API_KEY']='shippo_test_41c916402deba95527751c894fd23fc03d7d8198'
 
 else:

@@ -164,6 +164,7 @@ def generate_bins_that_fit(iterationLimit):
         if ordering==5:
             newItem=ItemPY3DBP(item.name, item.zDim, item.yDim, item.xDim)
         returnItemsRandomized.append(newItem)
+    returnItemsRandomized=[ele for ele in returnItemsRandomized if ele.volume>0]
     return container, returnItemsRandomized,coordinates
 # key invariant, if we can't expand, just return the shapes with no modification
 def try_to_expand_in_one_direction(existingShape, interiorPoints, directionToExpandIn, resolution):
@@ -448,6 +449,99 @@ def test_underfits_multipack():
         print(ele)
         test_one_underfit_multipack()
 
+
+def generate_bin_that_doesnt_fit(items):
+    globalVolume=0
+    for i in items:
+        x,y,z=i.xDim,i.yDim,i.zDim
+        globalVolume+=(x*y*z)
+    itemToNotFitOn=items[random.randint(0, len(items)-1)]
+    symmetryClass=random.randint(0,2)
+    x,y,z=itemToNotFitOn.xDim,itemToNotFitOn.yDim,itemToNotFitOn.zDim
+    x,y,z=sorted([x,y,z])
+    # we cant have items with negative volume or algorithm breaks
+    if x-1<=0:
+        return '',False
+    if symmetryClass==0:
+        return str(int(x-1))+'x'+str(int(x-1))+'x'+str(int(x-1)),True
+    if y-1<=0:
+        return '', False
+    if symmetryClass==1:
+        return str(int(x))+'x'+str(int(y-1))+'x'+str(int(y-1)),True
+    if z-1<=0:
+        return '', False
+    else:
+        return str(int(x))+'x'+str(int(y))+'x'+str(int(z-1)),True
+
+# test the sieve
+def test_one_underfit_sieve_with_quick_solution(printStuff=True):
+    import random
+
+    timeout=30
+    numItems=random.randint(1,15)
+
+    containerThatWorks, items,coordinates=generate_bins_that_fit(numItems)
+    if len(items)==0:
+        return
+
+    numContainers=random.randint(1,15)
+    containers=[containerThatWorks.get_dimension_string()]
+    # only save container in this code
+    for ele in range(0, numContainers):
+        container,valid=generate_bin_that_doesnt_fit(items)
+        if valid:
+            containers.append(container)
+
+    random.shuffle(containers)
+
+
+    # one container as a list
+
+    items=[item.get_dimension_string() for item in items]
+    ids=[ele for ele in range(0, len(items))]
+
+    startForJustOpt=time.time()
+    apiObjects, timedOut, arrangmentPossible=master_calculate_optimal_solution([containerThatWorks.get_dimension_string()],items,timeout,False,ids)
+    endForJustOpt=time.time()
+
+    start=time.time()
+    apiObjects, timedOut, fitAllArrangementPossibleAPriori,arrangementFittingAllItemsFound=box_stuff2.sieve_containers(containers,items,timeout,False,ids)
+    end=time.time()
+    # note: no reason apriori this can't occur, just unlikely enough to require examination
+    if apiObjects==None:
+        return 
+        print(endForJustOpt-startForJustOpt)
+        print(end-start)
+        print(containerThatWorks.get_dimension_string())
+        print(items)
+        print(containers)
+
+    try:
+        assert(len(apiObjects)==1)
+        # we only care about how sieve compares to master_calculate_optimal when the 
+        # time to calculate master_optimal is relatively quick due to the randomness of this method
+        if (endForJustOpt-startForJustOpt)<5: 
+            assert(end-start<5+(endForJustOpt-startForJustOpt))
+    except AssertionError:
+        print(endForJustOpt-startForJustOpt)
+        print(end-start)
+        print(containerThatWorks.get_dimension_string())
+        print(items)
+        print(containers)
+        print(len(apiObjects))
+        print(apiObjects)
+        raise Exception('here')
+    assert(not timedOut)
+    assert(fitAllArrangementPossibleAPriori)
+    assert(arrangementFittingAllItemsFound)
+    sortedOutput=sorted([apiObjects[0].xDim, apiObjects[0].yDim, apiObjects[0].zDim])
+    expectedResult=sorted([containerThatWorks.xDim, containerThatWorks.yDim, containerThatWorks.zDim])
+    # make sure that the container returned is the optimal one
+    assert(sortedOutput==expectedResult)
+    print('Valid check')
+    return end-start, endForJustOpt-startForJustOpt
+
+
 # test the sieve
 def test_one_underfit_sieve(printStuff=True):
     import random
@@ -535,7 +629,24 @@ def test_one_underfit_sieve(printStuff=True):
     assert(arrangementFittingAllItemsFound)
     print('Successful timeout :'+str(end-start))
 
+def test_underfits_sieve_quick_solution():
+    globalRealTime=0
+    globalJustOptTime=0
+    for ele in range(0, 100000):
+        print(ele)
+        res=test_one_underfit_sieve_with_quick_solution(ele)
+        if not(res==None):
+            realTime,justOptTime=res[0],res[1]
+            globalRealTime+=realTime
+            globalJustOptTime+=justOptTime
+            print(justOptTime/realTime)
+        # check that globalReal time isnt much slower then just calculating opt
+        if ele>0 and ele%1000==0:
+            print(globalJustOptTime)
+            print(globalRealTime)
+            assert(globalJustOptTime*1.1>globalRealTime)
 
+    
 def test_underfits_sieve():
     for ele in range(0, 100000):
         print(ele)
@@ -555,6 +666,7 @@ def test_underfits_sieve_one():
 '''
 from . import testing_imports
 from .testing_imports import *
+test_underfits_sieve_quick_solution()
 #test_underfits_api()
 #test_underfits()
 #test_underfits_multipack()

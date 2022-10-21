@@ -17,8 +17,11 @@ async def create_shippo_shipment(session, url, shipment):
         return shippo_shipment
 
 
-async def create_shippo_shipments(shipments, shippo_api_key):
-    headers={'Authorization': f'ShippoToken {shippo_api_key}'}
+async def create_shippo_shipments(shipments, shippo_api_key, production):
+    if production:
+        headers={'Authorization': f'Bearer {shippo_api_key}'}
+    else:
+        headers={'Authorization': f'ShippoToken {shippo_api_key}'}    
 
     async with aiohttp.ClientSession(headers=headers) as session:
 
@@ -36,8 +39,11 @@ async def create_shippo_shipments(shipments, shippo_api_key):
         return shipmentsToReturn
 
 
-async def create_shippo_addresses(address_from, address_to, shippo_api_key):
-    headers={'Authorization': f'ShippoToken {shippo_api_key}'}
+async def create_shippo_addresses(address_from, address_to, shippo_api_key, production):
+    if production:
+        headers={'Authorization': f'Bearer {shippo_api_key}'}
+    else:
+        headers={'Authorization': f'ShippoToken {shippo_api_key}'}
 
     async with aiohttp.ClientSession(headers=headers) as session:
 
@@ -59,6 +65,7 @@ def lambda_handler(event, context):
     body = event['body']
     body = json.loads(body)
     shippo_api_key = body['SHIPPO_API_KEY']
+    production = body['production']
 
     address_from = body['address_from']
     address_to = body['address_to']
@@ -74,7 +81,11 @@ def lambda_handler(event, context):
         shipments.append(shipment)
 
     start_time = time.time()
-    addressFrom, addressTo = asyncio.run(create_shippo_addresses(address_from, address_to, shippo_api_key))
+    addressFrom, addressTo = asyncio.run(create_shippo_addresses(address_from, address_to, shippo_api_key, production))
+
+    print("shippo_api_key", shippo_api_key)
+    print("addressFrom: ", addressFrom)
+    print("addressTo: ", addressTo)
 
     if not addressFrom['validation_results']['is_valid']:
         return {
@@ -96,7 +107,7 @@ def lambda_handler(event, context):
     print("address time", time.time()-start_time)
     start_time = time.time()
 
-    shipmentsToReturn = asyncio.run(create_shippo_shipments(shipments, shippo_api_key))
+    shipmentsToReturn = asyncio.run(create_shippo_shipments(shipments, shippo_api_key, production))
 
     print("shipment time", time.time()-start_time)
 
@@ -106,150 +117,150 @@ def lambda_handler(event, context):
     }
 
 
-b={
-    "SHIPPO_API_KEY":"shippo_test_41c916402deba95527751c894fd23fc03d7d8198",
-    "address_from":{
-        "name":"peter",
-        "street1": "1349 Hertz Drive SE",
-        "street2": "",
-        "city": "Cedar Rapids",
-        "state": "IA",
-        "zip": 54302,
-        "country":"US",
-        "phone":"+1 319 329 8349",
-        "email": "mrhippo@goshippo.com"
-    },
-    "address_to":{
-        "name":"peter",
-        "street1": "1349 Hertz Drive SE",
-        "street2": "",
-        "city": "Cedar Rapids",
-        "state": "IA",
-        "zip": 54302,
-        "country":"US",
-        "phone":"+1 319 329 8349",
-        "email": "mrhippo@goshippo.com"
-    },
-    "parcels": [{
-        "length": "10",
-        "width": "15",
-        "height": "10",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "8",
-        "width": "6",
-        "height": "8",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "8",
-        "width": "7",
-        "height": "8",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "9",
-        "width": "8",
-        "height": "8",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    },{
-        "length": "10",
-        "width": "15",
-        "height": "10",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "8",
-        "width": "6",
-        "height": "8",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "8",
-        "width": "7",
-        "height": "8",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "9",
-        "width": "8",
-        "height": "8",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "10",
-        "width": "15",
-        "height": "10",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "8",
-        "width": "6",
-        "height": "8",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "8",
-        "width": "7",
-        "height": "8",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "9",
-        "width": "8",
-        "height": "8",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    },{
-        "length": "10",
-        "width": "15",
-        "height": "10",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "8",
-        "width": "6",
-        "height": "8",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "8",
-        "width": "7",
-        "height": "8",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }, {
-        "length": "9",
-        "width": "8",
-        "height": "8",
-        "distance_unit": "in",
-        "weight": "1",
-        "mass_unit": "lb"
-    }],
-    "async": True
-}
+# b={
+#     "SHIPPO_API_KEY":"shippo_test_41c916402deba95527751c894fd23fc03d7d8198",
+#     "address_from":{
+#         "name":"peter",
+#         "street1": "1349 Hertz Drive SE",
+#         "street2": "",
+#         "city": "Cedar Rapids",
+#         "state": "IA",
+#         "zip": 54302,
+#         "country":"US",
+#         "phone":"+1 319 329 8349",
+#         "email": "mrhippo@goshippo.com"
+#     },
+#     "address_to":{
+#         "name":"peter",
+#         "street1": "1349 Hertz Drive SE",
+#         "street2": "",
+#         "city": "Cedar Rapids",
+#         "state": "IA",
+#         "zip": 54302,
+#         "country":"US",
+#         "phone":"+1 319 329 8349",
+#         "email": "mrhippo@goshippo.com"
+#     },
+#     "parcels": [{
+#         "length": "10",
+#         "width": "15",
+#         "height": "10",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "8",
+#         "width": "6",
+#         "height": "8",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "8",
+#         "width": "7",
+#         "height": "8",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "9",
+#         "width": "8",
+#         "height": "8",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     },{
+#         "length": "10",
+#         "width": "15",
+#         "height": "10",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "8",
+#         "width": "6",
+#         "height": "8",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "8",
+#         "width": "7",
+#         "height": "8",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "9",
+#         "width": "8",
+#         "height": "8",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "10",
+#         "width": "15",
+#         "height": "10",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "8",
+#         "width": "6",
+#         "height": "8",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "8",
+#         "width": "7",
+#         "height": "8",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "9",
+#         "width": "8",
+#         "height": "8",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     },{
+#         "length": "10",
+#         "width": "15",
+#         "height": "10",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "8",
+#         "width": "6",
+#         "height": "8",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "8",
+#         "width": "7",
+#         "height": "8",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }, {
+#         "length": "9",
+#         "width": "8",
+#         "height": "8",
+#         "distance_unit": "in",
+#         "weight": "1",
+#         "mass_unit": "lb"
+#     }],
+#     "async": True
+# }
 
 
-json_b = json.dumps(b)
-e = {"body":json_b}
+# json_b = json.dumps(b)
+# e = {"body":json_b}
 
-a = lambda_handler(e, 1)
-print(a)
+# a = lambda_handler(e, 1)
+# print(a)
 

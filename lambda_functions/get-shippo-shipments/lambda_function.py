@@ -10,9 +10,12 @@ async def get_shippo_shipment(session, url):
         return shippo_shipment
         
 
-async def get_all_shippo_shipments(shipmentIds, shippo_api_key):
+async def get_all_shippo_shipments(shipmentIds, shippo_api_key, production):
     shipmentsToReturn = []
-    headers={'Authorization': f'ShippoToken {shippo_api_key}'}
+    if production:
+        headers={'Authorization': f'Bearer {shippo_api_key}'}
+    else:
+        headers={'Authorization': f'ShippoToken {shippo_api_key}'}
 
     async with aiohttp.ClientSession(headers=headers) as session:
 
@@ -36,11 +39,12 @@ def lambda_handler(event, context):
     body = json.loads(body)
     shippo_api_key = body['SHIPPO_API_KEY']
     shipmentIds = body['shipmentIds']
+    production = body['production']
     
     # Try getting shippo shipments until all shipments are returned with status SUCCESS
     timeBetweenRequests = [0, 1, 2, 2.5, 3, 4, 4.5]
     for t_req in timeBetweenRequests:
-        shipmentsToReturn = asyncio.run(get_all_shippo_shipments(shipmentIds, shippo_api_key))
+        shipmentsToReturn = asyncio.run(get_all_shippo_shipments(shipmentIds, shippo_api_key, production))
         
         allShipmentsSuccessStatus = True
         for shipment in shipmentsToReturn:

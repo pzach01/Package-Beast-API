@@ -22,9 +22,9 @@ from django.conf import settings
 from rest_framework import status
 
 
-def get_shippo_shipments(SHIPPO_API_KEY, shipmentIds):
+def get_shippo_shipments(SHIPPO_API_KEY, shipmentIds, production):
     import requests
-    post_data = {"SHIPPO_API_KEY": SHIPPO_API_KEY, "shipmentIds": shipmentIds}
+    post_data = {"SHIPPO_API_KEY": SHIPPO_API_KEY, "shipmentIds": shipmentIds, "production": production}
     url = settings.SHIPPO_API_INTERFACE_FETCH_MANY_SHIPMENTS_URI
     headers = { 'content-type': "application/json" }
     response = requests.post(url, json = post_data, headers=headers)    
@@ -32,7 +32,7 @@ def get_shippo_shipments(SHIPPO_API_KEY, shipmentIds):
     shippo_shipments = json.loads(response.text)
     return shippo_shipments
 
-def make_shippo_shipment_request(SHIPPO_API_KEY, shipFromAddress, shipToAddress, solutionContainers):
+def make_shippo_shipment_request(SHIPPO_API_KEY, shipFromAddress, shipToAddress, solutionContainers, production):
     import requests
     address_from = {
         "name": shipFromAddress.name,
@@ -67,7 +67,7 @@ def make_shippo_shipment_request(SHIPPO_API_KEY, shipFromAddress, shipToAddress,
         }
         parcels.append(parcel)
     
-    post_data = {"SHIPPO_API_KEY": SHIPPO_API_KEY, "address_from": address_from, "address_to": address_to, "parcels": parcels, "async":True}
+    post_data = {"SHIPPO_API_KEY": SHIPPO_API_KEY, "address_from": address_from, "address_to": address_to, "parcels": parcels, "async":True, "production": production}
     url = settings.SHIPPO_API_INTERFACE_CREATE_SHIPMENTS_URI
     headers = { 'content-type': "application/json" }
     response = requests.post(url, json = post_data, headers=headers)    
@@ -197,12 +197,13 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         user=User.objects.get(email=validated_data['owner'])
         if user.userHasShippoAccount() and (os.getenv('ENVIRONMENT_TYPE')=='PRODUCTION'):
+            production = True
             shippo.config.api_key=user.shippoAccessToken
             SHIPPO_API_KEY =user.shippoAccessToken
         else:
+            production = False
             shippo.config.api_key = os.getenv('SHIPPO_API_KEY')
             SHIPPO_API_KEY = os.getenv('SHIPPO_API_KEY')
-
 
         addressEndTime=time.time()
         # similiar to running original arrangments serializer multiple times, but only creates
@@ -301,7 +302,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             assert(not zDim==0)
 
         forLoopEnd=time.time()
-        shipmentsReturnedFromShippo = make_shippo_shipment_request(SHIPPO_API_KEY, shipFromAddress, shipToAddress, solutionContainers)
+        shipmentsReturnedFromShippo = make_shippo_shipment_request(SHIPPO_API_KEY, shipFromAddress, shipToAddress, solutionContainers, production)
         print("shipmentsReturnedFromShippo 1: ", shipmentsReturnedFromShippo)
         
         if "messages" in shipmentsReturnedFromShippo:
@@ -332,7 +333,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
             shippoShipmentIds.append(shipmentReturnedFromShippo['object_id'])
 
         spinlockStart=time.time()
-        shipmentsReturnedFromShippo = get_shippo_shipments(SHIPPO_API_KEY, shippoShipmentIds)
+        shipmentsReturnedFromShippo = get_shippo_shipments(SHIPPO_API_KEY, shippoShipmentIds, production)
         print("shipmentsReturnedFromShippo 2: ", shipmentsReturnedFromShippo)
         spinlockEnd=time.time()
 

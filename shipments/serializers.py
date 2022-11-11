@@ -139,6 +139,9 @@ class ShipmentSerializer(serializers.ModelSerializer):
         shipFromAddress=Address.objects.create(owner=validated_data['owner'], **shipFromAddress_data)
         shipToAddress_data = validated_data.pop('shipToAddress')
         shipToAddress=Address.objects.create(owner=validated_data['owner'], **shipToAddress_data)
+        if shipFromAddress_data['country']!='United States' or shipToAddress_data['country']!='United States':
+            raise serializers.ValidationError({"message":"Can't ship outside of United States. If using the web application, fill in 'United States' as your shipping address and location."})
+
 
         shipment = Shipment.objects.create(shipFromAddress=shipFromAddress, shipToAddress=shipToAddress, **validated_data)
 
@@ -303,7 +306,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         forLoopEnd=time.time()
         shipmentsReturnedFromShippo = make_shippo_shipment_request(SHIPPO_API_KEY, shipFromAddress, shipToAddress, solutionContainers, production)
-        print("shipmentsReturnedFromShippo 1: ", shipmentsReturnedFromShippo)
+        #print("shipmentsReturnedFromShippo 1: ", shipmentsReturnedFromShippo)
         
         if "messages" in shipmentsReturnedFromShippo:
             if shipmentsReturnedFromShippo['messages'][0]=='error making request':
@@ -334,7 +337,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         spinlockStart=time.time()
         shipmentsReturnedFromShippo = get_shippo_shipments(SHIPPO_API_KEY, shippoShipmentIds, production)
-        print("shipmentsReturnedFromShippo 2: ", shipmentsReturnedFromShippo)
+        #print("shipmentsReturnedFromShippo 2: ", shipmentsReturnedFromShippo)
         spinlockEnd=time.time()
 
             

@@ -172,8 +172,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
             itemIds.append(item['id'])
             totalWeight += item['weight']
         
-        if totalWeight > 70:
-            raise serializers.ValidationError({"message":'shipment total weight exceeds limit of 70 lbs'})
+        if totalWeight > 150:
+            raise serializers.ValidationError({"message":'shipment total weight exceeds limit of 150 lbs'})
 
         #increment the amount of shipments the user has used      
         userSubscription.increment_shipment_requests()
@@ -347,6 +347,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
         for i, shipmentReturnedFromShippo in enumerate(shipmentsReturnedFromShippo):
             rates = shipmentReturnedFromShippo['rates']
             for rate in rates:
+                print(rate)
                 q=Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=solutionArrangements[i],carrier=rate['provider'],cost=float(rate['amount']),serviceDescription=rate['servicelevel']['name'],daysToShip=rate['estimated_days'],scheduledDeliveryTime=rate['duration_terms'],shippoRateId=rate['object_id'])
                 ServiceLevel.objects.create(name=rate['servicelevel']['name'],token=rate['servicelevel']['token'],terms=rate['servicelevel']['terms'],quote=q)
         quoteCreationEnd=time.time()

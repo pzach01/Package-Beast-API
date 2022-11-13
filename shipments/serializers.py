@@ -363,6 +363,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
         shipment.save()
 
         for c in containers:
-            AnalysedContainer.objects.create(*c, shipment = shipment)
+            AnalysedContainer.objects.create(**c, owner=validated_data['owner'], shipment = shipment)
             
         return shipment

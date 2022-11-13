@@ -1,8 +1,15 @@
 from rest_framework import serializers
-from containers.models import Container, ThirdPartyContainer
+from containers.models import Container, ThirdPartyContainer, AnalysedContainer
 from django.http import Http404
 from subscription.models import Subscription
 
+class AnalysedContainerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnalysedContainer
+        fields = ['id', 'shipment', 'sku', 'description',
+                  'xDim', 'yDim', 'zDim', 'volume', 'units']
+        read_only_fields = ['id', 'shipment', 'sku', 'description',
+                  'xDim', 'yDim', 'zDim', 'volume', 'units']
 
 class ContainerSerializer(serializers.ModelSerializer):
     class Meta:

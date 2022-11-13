@@ -4,10 +4,10 @@ from shipments.models import Shipment
 from django.http import Http404
 from subscription.models import Subscription
 from quotes.models import Quote, ServiceLevel
-from containers.serializers import ContainerSerializer
+from containers.serializers import ContainerSerializer, AnalysedContainerSerializer
 from arrangements.serializers import ArrangementSerializer
 from items.serializers import ItemSerializerWithId
-from containers.models import Container
+from containers.models import Container, AnalysedContainer
 from arrangements.models import Arrangement
 from items.models import Item
 from addresses.serializers import AddressSerializer
@@ -100,12 +100,13 @@ class ShipmentSerializer(serializers.ModelSerializer):
     shipToAddress = AddressSerializer()
     shipFromAddress = AddressSerializer()
     quotes = QuoteSerializer(many=True, required=False, read_only=True)
+    analysedContainers = AnalysedContainerSerializer(many=True, required=False, read_only=True)
 
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests','activeThreads']
-        read_only_fields = ['owner', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests','activeThreads']
+        fields = ['id', 'analysedContainers', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests','activeThreads']
+        read_only_fields = ['owner', 'analysedContainers', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests','activeThreads']
         
 
     # note that these two methods are found in the arrangments serializer (quite sloppily)
@@ -360,4 +361,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
         shipment.timingInformation=str(totalTime)+";"+str(spinlockTotal)+";"+str(quoteCreationTotal)+";"+str(addressCreationTotal)+";"+str(sieveTotal)+";"+str(forLoopTime)+";"+str(asyncioTotal)
         shipment.activeThreads=threading.active_count()
         shipment.save()
+
+        for c in containers:
+            AnalysedContainer.objects.create(*c, shipment = shipment)
+            
         return shipment

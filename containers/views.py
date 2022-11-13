@@ -1,8 +1,8 @@
 from django.shortcuts import render
 
 # Create your views here.
-from containers.models import Container, ThirdPartyContainer
-from containers.serializers import ContainerSerializer, ThirdPartyContainerSerializer
+from containers.models import Container, ThirdPartyContainer, AnalysedContainer
+from containers.serializers import ContainerSerializer, ThirdPartyContainerSerializer, AnalysedContainerSerializer
 from rest_framework import generics, permissions
 
 ADMIN_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE']
@@ -58,3 +58,19 @@ class ThirdPartyContainerDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticatedReadOrAdminWrite]
     queryset = ThirdPartyContainer.objects.all()
     serializer_class = ThirdPartyContainerSerializer
+
+class AnalysedContainerList(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated, IsOwner]
+
+    def get_queryset(self):
+        user = self.request.user
+        shipment = self.request.query_params.get('shipment')
+        if shipment is not None:
+            return AnalysedContainer.objects.filter(owner=user, shipment=shipment)
+        else:
+            return AnalysedContainer.objects.filter(owner=user)
+
+    serializer_class = AnalysedContainerSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)

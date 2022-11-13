@@ -19,7 +19,6 @@ import os
 import shippo
 import threading
 from django.conf import settings
-from rest_framework import status
 
 
 def get_shippo_shipments(SHIPPO_API_KEY, shipmentIds, production):

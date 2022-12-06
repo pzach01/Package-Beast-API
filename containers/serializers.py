@@ -15,10 +15,13 @@ class AnalysedContainerSerializer(serializers.ModelSerializer):
         container = AnalysedContainer.objects.create(**validated_data)
         container.volume = validated_data['xDim'] * \
             validated_data['yDim']*validated_data['zDim']
+        print('create')
+        print(container.volume)
         container.save()
         return container
 
     def update(self, instance, validated_data):
+        print('hello')
         instance.sku = validated_data.get('sku', instance.sku)
         instance.description = validated_data.get(
             'description', instance.description)

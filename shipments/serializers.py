@@ -346,7 +346,6 @@ class ShipmentSerializer(serializers.ModelSerializer):
         for i, shipmentReturnedFromShippo in enumerate(shipmentsReturnedFromShippo):
             rates = shipmentReturnedFromShippo['rates']
             for rate in rates:
-                print(rate)
                 q=Quote.objects.create(owner=validated_data['owner'],shipment=shipment, arrangement=solutionArrangements[i],carrier=rate['provider'],cost=float(rate['amount']),serviceDescription=rate['servicelevel']['name'],daysToShip=rate['estimated_days'],scheduledDeliveryTime=rate['duration_terms'],shippoRateId=rate['object_id'])
                 ServiceLevel.objects.create(name=rate['servicelevel']['name'],token=rate['servicelevel']['token'],terms=rate['servicelevel']['terms'],quote=q)
         quoteCreationEnd=time.time()
@@ -363,6 +362,9 @@ class ShipmentSerializer(serializers.ModelSerializer):
         shipment.save()
 
         for c in containers:
-            AnalysedContainer.objects.create(**c, owner=validated_data['owner'], shipment = shipment)
+            c['xDim'], c['yDim'], c['zDim'], c['units'] = self.convert_to_inches(c['xDim'], c['yDim'], c['zDim'], c['units'])
+            # Volume is a read only field so we need to populate it
+            volume = c['xDim']*c['yDim']*c['zDim']
+            AnalysedContainer.objects.create(**c, volume = volume, owner=validated_data['owner'], shipment = shipment)
             
         return shipment

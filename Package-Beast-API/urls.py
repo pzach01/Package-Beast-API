@@ -29,14 +29,13 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.contrib.auth.views import PasswordResetView
 from rest_auth.registration.views import VerifyEmailView
-from .views import CustomPasswordChangeView
+from .views import CustomPasswordChangeView, verify_identity_token
 
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
 from subscription.models import Subscription
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account.models import EmailAddress
-import os
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
@@ -125,11 +124,11 @@ urlpatterns = [
     path('accounts/', include('rest_auth.urls')),
     path('accounts/registration/', include('rest_auth.registration.urls')),
     path('social-login/google/', GoogleLogin.as_view(), name='google_login'),
+    path('accounts/google-login/', verify_identity_token, name='google2_login'),
     url(r'^accounts/', include('allauth.urls'), name='socialaccount_signup'),
     re_path(r'^account-confirm-email/', VerifyEmailView.as_view(),
             name='account_email_verification_sent'),
     re_path(
         r'^reset-password/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', PasswordResetView, name='password_reset_confirm'),
     re_path(r'^.*$', RedirectView.as_view(url='/accounts/login/', permanent=False)),
-
 ]

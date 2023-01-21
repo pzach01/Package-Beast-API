@@ -7,7 +7,7 @@ from drf_yasg import openapi
 
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authtoken.models import Token
-from users.models import User, UserManager
+from users.models import User
 import os
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -73,8 +73,8 @@ def verify_identity_token(request):
         # if it does not, let allauth take care of this new social account
         except:
             from django.utils.crypto import get_random_string
-            p = get_random_string(length=10)
-            user = UserManager.create_user(email=email, password=p, first_name=given_name, last_name=family_name)
+            p = get_random_string(length=32)
+            user = User.create_user(email=email, password=p, first_name=given_name, last_name=family_name)
             Subscription.objects.create_subscription(user)
             user.save()
 

@@ -14,6 +14,7 @@ from google.auth.transport import requests
 from django.http import Http404
 from subscription.models import Subscription
 from allauth.account.models import EmailAddress
+from django.core.exceptions import ObjectDoesNotExist
 
 class PostSuccessMixin(object):
     def dispatch(self, request, *args, **kwargs):
@@ -72,7 +73,7 @@ def verify_identity_token(request):
             user = User.objects.get(email=email)
 
         # if it does not, let allauth take care of this new social account
-        except:
+        except ObjectDoesNotExist:
             from django.utils.crypto import get_random_string
             p = get_random_string(length=32)
             user = User.objects.create_user(email=email, password=p, first_name=given_name, last_name=family_name)

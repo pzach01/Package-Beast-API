@@ -12,6 +12,7 @@ import os
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from django.http import Http404
+from subscription.models import Subscription
 
 class PostSuccessMixin(object):
     def dispatch(self, request, *args, **kwargs):
@@ -72,6 +73,7 @@ def verify_identity_token(request):
         # if it does not, let allauth take care of this new social account
         except:
             user = User.objects.create(email=email, first_name=given_name, last_name=family_name)
+            Subscription.objects.create_subscription(user)
             user.save()
 
         

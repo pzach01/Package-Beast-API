@@ -13,6 +13,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from django.http import Http404
 from subscription.models import Subscription
+from allauth.account.models import EmailAddress
 
 class PostSuccessMixin(object):
     def dispatch(self, request, *args, **kwargs):
@@ -76,9 +77,11 @@ def verify_identity_token(request):
             p = get_random_string(length=32)
             user = User.objects.create_user(email=email, password=p, first_name=given_name, last_name=family_name)
             Subscription.objects.create_subscription(user)
-            user.save()
-
-        
+            e = EmailAddress.objects.add_email(None, user, email)
+            e.verified = True
+            e.primary = True
+            e.save()
+            
         token, created = Token.objects.get_or_create(user=user)
 
         # response = {'userid': userid, 'email':email, 'aud': aud, 'key': token.key}

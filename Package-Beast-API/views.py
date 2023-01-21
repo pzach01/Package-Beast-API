@@ -74,7 +74,7 @@ def verify_identity_token(request):
         except:
             from django.utils.crypto import get_random_string
             p = get_random_string(length=10)
-            user = UserManager.objects.create_user(email=email, password=p, first_name=given_name, last_name=family_name)
+            user = UserManager.create_user(email=email, password=p, first_name=given_name, last_name=family_name)
             Subscription.objects.create_subscription(user)
             user.save()
 

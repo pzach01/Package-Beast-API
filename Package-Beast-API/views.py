@@ -73,7 +73,7 @@ def verify_identity_token(request):
         # if it does not, let allauth take care of this new social account
         except:
             from django.utils.crypto import get_random_string
-            user = User.objects.create(email=email, first_name=given_name, last_name=family_name, password=get_random_string(length=32))
+            user = User.objects.create_user(email=email, first_name=given_name, last_name=family_name, password=get_random_string(length=32))
             Subscription.objects.create_subscription(user)
             user.save()
 

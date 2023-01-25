@@ -34,6 +34,8 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
     }
     ALLOWED_HOSTS = ['https://packagebeast.com', 'api.packagebeast.com', 'packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com']
     #ALLOWED_HOSTS = ['*']
+    CORS_ALLOWED_ORIGINS = ['https://packagebeast.com']
+
    
     # SECURITY WARNING: don't run with debug turned on in production!
     DEBUG = False
@@ -53,7 +55,8 @@ else:
             'PORT': '5432'
         }
     }
-    ALLOWED_HOSTS = ['https://development.packagebeast.com', 'localhost:4200', '127.0.0.1', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'developmentapi.packagebeast.com']
+    ALLOWED_HOSTS = ['127.0.0.1', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'developmentapi.packagebeast.com']
+    CORS_ALLOWED_ORIGINS = ['http://localhost:4200', 'https://development.packagebeast.com']
     #ALLOWED_HOSTS = ['*']
     DEBUG = True
 

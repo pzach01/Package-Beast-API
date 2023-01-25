@@ -32,7 +32,7 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
             'PORT': '5432'
         }
     }
-    ALLOWED_HOSTS = ['https://packagebeast.com', 'api.packagebeast.com', 'packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com']
+    ALLOWED_HOSTS = ['api.packagebeast.com', 'packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com']
     #ALLOWED_HOSTS = ['*']
     CORS_ORIGIN_WHITELIST = ['https://packagebeast.com']
 

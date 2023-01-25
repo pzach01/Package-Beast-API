@@ -4,10 +4,10 @@ from shipments.models import Shipment
 from django.http import Http404
 from subscription.models import Subscription
 from quotes.models import Quote, ServiceLevel
-from containers.serializers import ContainerSerializer
+from containers.serializers import ContainerSerializer, AnalysedContainerSerializer
 from arrangements.serializers import ArrangementSerializer
 from items.serializers import ItemSerializerWithId
-from containers.models import Container
+from containers.models import Container, AnalysedContainer
 from arrangements.models import Arrangement
 from items.models import Item
 from addresses.serializers import AddressSerializer
@@ -19,7 +19,6 @@ import os
 import shippo
 import threading
 from django.conf import settings
-from rest_framework import status
 
 
 def get_shippo_shipments(SHIPPO_API_KEY, shipmentIds, production):
@@ -100,12 +99,13 @@ class ShipmentSerializer(serializers.ModelSerializer):
     shipToAddress = AddressSerializer()
     shipFromAddress = AddressSerializer()
     quotes = QuoteSerializer(many=True, required=False, read_only=True)
+    analysedContainers = AnalysedContainerSerializer(many=True, required=False, read_only=True)
 
     class Meta:
         model = Shipment
         depth=1
-        fields = ['id', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests','activeThreads']
-        read_only_fields = ['owner', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests','activeThreads']
+        fields = ['id', 'analysedContainers', 'owner', 'created', 'title', 'lastSelectedQuoteId', 'items', 'containers','arrangements', 'multiBinPack', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration', 'shipFromAddress', 'shipToAddress', 'quotes', 'timeout','timingInformation','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests','activeThreads']
+        read_only_fields = ['owner', 'analysedContainers', 'created', 'fitAllArrangementPossibleAPriori','arrangementFittingAllItemsFound', 'timeoutDuration','arrangements', 'timeout','validFromAddress','validToAddress','usedAllValidContainers','noValidRequests','noErrorsMakingRequests','activeThreads']
         
 
     # note that these two methods are found in the arrangments serializer (quite sloppily)
@@ -139,6 +139,9 @@ class ShipmentSerializer(serializers.ModelSerializer):
         shipFromAddress=Address.objects.create(owner=validated_data['owner'], **shipFromAddress_data)
         shipToAddress_data = validated_data.pop('shipToAddress')
         shipToAddress=Address.objects.create(owner=validated_data['owner'], **shipToAddress_data)
+        if shipFromAddress_data['country']!='United States' or shipToAddress_data['country']!='United States':
+            raise serializers.ValidationError({"message":"Can't ship outside of United States. If using the web application, fill in 'United States' as your shipping address and location."})
+
 
         shipment = Shipment.objects.create(shipFromAddress=shipFromAddress, shipToAddress=shipToAddress, **validated_data)
 
@@ -168,8 +171,8 @@ class ShipmentSerializer(serializers.ModelSerializer):
             itemIds.append(item['id'])
             totalWeight += item['weight']
         
-        if totalWeight > 70:
-            raise serializers.ValidationError({"message":'shipment total weight exceeds limit of 70 lbs'})
+        if totalWeight > 150:
+            raise serializers.ValidationError({"message":'shipment total weight exceeds limit of 150 lbs'})
 
         #increment the amount of shipments the user has used      
         userSubscription.increment_shipment_requests()
@@ -303,7 +306,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         forLoopEnd=time.time()
         shipmentsReturnedFromShippo = make_shippo_shipment_request(SHIPPO_API_KEY, shipFromAddress, shipToAddress, solutionContainers, production)
-        print("shipmentsReturnedFromShippo 1: ", shipmentsReturnedFromShippo)
+        #print("shipmentsReturnedFromShippo 1: ", shipmentsReturnedFromShippo)
         
         if "messages" in shipmentsReturnedFromShippo:
             if shipmentsReturnedFromShippo['messages'][0]=='error making request':
@@ -334,7 +337,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
         spinlockStart=time.time()
         shipmentsReturnedFromShippo = get_shippo_shipments(SHIPPO_API_KEY, shippoShipmentIds, production)
-        print("shipmentsReturnedFromShippo 2: ", shipmentsReturnedFromShippo)
+        #print("shipmentsReturnedFromShippo 2: ", shipmentsReturnedFromShippo)
         spinlockEnd=time.time()
 
             
@@ -357,4 +360,11 @@ class ShipmentSerializer(serializers.ModelSerializer):
         shipment.timingInformation=str(totalTime)+";"+str(spinlockTotal)+";"+str(quoteCreationTotal)+";"+str(addressCreationTotal)+";"+str(sieveTotal)+";"+str(forLoopTime)+";"+str(asyncioTotal)
         shipment.activeThreads=threading.active_count()
         shipment.save()
+
+        for c in containers:
+            c['xDim'], c['yDim'], c['zDim'], c['units'] = self.convert_to_inches(c['xDim'], c['yDim'], c['zDim'], c['units'])
+            # Volume is a read only field so we need to populate it
+            volume = c['xDim']*c['yDim']*c['zDim']
+            AnalysedContainer.objects.create(**c, volume = volume, owner=validated_data['owner'], shipment = shipment)
+            
         return shipment

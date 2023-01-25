@@ -1,8 +1,37 @@
 from rest_framework import serializers
-from containers.models import Container, ThirdPartyContainer
+from containers.models import Container, ThirdPartyContainer, AnalysedContainer
 from django.http import Http404
 from subscription.models import Subscription
 
+class AnalysedContainerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnalysedContainer
+        fields = ['id', 'shipment', 'sku', 'description',
+                  'xDim', 'yDim', 'zDim', 'volume', 'units']
+        read_only_fields = ['id', 'shipment', 'sku', 'description',
+                  'xDim', 'yDim', 'zDim', 'volume', 'units']
+
+    def create(self, validated_data):
+        container = AnalysedContainer.objects.create(**validated_data)
+        container.volume = validated_data['xDim'] * \
+            validated_data['yDim']*validated_data['zDim']
+        print('create')
+        print(container.volume)
+        container.save()
+        return container
+
+    def update(self, instance, validated_data):
+        print('hello')
+        instance.sku = validated_data.get('sku', instance.sku)
+        instance.description = validated_data.get(
+            'description', instance.description)
+        instance.xDim = validated_data.get('xDim', instance.xDim)
+        instance.yDim = validated_data.get('yDim', instance.yDim)
+        instance.zDim = validated_data.get('zDim', instance.zDim)
+        instance.volume = instance.xDim * instance.yDim * instance.zDim
+        instance.units = validated_data.get('units', instance.units)
+        instance.save()
+        return instance
 
 class ContainerSerializer(serializers.ModelSerializer):
     class Meta:

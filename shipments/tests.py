@@ -80,7 +80,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Iowa City",
                 "stateProvince": "IA",
-                "postalCode": "52245"
+                "postalCode": "52245",
+                "country": "United States"
+
             },
             "shipToAddress":{
                 "name":"John Doe",
@@ -89,7 +91,8 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Des Moines",
                 "stateProvince": "IA",
-                "postalCode": "50323"
+                "postalCode": "50323",
+                "country": "United States"
             }
             }
 
@@ -139,7 +142,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Iowa City",
                 "stateProvince": "IA",
-                "postalCode": "52245"
+                "postalCode": "52245",
+                "country": "United States"
+
             },
             "shipToAddress":{
                 "name":"John Doe",
@@ -148,7 +153,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Des Moines",
                 "stateProvince": "IA",
-                "postalCode": "50323"
+                "postalCode": "50323",
+                "country": "United States"
+
             }
             }
 
@@ -202,7 +209,9 @@ class ShipmentsTests(APITestCase):
             "addressLine2": "string",
             "city": "Iowa City",
             "stateProvince": "IA",
-            "postalCode": "52245"
+            "postalCode": "52245",
+            "country": "United States"
+
         },
         "shipToAddress":{
             "name":"John Doe",
@@ -211,7 +220,8 @@ class ShipmentsTests(APITestCase):
             "addressLine2": "string",
             "city": "Des Moines",
             "stateProvince": "IA",
-            "postalCode": "50323"
+            "postalCode": "50323",
+            "country": "United States"
         }
         }
 
@@ -291,7 +301,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Iowa City",
                 "stateProvince": "IA",
-                "postalCode": "52245"
+                "postalCode": "52245",
+                "country": "United States"
+
             },
             "shipToAddress":{
                 "name":"John Doe",
@@ -300,7 +312,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Des Moines",
                 "stateProvince": "IA",
-                "postalCode": "50323"
+                "postalCode": "50323",
+                "country": "United States"
+
             }
             }
 
@@ -538,7 +552,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Iowa City",
                 "stateProvince": "IA",
-                "postalCode": "52245"
+                "postalCode": "52245",
+                "country": "United States"
+
             },
             "shipToAddress":{
                 "name":"John Doe",
@@ -547,7 +563,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Des Moines",
                 "stateProvince": "IA",
-                "postalCode": "50323"
+                "postalCode": "50323",
+                "country": "United States"
+
             }
             }
 
@@ -621,7 +639,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Iowa City",
                 "stateProvince": "IA",
-                "postalCode": "52245"
+                "postalCode": "52245",
+                "country": "United States"
+
             },
             "shipToAddress":{
                 "name":"John Doe",
@@ -630,7 +650,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Des Moines",
                 "stateProvince": "IA",
-                "postalCode": "50323"
+                "postalCode": "50323",
+                "country": "United States"
+
             }
             }
 
@@ -691,7 +713,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Des Moines",
                 "stateProvince": "IA",
-                "postalCode": "50323"
+                "postalCode": "50323",
+                "country": "United States"
+
             },
             "shipToAddress":{
                 "name":"John Doe",
@@ -700,7 +724,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Des Moines",
                 "stateProvince": "IA",
-                "postalCode": "50323"
+                "postalCode": "50323",
+                "country": "United States"
+
             }
             }
 
@@ -749,7 +775,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Des Moines",
                 "stateProvince": "IA",
-                "postalCode": "50323"
+                "postalCode": "50323",
+                "country": "United States"
+
             },
             "shipToAddress":{
                 "name":"Seymour Cox",
@@ -758,7 +786,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Des Moines",
                 "stateProvince": "IA",
-                "postalCode": "50323"
+                "postalCode": "50323",
+                "country": "United States"
+
             }
             }
 
@@ -820,7 +850,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Iowa City",
                 "stateProvince": "IA",
-                "postalCode": "52245"
+                "postalCode": "52245",
+                "country": "United States"
+
             },
             "shipToAddress":{
                 "name":"John Doe",
@@ -829,7 +861,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Des Moines",
                 "stateProvince": "IA",
-                "postalCode": "50323"
+                "postalCode": "50323",
+                "country": "United States"
+
             }
             }
 
@@ -1193,7 +1227,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Iowa City",
                 "stateProvince": "IA",
-                "postalCode": "52245"
+                "postalCode": "52245",
+                "country": "United States"
+
             },
             "shipToAddress":{
                 "name":"John Doe",
@@ -1202,7 +1238,9 @@ class ShipmentsTests(APITestCase):
                 "addressLine2": "string",
                 "city": "Des Moines",
                 "stateProvince": "IA",
-                "postalCode": "50323"
+                "postalCode": "50323",
+                "country": "United States"
+
             }
             }
 

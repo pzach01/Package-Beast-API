@@ -33,13 +33,15 @@ if (os.getenv('ENVIRONMENT_TYPE') == 'PRODUCTION'):
         }
     }
     ALLOWED_HOSTS = ['api.packagebeast.com', 'packageapp-env.pumdxt3sbe.us-east-1.elasticbeanstalk.com']
-    ALLOWED_HOSTS = ['*']
+    #ALLOWED_HOSTS = ['*']
+    CORS_ORIGIN_WHITELIST = ['https://packagebeast.com']
+
    
     # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = True
+    DEBUG = False
     os.environ['STRIPE_TAX_RATE_ID']='txr_1ICsUoJWFTMXIZUo9c5KbCFS'
-    #Delete this line...
-    os.environ['SHIPPO_API_KEY']='shippo_test_41c916402deba95527751c894fd23fc03d7d8198'
+    # Delete this line...
+    # os.environ['SHIPPO_API_KEY']='shippo_test_41c916402deba95527751c894fd23fc03d7d8198'
 
 else:
     SECRET_KEY = '05^q)gef3f(*a^u3-e2b4of@5uh^^#i@roi*54^c2kft*r+*sq'
@@ -53,8 +55,9 @@ else:
             'PORT': '5432'
         }
     }
-    # ALLOWED_HOSTS = ['127.0.0.1', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'developmentapi.packagebeast.com']
-    ALLOWED_HOSTS = ['*']
+    ALLOWED_HOSTS = ['127.0.0.1', 'packageapp-development.us-east-1.elasticbeanstalk.com', 'developmentapi.packagebeast.com']
+    CORS_ORIGIN_WHITELIST = ['http://localhost:4200', 'https://development.packagebeast.com']
+    #ALLOWED_HOSTS = ['*']
     DEBUG = True
 
     # test keys
@@ -64,12 +67,13 @@ else:
     os.environ['SHIPPO_CLIENT_ID']='bf2c8e4685b44c3dbf35b8aa3cb2df5e'
     os.environ['SHIPPO_CLIENT_SECRET']='LC9N-5-HnySDwsSGbG1PCSvuaTve1WMf0HyEXXu-t_g'
     os.environ['SHIPPO_API_KEY']='shippo_test_41c916402deba95527751c894fd23fc03d7d8198'
+    os.environ['GOOGLE_CLIENT_ID']= '1085639833940-5rtpdadme2qql89234lc94jifv1lg30d.apps.googleusercontent.com'
 
 # Lambda function / api gateway uri's
 SHIPPO_API_INTERFACE_FETCH_MANY_SHIPMENTS_URI = 'https://z3k2o2uns4.execute-api.us-east-1.amazonaws.com/shippo-shipments/fetch-many'
 SHIPPO_API_INTERFACE_CREATE_SHIPMENTS_URI = 'https://z3k2o2uns4.execute-api.us-east-1.amazonaws.com/shippo-shipments/create-many'
 
-CORS_ORIGIN_ALLOW_ALL = True
+#CORS_ORIGIN_ALLOW_ALL = True
 
 # Setup support for proxy headers
 USE_X_FORWARDED_HOST = True

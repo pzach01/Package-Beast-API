@@ -76,10 +76,13 @@ def lambda_handler(event, context):
     # Take list of parcels and make a list of shipments, each with one parcel.
     shipments = []
     parcels = shipment['parcels']
+    print('parcels', parcels)
     for parcel in  parcels:
-        shipment['parcels'] = [parcel]
-        shipments.append(shipment)
+        shipment_copy = shipment.copy()
+        shipment_copy['parcels'] = [parcel]
+        shipments.append(shipment_copy)
 
+    print('shipments', shipments)
     start_time = time.time()
     addressFrom, addressTo = asyncio.run(create_shippo_addresses(address_from, address_to, shippo_api_key, production))
 
